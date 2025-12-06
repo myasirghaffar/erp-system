@@ -11,6 +11,7 @@ import AuthRedirect from "./utils/AuthRedirect";
 import AdminDashboard from "./pages/adminRole/dashboard";
 import UserDashboard from "./pages/userRole/dashboard";
 import ContractorDashboard from "./pages/contractorRole/dashboard";
+import ManageWorkplaces from "./pages/adminRole/manageWorkplaces";
 
 const AppRouter = () => {
   return (
@@ -36,6 +37,7 @@ const AppRouter = () => {
       >
         <Route index element={<AdminDashboard />} />
         <Route path="dashboard" element={<AdminDashboard />} />
+        <Route path="manage-workplaces" element={<ManageWorkplaces />} />
       </Route>
 
       {/* User Dashboard Routes - Using AppLayout */}

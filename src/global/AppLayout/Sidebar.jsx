@@ -56,7 +56,7 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar }) {
         main: [
           { path: "/admin/dashboard", name: "Dashboard", icon: DashboardIconNew },
           { path: "/admin/users", name: "Manage employee", icon: ManageEmployeeIcon },
-          { path: "/admin/jobs", name: "Manage workplaces", icon: ManageWorkplacesIcon },
+          { path: "/admin/manage-workplaces", name: "Manage workplaces", icon: ManageWorkplacesIcon },
           {
             path: "/admin/bids",
             name: "Manage QR Code",
