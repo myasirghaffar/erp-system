@@ -55,7 +55,7 @@ function AppLayout() {
         </div>
 
         {/* Main Content */}
-        <main className="flex-1 scrollbar-custom text-text-black md:pl-[18.5625rem]  pt-[5rem]">
+        <main className="flex-1 scrollbar-custom text-text-black md:pl-[16rem] pt-[5rem]">
           <div className="h-full bg-gray-100">
             <Outlet key={location.pathname} />
           </div>

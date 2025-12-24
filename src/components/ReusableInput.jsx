@@ -1,6 +1,7 @@
 import { useState, forwardRef } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { useField, useFormikContext } from "formik";
+import { cn } from "../lib/utils";
 
 const ReusableInput = forwardRef(
   (
@@ -49,7 +50,7 @@ const ReusableInput = forwardRef(
 
     // Use the error from props if provided, otherwise use Formik's error
     const displayError = error || (formikMeta.touched && formikMeta.error);
-    
+
     // Get current value to determine text color
     const fieldValue = isFormik ? formikField.value : value;
     const hasValue = fieldValue !== undefined && fieldValue !== null && fieldValue !== "";
@@ -59,12 +60,13 @@ const ReusableInput = forwardRef(
       id: name,
       name: name,
       ref: ref,
-      className: `w-full md:h-[3.18rem] h-[3.4rem] font-poppins placeholder-[#6668769C] text-[0.879rem] ${textColor} px-4 py-4 rounded-xl border ${error ? "border-red-500" : `${border || "border-gray-50"} `
-        } ${backgroundColor} ${readOnly
-          ? "outline-none"
-          : `focus:outline-none focus:ring-1 ${focusRing}`
+      className: cn(
+        `w-full md:h-[3.18rem] h-[3.4rem] font-poppins placeholder-[#6668769C] text-[0.879rem] ${textColor} px-4 py-4 rounded-xl border ${error ? "border-red-500" : `${border || "border-gray-200"} `
+        } ${backgroundColor} ${readOnly ? "outline-none" : `focus:outline-none focus:ring-1 ${focusRing}`
         } ${iconLeft ? "pl-10" : ""} ${iconRight || type === "password" ? "pr-10" : ""
-        } ${classes}`,
+        }`,
+        classes
+      ),
       readOnly: readOnly,
       placeholder: placeholder,
       // Use Formik if available, else fallback to props

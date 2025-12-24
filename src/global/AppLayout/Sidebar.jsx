@@ -56,6 +56,7 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar }) {
         main: [
           { path: "/admin/dashboard", name: "Dashboard", icon: DashboardIconNew },
           { path: "/admin/users", name: "Manage employee", icon: ManageEmployeeIcon },
+          { path: "/admin/attendance", name: "Attendance", icon: AttendanceIcon },
           { path: "/admin/manage-workplaces", name: "Manage workplaces", icon: ManageWorkplacesIcon },
           {
             path: "/admin/bids",
@@ -73,11 +74,6 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar }) {
             icon: ApproveRequestIcon,
           },
           {
-            path: "/admin/ratings",
-            name: "Attendance",
-            icon: AttendanceIcon,
-          },
-          {
             path: "/admin/reports",
             name: "Settings",
             icon: SettingsIconNew,
@@ -89,6 +85,7 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar }) {
         main: [
           { path: "/user/dashboard", name: "Dashboard", icon: DashboardIconNew },
           { path: "/user/jobs", name: "Manage workplaces", icon: ManageWorkplacesIcon },
+          { path: "/user/attendance", name: "Attendance", icon: AttendanceIcon },
           {
             path: "/user/bids",
             name: "Manage QR Code",
@@ -103,11 +100,6 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar }) {
             path: "/user/payments",
             name: "Approve Request",
             icon: ApproveRequestIcon,
-          },
-          {
-            path: "/user/ratings",
-            name: "Attendance",
-            icon: AttendanceIcon,
           },
         ],
         bottom: [],
@@ -124,6 +116,7 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar }) {
             name: "Manage workplaces",
             icon: ManageWorkplacesIcon,
           },
+          { path: "/contractor/attendance", name: "Attendance", icon: AttendanceIcon },
           {
             path: "/contractor/bids",
             name: "Manage QR Code",
@@ -138,11 +131,6 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar }) {
             path: "/contractor/payments",
             name: "Approve Request",
             icon: ApproveRequestIcon,
-          },
-          {
-            path: "/contractor/ratings",
-            name: "Attendance",
-            icon: AttendanceIcon,
           },
           {
             path: "/contractor/reports",

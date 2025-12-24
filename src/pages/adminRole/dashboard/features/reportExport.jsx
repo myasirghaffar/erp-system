@@ -84,7 +84,7 @@ const ReportExport = () => {
                             <Select
                                 options={[{ value: "December 2024", label: "December 2024" }]}
                                 value="December 2024"
-                                className="w-full h-11 bg-white text-black text-sm font-normal font-inter outline outline-[0.86px] outline-offset-[-0.86px] outline-gray-300 border-none appearance-none pr-10"
+                                className="w-full h-11 bg-white text-black text-sm font-normal font-inter border border-gray-300 appearance-none pr-10"
                             />
                             <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
                                 <ChevronDownIconLarge />
@@ -145,7 +145,7 @@ const ReportExport = () => {
                                     <CalendarIconLarge />
                                 </div>
                             }
-                            classes="h-11 rounded-md outline outline-[0.86px] outline-offset-[-0.86px] outline-gray-300 border-none bg-white !text-black text-sm font-normal font-inter [&::-webkit-calendar-picker-indicator]:hidden"
+                            classes="h-11 md:h-11 rounded-md border border-gray-300 bg-white !text-black text-sm font-normal font-inter [&::-webkit-calendar-picker-indicator]:hidden"
                         />
                     </div>
                     <div className="w-full lg:w-60">
@@ -160,10 +160,10 @@ const ReportExport = () => {
                                     className="cursor-pointer"
                                     onClick={() => endDateRef.current?.showPicker()}
                                 >
-                                    <CalendarIconLarge />
+                                    <CalendarIconLarge className="w-5 h-5" />
                                 </div>
                             }
-                            classes="h-11 rounded-md outline outline-[0.86px] outline-offset-[-0.86px] outline-gray-300 border-none bg-white !text-black text-sm font-normal font-inter [&::-webkit-calendar-picker-indicator]:hidden"
+                            classes="h-11 md:h-11 rounded-md border border-gray-300 bg-white !text-black text-sm font-normal font-inter [&::-webkit-calendar-picker-indicator]:hidden"
                         />
                     </div>
                     <div className="w-full lg:w-60">
@@ -172,7 +172,7 @@ const ReportExport = () => {
                             <Select
                                 options={[{ value: "Excel (.xlsx)", label: "Excel (.xlsx)" }]}
                                 value="Excel (.xlsx)"
-                                className="w-full h-11 bg-white text-black text-sm font-normal font-inter outline outline-[0.86px] outline-offset-[-0.86px] outline-gray-300 border-none appearance-none pr-10"
+                                className="w-full h-11 bg-white text-black text-sm font-normal font-inter border border-gray-300 appearance-none pr-10"
                             />
                             <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
                                 <ChevronDownIconLarge />
@@ -200,7 +200,7 @@ const ReportExport = () => {
                                 <Select
                                     options={[{ value: "John Smith", label: "John Smith" }]}
                                     value="John Smith"
-                                    className="w-full h-11 bg-white text-black text-sm font-normal font-inter outline outline-[0.86px] outline-offset-[-0.86px] outline-gray-300 border-none appearance-none pr-10"
+                                    className="w-full h-11 bg-white text-black text-sm font-normal font-inter border border-gray-300 appearance-none pr-10"
                                 />
                                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
                                     <ChevronDownIconLarge />
@@ -213,7 +213,7 @@ const ReportExport = () => {
                                 <Select
                                     options={[{ value: "December 2024", label: "December 2024" }]}
                                     value="December 2024"
-                                    className="w-full h-11 bg-white text-black text-sm font-normal font-inter outline outline-[0.86px] outline-offset-[-0.86px] outline-gray-300 border-none appearance-none pr-10"
+                                    className="w-full h-11 bg-white text-black text-sm font-normal font-inter border border-gray-300 appearance-none pr-10"
                                 />
                                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
                                     <ChevronDownIconLarge />
@@ -239,7 +239,7 @@ const ReportExport = () => {
                                 <Select
                                     options={[{ value: "Main Office - Downtown", label: "Main Office - Downtown" }]}
                                     value="Main Office - Downtown"
-                                    className="w-full h-11 bg-white text-black text-sm font-normal font-inter outline outline-[0.86px] outline-offset-[-0.86px] outline-gray-300 border-none appearance-none pr-10"
+                                    className="w-full h-11 bg-white text-black text-sm font-normal font-inter border border-gray-300 appearance-none pr-10"
                                 />
                                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
                                     <ChevronDownIconLarge />
@@ -252,7 +252,7 @@ const ReportExport = () => {
                                 <Select
                                     options={[{ value: "December 2024", label: "December 2024" }]}
                                     value="December 2024"
-                                    className="w-full h-11 bg-white text-black text-sm font-normal font-inter outline outline-[0.86px] outline-offset-[-0.86px] outline-gray-300 border-none appearance-none pr-10"
+                                    className="w-full h-11 bg-white text-black text-sm font-normal font-inter border border-gray-300 appearance-none pr-10"
                                 />
                                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
                                     <ChevronDownIconLarge />

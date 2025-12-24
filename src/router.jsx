@@ -12,6 +12,8 @@ import AdminDashboard from "./pages/adminRole/dashboard";
 import UserDashboard from "./pages/userRole/dashboard";
 import ContractorDashboard from "./pages/contractorRole/dashboard";
 import ManageWorkplaces from "./pages/adminRole/manageWorkplaces";
+import AttendanceDashboard from "./pages/adminRole/attandance";
+import EmployeeDashboard from "./pages/adminRole/employemanage";
 
 const AppRouter = () => {
   return (
@@ -37,7 +39,9 @@ const AppRouter = () => {
       >
         <Route index element={<AdminDashboard />} />
         <Route path="dashboard" element={<AdminDashboard />} />
+        <Route path="users" element={<EmployeeDashboard />} />
         <Route path="manage-workplaces" element={<ManageWorkplaces />} />
+        <Route path="attendance" element={<AttendanceDashboard />} />
       </Route>
 
       {/* User Dashboard Routes - Using AppLayout */}

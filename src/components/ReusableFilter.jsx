@@ -33,12 +33,23 @@ const ReusableFilter = ({
   searchFields = [],
   caseSensitive = false,
   debounceMs = 300,
+
+  // External control for dropdowns
+  externalOpenDropdowns = null,
+  onToggleDropdown = null,
+  fullWidth = false,
 }) => {
-  const [openDropdowns, setOpenDropdowns] = useState({});
+  const [internalOpenDropdowns, setInternalOpenDropdowns] = useState({});
+  const openDropdowns = externalOpenDropdowns || internalOpenDropdowns;
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilters, setSelectedFilters] = useState({});
 
   const toggleDropdown = (filterKey) => {
+    if (onToggleDropdown) {
+      onToggleDropdown(filterKey);
+      return;
+    }
+
     setOpenDropdowns((prev) => {
       // Close all other dropdowns first
       const newState = {};
@@ -52,6 +63,9 @@ const ReusableFilter = ({
       return newState;
     });
   };
+
+  // Alias for setInternalOpenDropdowns to keep existing code working
+  const setOpenDropdowns = setInternalOpenDropdowns;
 
   const handleFilterSelect = (filterKey, value) => {
     console.log("🔍 Filter selected:", filterKey, "=", value);
@@ -138,7 +152,7 @@ const ReusableFilter = ({
   const containerClasses =
     layout === "vertical"
       ? `flex flex-col ${gap} w-full ${className}`
-      : `flex flex-wrap items-center ${gap} w-full lg:w-auto ${className}`;
+      : `flex flex-wrap items-center ${gap} ${fullWidth ? "w-full" : "lg:w-auto"} ${className}`;
 
   return (
     <div className={containerClasses}>
@@ -175,14 +189,14 @@ const ReusableFilter = ({
       {filters.length > 0 && (
         <div className={`flex flex-wrap items-center gap-2 ${filterClassName}`}>
           {filters.map((filter, index) => (
-            <div key={filter.key} className="relative filter-dropdown">
+            <div key={filter.key} className={`relative filter-dropdown ${fullWidth ? "w-full" : ""}`}>
               <button
                 onClick={() => toggleDropdown(filter.key)}
-                className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border transition-colors min-w-[120px] justify-between whitespace-nowrap text-[0.75rem] font-poppins ${
-                  selectedFilters[filter.key]
+                className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border transition-colors min-w-[120px] justify-between whitespace-nowrap text-[0.75rem] font-poppins ${fullWidth ? "w-full" : ""
+                  } ${selectedFilters[filter.key]
                     ? "bg-primary-50 border-primary-200 text-primary-700"
                     : "bg-white hover:bg-gray-50 text-gray-700 border-gray-200"
-                }`}
+                  }`}
               >
                 <span className="font-normal truncate">
                   {filter.options?.find(
@@ -190,18 +204,16 @@ const ReusableFilter = ({
                   )?.label || filter.label}
                 </span>
                 <ChevronDown
-                  className={`w-4 h-4 text-gray-400 transition-transform flex-shrink-0 ${
-                    openDropdowns[filter.key] ? "rotate-180" : ""
-                  }`}
+                  className={`w-4 h-4 text-gray-400 transition-transform flex-shrink-0 ${openDropdowns[filter.key] ? "rotate-180" : ""
+                    }`}
                 />
               </button>
 
               {/* Dropdown Menu */}
               {openDropdowns[filter.key] && (
                 <div
-                  className={`absolute top-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-[180px] max-h-60 overflow-y-auto ${
-                    index === filters.length - 1 ? "right-0" : "left-0"
-                  } ${dropdownClassName}`}
+                  className={`absolute top-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-[180px] max-h-60 overflow-y-auto ${index === filters.length - 1 ? "right-0" : "left-0"
+                    } ${dropdownClassName}`}
                 >
                   {/* Dropdown Options */}
                   {filter.options?.map((option) => (
@@ -210,11 +222,10 @@ const ReusableFilter = ({
                       onClick={() =>
                         handleFilterSelect(filter.key, option.value)
                       }
-                      className={`w-full text-left px-4 py-3 text-[0.75rem] font-poppins text-gray-700 hover:bg-gray-50 transition-colors ${
-                        selectedFilters[filter.key] === option.value
-                          ? "bg-primary-50 text-primary-700"
-                          : ""
-                      }`}
+                      className={`w-full text-left px-4 py-3 text-[0.75rem] font-poppins text-gray-700 hover:bg-gray-50 transition-colors ${selectedFilters[filter.key] === option.value
+                        ? "bg-primary-50 text-primary-700"
+                        : ""
+                        }`}
                     >
                       {option.label}
                     </button>
@@ -233,15 +244,14 @@ const ReusableFilter = ({
             <button
               key={index}
               onClick={button.onClick}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-poppins text-[0.75rem] transition-colors ${
-                button.variant === "primary"
-                  ? "bg-primary-500 text-white hover:bg-primary-600"
-                  : button.variant === "secondary"
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-poppins text-[0.75rem] transition-colors ${button.variant === "primary"
+                ? "bg-primary-500 text-white hover:bg-primary-600"
+                : button.variant === "secondary"
                   ? "bg-white text-gray-700 border border-gray-200 hover:bg-gray-50"
                   : button.variant === "outline"
-                  ? "bg-transparent text-gray-700 border border-gray-200 hover:bg-gray-50"
-                  : "bg-primary-500 text-white hover:bg-primary-600"
-              } ${button.className || ""}`}
+                    ? "bg-transparent text-gray-700 border border-gray-200 hover:bg-gray-50"
+                    : "bg-primary-500 text-white hover:bg-primary-600"
+                } ${button.className || ""}`}
             >
               {button.icon && <button.icon className="w-4 h-4" />}
               <span className="font-medium">{button.label}</span>

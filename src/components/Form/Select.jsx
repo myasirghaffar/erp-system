@@ -1,4 +1,5 @@
 import React from "react";
+import { cn } from "../../lib/utils";
 const Select = ({
   options = [],
   value,
@@ -13,10 +14,10 @@ const Select = ({
       value={value}
       onChange={onChange}
       disabled={disabled}
-      className={`
-         bg-gray-950 text-gray-750 text-xs rounded-lg border-none px-4 py-2 min-w-[120px]
-        ${className}
-      `.trim()}
+      className={cn(
+        "bg-gray-950 text-gray-750 text-xs rounded-lg border border-gray-800 px-4 py-2 min-w-[120px]",
+        className
+      )}
       {...props}
     >
       {placeholder && (
