@@ -6,7 +6,7 @@ import { signup } from "../store/slices/authSlice";
 import { strongPasswordRegex } from "../utils/constants";
 import { HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
 import { Check } from "lucide-react";
-import loginForm from "../assets/images/login-form.png";
+import loginForm from "../assets/images/login-form.jpg";
 
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);

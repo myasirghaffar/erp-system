@@ -12,6 +12,7 @@ import ReusablePagination from "../../../components/ReusablePagination";
 import ReusableFilter from "../../../components/ReusableFilter";
 import AddWorkplace from "./features/AddWorkplace";
 import WorkPlaceQrForm from "./features/workPlaceQrForm";
+import QrCodeDetail from "./features/QrCodeDetail";
 
 const itemsPerPage = 4;
 const qrItemsPerPage = 5;
@@ -102,22 +103,9 @@ const WorkplaceManagement = () => {
     const [view, setView] = useState("list");
     const [currentPage, setCurrentPage] = useState(1); // Workplace Pagination state
     const [qrCurrentPage, setQrCurrentPage] = useState(1); // QR Pagination state
+    const [selectedQr, setSelectedQr] = useState(null);
 
-    if (view === "generateQR") {
-        return (
-             <div className="min-h-screen bg-gray-100 p-4 md:p-6 pb-20 overflow-x-hidden">
-                <WorkPlaceQrForm onBack={() => setView("list")} />
-             </div>
-        );
-    }
 
-    if (view === "add") {
-        return (
-             <div className="min-h-screen bg-gray-100 p-4 md:p-6 pb-20 overflow-x-hidden">
-                <AddWorkplace onBack={() => setView("list")} />
-             </div>
-        );
-    }
 
     const [filteredWorkplaces, setFilteredWorkplaces] = useState(workplaceData);
     const [filteredQRs, setFilteredQRs] = useState(qrData);
@@ -138,6 +126,53 @@ const WorkplaceManagement = () => {
         }
         setQrCurrentPage(1);
     }, [qrTab]);
+
+    const handleViewQr = (row) => {
+        // Map row data to detailed structure expected by QrCodeDetail
+        // Since mock data is limited, we might mock some missing fields or just pass what we have
+        const detailedData = {
+            id: row.qrId.replace("QR-", ""), // Extract numeric part or keep full
+            created: row.created.replace('\n', ' '),
+            status: row.status,
+            companyName: "TechCorp Industries", // Mock default for now as it's not in table
+            location: row.workplace,
+            department: "Engineering", // Mock default
+            capacity: "50 Employees", // Mock default
+            contact: "+1 (555) 123-4567", // Mock default
+            email: "info@techcorp.com", // Mock default
+            qrValue: JSON.stringify(row)
+        };
+        setSelectedQr(detailedData);
+        setView("qrDetail");
+    };
+
+    if (view === "qrDetail") {
+        return (
+             <div className="min-h-screen bg-gray-100 p-4 md:p-6 pb-20 overflow-x-hidden">
+                <QrCodeDetail 
+                    data={selectedQr} 
+                    onBack={() => setView("list")}
+                    onEdit={() => console.log("Edit QR", selectedQr)}
+                />
+             </div>
+        );
+    }
+
+    if (view === "generateQR") {
+        return (
+             <div className="min-h-screen bg-gray-100 p-4 md:p-6 pb-20 overflow-x-hidden">
+                <WorkPlaceQrForm onBack={() => setView("list")} />
+             </div>
+        );
+    }
+
+    if (view === "add") {
+        return (
+             <div className="min-h-screen bg-gray-100 p-4 md:p-6 pb-20 overflow-x-hidden">
+                <AddWorkplace onBack={() => setView("list")} />
+             </div>
+        );
+    }
 
     // Workplace Pagination Logic
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -315,9 +350,9 @@ const WorkplaceManagement = () => {
             key: "actions",
             label: "Actions",
              width: "120px",
-            render: () => (
+            render: (row) => (
                 <div className="flex items-center gap-4">
-                     <button className="text-gray-400 hover:text-blue-500"><Eye size={16} strokeWidth={2}/></button>
+                     <button onClick={() => handleViewQr(row)} className="text-gray-400 hover:text-blue-500"><Eye size={16} strokeWidth={2}/></button>
                      <button className="text-gray-400 hover:text-blue-500"><Download size={16} strokeWidth={2}/></button>
                      <button className="text-gray-400 hover:text-gray-600">
                         {/* Kebab menu placeholder */}

@@ -7,7 +7,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { authenticateUser } from "../data/dummyUsers";
 
-import loginForm from "../assets/images/login-form.png";
+import loginForm from "../assets/images/login-form.jpg";
 
 const Login = () => {
   const [error, setError] = useState(null);

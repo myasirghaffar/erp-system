@@ -66,22 +66,22 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar }) {
           icon: ManageWorkplacesIcon,
         },
         {
-          path: "/admin/bids",
+          path: "/admin/manage-qr-code",
           name: "Manage QR Code",
           icon: ManageQrCodeIcon,
         },
         {
-          path: "/admin/work-orders",
+          path: "/admin/view-map",
           name: "View map",
           icon: ViewMapIcon,
         },
         {
-          path: "/admin/payments",
+          path: "/admin/approve-requests",
           name: "Approve Request",
           icon: ApproveRequestIcon,
         },
         {
-          path: "/admin/reports",
+          path: "/admin/settings",
           name: "Settings",
           icon: SettingsIconNew,
         },

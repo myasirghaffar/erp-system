@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Building2, QrCode, Download, Printer, Info, Check, Image as ImageIcon, FileText } from "lucide-react";
+import { QRCodeCanvas } from 'qrcode.react';
 import ReusableInput from "../../../../components/ReusableInput";
 import Select from "../../../../components/Form/Select";
 import DashboardBanner from "../../../../components/DashboardBanner";
@@ -12,10 +13,45 @@ const WorkPlaceQrForm = ({ onBack }) => {
         contactNumber: "",
         email: "",
     });
+    const [qrCodeValue, setQrCodeValue] = useState(null);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleGenerate = () => {
+        // Basic validation: Ensure at least Company Name and Workplace Location are present
+        if (!formData.companyName || !formData.workplaceLocation) {
+            alert("Please fill in Company Name and Workplace Location to generate QR code.");
+            return;
+        }
+        
+        // Create a structured string or JSON for the QR code
+        // Simple JSON format for now
+        const qrContent = JSON.stringify({
+            c: formData.companyName,
+            w: formData.workplaceLocation,
+            d: formData.department,
+            p: formData.contactNumber,
+            e: formData.email,
+            ts: Date.now() // Timestamp to make unique if needed
+        });
+        
+        setQrCodeValue(qrContent);
+    };
+
+    const handleDownloadPNG = () => {
+        const canvas = document.getElementById('qr-code-canvas');
+        if (canvas) {
+            const pngUrl = canvas.toDataURL("image/png");
+            const downloadLink = document.createElement("a");
+            downloadLink.href = pngUrl;
+            downloadLink.download = `QR_${formData.companyName.replace(/\s+/g, '_')}_${formData.workplaceLocation}.png`;
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
     };
 
     const workplaceOptions = [
@@ -143,7 +179,10 @@ const WorkPlaceQrForm = ({ onBack }) => {
 
                     {/* Generate Button */}
                     <div className="mt-8 pt-6">
-                        <button className="w-full h-12 bg-[#22B3E8] hover:bg-[#1fa0d1] transition-colors rounded-xl shadow-lg shadow-sky-100 flex items-center justify-center gap-2 text-white font-bold text-sm">
+                        <button 
+                            onClick={handleGenerate}
+                            className="w-full h-12 bg-[#22B3E8] hover:bg-[#1fa0d1] transition-colors rounded-xl shadow-lg shadow-sky-100 flex items-center justify-center gap-2 text-white font-bold text-sm"
+                        >
                             <QrCode size={18} />
                             <span>Generate QR Code</span>
                         </button>
@@ -168,33 +207,56 @@ const WorkPlaceQrForm = ({ onBack }) => {
                     </div>
 
                     {/* Preview Area */}
-                    <div className="w-full aspect-square max-h-[300px] mx-auto bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 flex items-center justify-center mb-8">
-                        <div className="flex flex-col items-center gap-3">
-                            <div className="w-16 h-16 bg-gray-200 rounded-xl flex items-center justify-center">
-                                <QrCode className="text-gray-400" size={32} />
+                    <div className="w-full aspect-square max-h-[300px] mx-auto bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 flex items-center justify-center mb-8 relative">
+                        {qrCodeValue ? (
+                             <div className="p-4 bg-white rounded-xl shadow-sm">
+                                <QRCodeCanvas 
+                                    id="qr-code-canvas"
+                                    value={qrCodeValue} 
+                                    size={200} 
+                                    level={"H"}
+                                    includeMargin={true}
+                                />
+                             </div>
+                        ) : (
+                            <div className="flex flex-col items-center gap-3">
+                                <div className="w-16 h-16 bg-gray-200 rounded-xl flex items-center justify-center">
+                                    <QrCode className="text-gray-400" size={32} />
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-gray-500 text-sm font-bold">
+                                        No QR Code Generated
+                                    </p>
+                                    <p className="text-gray-400 text-xs font-medium mt-1">
+                                        Select a workplace and click generate
+                                    </p>
+                                </div>
                             </div>
-                            <div className="text-center">
-                                <p className="text-gray-500 text-sm font-bold">
-                                    No QR Code Generated
-                                </p>
-                                <p className="text-gray-400 text-xs font-medium mt-1">
-                                    Select a workplace and click generate
-                                </p>
-                            </div>
-                        </div>
+                        )}
                     </div>
 
                     {/* Action Buttons */}
                     <div className="space-y-3">
-                        <button className="w-full h-11 bg-[#4285F4] hover:bg-blue-600 transition-colors rounded-xl text-white font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <button 
+                            onClick={handleDownloadPNG}
+                            disabled={!qrCodeValue}
+                            className={`w-full h-11 transition-colors rounded-xl text-white font-semibold text-sm flex items-center justify-center gap-2 ${!qrCodeValue ? 'bg-gray-300 cursor-not-allowed' : 'bg-[#4285F4] hover:bg-blue-600'}`}
+                        >
                             <ImageIcon size={16} />
                             Download PNG
                         </button>
-                         <button className="w-full h-11 bg-white border border-gray-200 hover:bg-gray-50 transition-colors rounded-xl text-gray-700 font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                         <button 
+                            disabled={!qrCodeValue}
+                            className={`w-full h-11 border transition-colors rounded-xl font-semibold text-sm flex items-center justify-center gap-2 ${!qrCodeValue ? 'border-gray-200 text-gray-400 cursor-not-allowed bg-gray-50' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'}`}
+                         >
                             <FileText size={16} />
                             Download PDF
                         </button>
-                         <button className="w-full h-11 bg-white border border-gray-200 hover:bg-gray-50 transition-colors rounded-xl text-gray-700 font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                         <button 
+                            disabled={!qrCodeValue}
+                            onClick={() => window.print()}
+                            className={`w-full h-11 border transition-colors rounded-xl font-semibold text-sm flex items-center justify-center gap-2 ${!qrCodeValue ? 'border-gray-200 text-gray-400 cursor-not-allowed bg-gray-50' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'}`}
+                         >
                             <Printer size={16} />
                             Print QR Code
                         </button>
