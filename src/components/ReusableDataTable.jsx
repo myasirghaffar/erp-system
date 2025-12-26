@@ -137,18 +137,34 @@ const ReusableDataTable = ({
     headRow: {
       ...defaultStyles.headRow,
       ...customStyles.headRow,
+      style: {
+        ...defaultStyles.headRow.style,
+        ...(customStyles.headRow?.style || {}),
+      },
     },
     headCells: {
       ...defaultStyles.headCells,
       ...customStyles.headCells,
+      style: {
+        ...defaultStyles.headCells.style,
+        ...(customStyles.headCells?.style || {}),
+      },
     },
     rows: {
       ...defaultStyles.rows,
       ...customStyles.rows,
+      style: {
+        ...defaultStyles.rows.style,
+        ...(customStyles.rows?.style || {}),
+      },
     },
     cells: {
       ...defaultStyles.cells,
       ...customStyles.cells,
+      style: {
+        ...defaultStyles.cells.style,
+        ...(customStyles.cells?.style || {}),
+      },
     },
   };
 
