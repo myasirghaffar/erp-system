@@ -1,15 +1,18 @@
 import React, { useState } from "react";
 import { ChevronDown, Search, X } from "lucide-react";
 
+const DEFAULT_EMPTY_ARRAY = [];
+const DEFAULT_EMPTY_OBJECT = {};
+
 const ReusableFilter = ({
   // Search configuration
   searchConfig = null,
 
   // Filter dropdowns configuration
-  filters = [],
+  filters = DEFAULT_EMPTY_ARRAY,
 
   // Data to filter
-  data = [],
+  data = DEFAULT_EMPTY_ARRAY,
 
   // Event handlers
   onFilterChange,
@@ -23,14 +26,14 @@ const ReusableFilter = ({
   dropdownClassName = "",
 
   // Action buttons
-  actionButtons = [],
+  actionButtons = DEFAULT_EMPTY_ARRAY,
 
   // Layout options
   layout = "horizontal",
   gap = "gap-4",
 
   // Advanced options
-  searchFields = [],
+  searchFields = DEFAULT_EMPTY_ARRAY,
   caseSensitive = false,
   debounceMs = 300,
 
@@ -192,7 +195,7 @@ const ReusableFilter = ({
             <div key={filter.key} className={`relative filter-dropdown ${fullWidth ? "w-full" : ""}`}>
               <button
                 onClick={() => toggleDropdown(filter.key)}
-                className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border transition-colors min-w-[120px] justify-between whitespace-nowrap text-[0.75rem] font-poppins ${fullWidth ? "w-full" : ""
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border transition-colors min-w-[120px] justify-between whitespace-nowrap text-[13px] font-inter ${fullWidth ? "w-full" : ""
                   } ${selectedFilters[filter.key]
                     ? "bg-primary-50 border-primary-200 text-primary-700"
                     : "bg-white hover:bg-gray-50 text-gray-700 border-gray-200"

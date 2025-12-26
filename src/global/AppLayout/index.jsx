@@ -57,7 +57,7 @@ function AppLayout() {
         {/* Main Content */}
         <main className="flex-1 scrollbar-custom text-text-black md:pl-[16rem] pt-[5rem]">
           <div className="h-full bg-gray-100">
-            <Outlet key={location.pathname} />
+            <Outlet />
           </div>
         </main>
         {/* <div className="fixed block md:hidden mt-10 bottom-0 left-0 right-0">

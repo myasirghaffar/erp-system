@@ -3,14 +3,23 @@ import { LuPlus } from "react-icons/lu";
 import DashboardBanner from "../../../components/DashboardBanner";
 import EmployeeReport from "./features/employeReport";
 import AddEditEmployee from "./features/AddEditEmployee";
+import EmployeeProfile from "./features/EmployeeProfile";
 
 const EmployeeDashboard = () => {
-  const [view, setView] = useState("list"); // 'list' or 'add'
+  const [view, setView] = useState("list"); // 'list', 'add', or 'profile'
 
   if (view === "add") {
     return (
       <div className="min-h-screen bg-gray-100 p-4 md:p-6 overflow-x-hidden">
         <AddEditEmployee onBack={() => setView("list")} />
+      </div>
+    );
+  }
+
+  if (view === "profile") {
+    return (
+      <div className="min-h-screen bg-gray-100 p-4 md:p-6 overflow-x-hidden">
+        <EmployeeProfile onBack={() => setView("list")} onEdit={() => setView("add")} />
       </div>
     );
   }
@@ -39,7 +48,7 @@ const EmployeeDashboard = () => {
               }
             />
             <div className="rounded-[1.5rem]">
-              <EmployeeReport />
+              <EmployeeReport onViewProfile={() => setView("profile")} />
             </div>
           </div>
         </div>

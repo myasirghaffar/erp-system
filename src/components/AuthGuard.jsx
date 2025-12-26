@@ -30,35 +30,9 @@ const AuthGuard = ({ children }) => {
       return;
     }
 
-    // Check if user is trying to access a route that matches their role
-    const currentPath = location.pathname;
-    const userRole = user.role;
-
-    // Map roles to their expected route prefixes (only include routes that actually exist)
-    const roleRouteMap = {
-      "CTS Admin": "/admin",
-      "Company Owner": "/user", 
-      "Driver": "/contractor",
-    };
-
-    const expectedRoutePrefix = roleRouteMap[userRole];
-
-    // If user is trying to access a route that doesn't match their role
-    if (expectedRoutePrefix && !currentPath.startsWith(expectedRoutePrefix)) {
-      // Show warning toast
-      toast.warning("Você não tem permissão para acessar esta página.", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
-
-      // Redirect to their appropriate dashboard
-      navigate(`${expectedRoutePrefix}/dashboard`, { replace: true });
-      return;
-    }
+    // If authenticated, we allow access to the requested route (assuming all protected routes are admin routes now)
+    // You can add a check here if you want to strictly enforce 'admin' role in the user object,
+    // but since we removed other roles, basic auth check is the primary gate.
   }, [isAuthenticated, user, navigate, location]);
 
   // If not authenticated, don't render children
