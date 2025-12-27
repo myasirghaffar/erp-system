@@ -12,8 +12,10 @@ import {
 } from "../../../../assets/icons/icons";
 import ReusableInput from "../../../../components/ReusableInput";
 import Select from "../../../../components/Form/Select";
+import { useTranslation } from "react-i18next";
 
 const WorkPlaceForm = () => {
+    const { t } = useTranslation();
     const [formData, setFormData] = useState({
         companyName: "",
         workplaceLocation: "",
@@ -51,10 +53,10 @@ const WorkPlaceForm = () => {
                     </div>
                     <div>
                         <h2 className="text-gray-900 text-lg font-bold font-inter leading-6">
-                            Select Workplace
+                            {t('workplace.selectWorkplaceTitle')}
                         </h2>
                         <p className="text-gray-500 text-xs font-normal font-inter leading-5">
-                            Choose a workplace to generate QR code
+                            {t('workplace.selectWorkplaceDesc')}
                         </p>
                     </div>
                 </div>
@@ -64,9 +66,9 @@ const WorkPlaceForm = () => {
                     {/* Company Name */}
                     <div className="flex flex-col gap-2">
                         <ReusableInput
-                            label="Company Name"
+                            label={t('workplace.companyName')}
                             name="companyName"
-                            placeholder="Enter Company Name"
+                            placeholder={t('workplace.companyName')}
                             value={formData.companyName}
                             onChange={handleChange}
                             backgroundColor="bg-gray-50"
@@ -78,14 +80,14 @@ const WorkPlaceForm = () => {
                     {/* Workplace Location */}
                     <div className="flex flex-col gap-2">
                         <label className="text-gray-700 text-xs font-semibold font-inter mb-1">
-                            Workplace Location
+                            {t('workplace.workplaceLocation')}
                         </label>
                         <Select
                             name="workplaceLocation"
                             value={formData.workplaceLocation}
                             onChange={handleChange}
                             options={workplaceOptions}
-                            placeholder="Select a workplace..."
+                            placeholder={t('form.selectOption')}
                             className="w-full h-[3.4rem] md:h-[3.18rem] bg-gray-50 border border-gray-200 rounded-xl px-4 text-gray-900 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
                         />
                     </div>
@@ -93,14 +95,14 @@ const WorkPlaceForm = () => {
                     {/* Department */}
                     <div className="flex flex-col gap-2">
                         <label className="text-gray-700 text-xs font-semibold font-inter mb-1">
-                            Department
+                            {t('employee.department')}
                         </label>
                         <Select
                             name="department"
                             value={formData.department}
                             onChange={handleChange}
                             options={departmentOptions}
-                            placeholder="Select Department"
+                            placeholder={t('employee.department')}
                             className="w-full h-[3.4rem] md:h-[3.18rem] bg-gray-50 border border-gray-200 rounded-xl px-4 text-gray-900 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
                         />
                     </div>
@@ -108,9 +110,9 @@ const WorkPlaceForm = () => {
                     {/* Contact Number */}
                     <div className="flex flex-col gap-2">
                         <ReusableInput
-                            label="Contact Number"
+                            label={t('workplace.contactNumber')}
                             name="contactNumber"
-                            placeholder="Enter Contact Number"
+                            placeholder={t('workplace.contactNumber')}
                             type="tel"
                             value={formData.contactNumber}
                             onChange={handleChange}
@@ -123,9 +125,9 @@ const WorkPlaceForm = () => {
                     {/* Email */}
                     <div className="flex flex-col gap-2">
                         <ReusableInput
-                            label="Email"
+                            label={t('employee.email')}
                             name="email"
-                            placeholder="Enter Email Address"
+                            placeholder={t('employee.email')}
                             type="email"
                             value={formData.email}
                             onChange={handleChange}
@@ -141,7 +143,7 @@ const WorkPlaceForm = () => {
                     <button className="w-full h-12 bg-sky-400 hover:bg-sky-500 transition-colors rounded-xl shadow-lg shadow-indigo-200/50 flex items-center justify-center gap-2 text-white">
                         <GenerateQrCodeIcon />
                         <span className="text-sm font-semibold font-inter">
-                            Generate QR Code
+                            {t('qrCode.generateQrCode')}
                         </span>
                     </button>
                 </div>
@@ -156,10 +158,10 @@ const WorkPlaceForm = () => {
                     </div>
                     <div>
                         <h2 className="text-gray-900 text-lg font-bold font-inter leading-6">
-                            QR Code Preview
+                            {t('workplace.qrPreviewTitle')}
                         </h2>
                         <p className="text-gray-500 text-xs font-normal font-inter leading-5">
-                            Preview and download your QR code
+                            {t('workplace.qrPreviewDesc')}
                         </p>
                     </div>
                 </div>
@@ -172,10 +174,10 @@ const WorkPlaceForm = () => {
                         </div>
                         <div className="text-center">
                             <p className="text-gray-500 text-sm font-medium font-inter leading-6">
-                                No QR Code Generated
+                                {t('workplace.noQrCode')}
                             </p>
                             <p className="text-gray-400 text-xs font-normal font-inter leading-5">
-                                Select a workplace and click generate
+                                {t('workplace.noQrCodeDesc')}
                             </p>
                         </div>
                     </div>
@@ -188,15 +190,15 @@ const WorkPlaceForm = () => {
                         <div className="space-y-4">
                             <button className="w-full h-12 bg-blue-600 rounded-xl shadow-lg shadow-blue-200/50 flex items-center justify-center gap-2 text-white">
                                 <DownloadPngIcon />
-                                <span className="text-sm font-semibold font-inter">Download PNG</span>
+                                <span className="text-sm font-semibold font-inter">{t('workplace.downloadPng')}</span>
                             </button>
                             <button className="w-full h-12 bg-white border border-gray-600 rounded-xl flex items-center justify-center gap-2 text-gray-600">
                                 <DownloadPdfIcon />
-                                <span className="text-sm font-semibold font-inter">Download PDF</span>
+                                <span className="text-sm font-semibold font-inter">{t('workplace.downloadPdf')}</span>
                             </button>
                             <button className="w-full h-12 bg-white border border-gray-600 rounded-xl flex items-center justify-center gap-2 text-gray-600">
                                 <PrintQrCodeIcon />
-                                <span className="text-sm font-semibold font-inter">Print QR Code</span>
+                                <span className="text-sm font-semibold font-inter">{t('workplace.printQr')}</span>
                             </button>
                         </div>
                     </div>
@@ -209,11 +211,10 @@ const WorkPlaceForm = () => {
                     </div>
                     <div>
                         <h4 className="text-blue-900 text-xs font-semibold font-inter leading-5">
-                            Quick Tip
+                            {t('workplace.quickTip')}
                         </h4>
                         <p className="text-blue-800 text-xs font-normal font-inter leading-4 mt-1">
-                            Print the QR code on durable material and place it in a visible
-                            location at the workplace for easy scanning.
+                            {t('workplace.quickTipDesc')}
                         </p>
                     </div>
                 </div>

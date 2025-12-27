@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../store/slices/authSlice";
 import { persistor } from "../../store";
+import { useTranslation } from "react-i18next";
 import {
   DashboardIconNew,
   ManageEmployeeIcon,
@@ -16,7 +17,7 @@ import {
   SettingsIconNew,
   LogoutIcon,
   XIcon,
-  TeacherIcon, // Keep for nested menu indicator if needed, or replace
+  TeacherIcon,
 } from "../../assets/icons";
 import { main_logo } from "../../assets/logos";
 
@@ -24,6 +25,7 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
   const [expandedMenus, setExpandedMenus] = useState({});
 
   // Close sidebar when clicking outside on mobile
@@ -54,28 +56,28 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar }) {
     const menu = {
       admin: {
         main: [
-          { path: "/admin/dashboard", name: "Dashboard", icon: DashboardIconNew },
-          { path: "/admin/users", name: "Manage employee", icon: ManageEmployeeIcon },
-          { path: "/admin/attendance", name: "Attendance", icon: AttendanceIcon },
-          { path: "/admin/manage-workplaces", name: "Manage workplaces", icon: ManageWorkplacesIcon },
+          { path: "/admin/dashboard", name: t('sidebar.dashboard'), icon: DashboardIconNew },
+          { path: "/admin/users", name: t('sidebar.manageEmployee'), icon: ManageEmployeeIcon },
+          { path: "/admin/attendance", name: t('sidebar.attendance'), icon: AttendanceIcon },
+          { path: "/admin/manage-workplaces", name: t('sidebar.manageWorkplaces'), icon: ManageWorkplacesIcon },
           {
             path: "/admin/bids",
-            name: "Manage QR Code",
+            name: t('sidebar.manageQrCode'),
             icon: ManageQrCodeIcon,
           },
           {
             path: "/admin/work-orders",
-            name: "View map",
+            name: t('sidebar.viewMap'),
             icon: ViewMapIcon,
           },
           {
             path: "/admin/payments",
-            name: "Approve Request",
+            name: t('sidebar.approveRequest'),
             icon: ApproveRequestIcon,
           },
           {
             path: "/admin/reports",
-            name: "Settings",
+            name: t('sidebar.settings'),
             icon: SettingsIconNew,
           },
         ],
@@ -83,22 +85,22 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar }) {
       },
       user: {
         main: [
-          { path: "/user/dashboard", name: "Dashboard", icon: DashboardIconNew },
-          { path: "/user/jobs", name: "Manage workplaces", icon: ManageWorkplacesIcon },
-          { path: "/user/attendance", name: "Attendance", icon: AttendanceIcon },
+          { path: "/user/dashboard", name: t('sidebar.dashboard'), icon: DashboardIconNew },
+          { path: "/user/jobs", name: t('sidebar.manageWorkplaces'), icon: ManageWorkplacesIcon },
+          { path: "/user/attendance", name: t('sidebar.attendance'), icon: AttendanceIcon },
           {
             path: "/user/bids",
-            name: "Manage QR Code",
+            name: t('sidebar.manageQrCode'),
             icon: ManageQrCodeIcon,
           },
           {
             path: "/user/work-orders",
-            name: "View map",
+            name: t('sidebar.viewMap'),
             icon: ViewMapIcon,
           },
           {
             path: "/user/payments",
-            name: "Approve Request",
+            name: t('sidebar.approveRequest'),
             icon: ApproveRequestIcon,
           },
         ],
@@ -108,33 +110,33 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar }) {
         main: [
           {
             path: "/contractor/dashboard",
-            name: "Dashboard",
+            name: t('sidebar.dashboard'),
             icon: DashboardIconNew,
           },
           {
             path: "/contractor/jobs",
-            name: "Manage workplaces",
+            name: t('sidebar.manageWorkplaces'),
             icon: ManageWorkplacesIcon,
           },
-          { path: "/contractor/attendance", name: "Attendance", icon: AttendanceIcon },
+          { path: "/contractor/attendance", name: t('sidebar.attendance'), icon: AttendanceIcon },
           {
             path: "/contractor/bids",
-            name: "Manage QR Code",
+            name: t('sidebar.manageQrCode'),
             icon: ManageQrCodeIcon,
           },
           {
             path: "/contractor/work-orders",
-            name: "View map",
+            name: t('sidebar.viewMap'),
             icon: ViewMapIcon,
           },
           {
             path: "/contractor/payments",
-            name: "Approve Request",
+            name: t('sidebar.approveRequest'),
             icon: ApproveRequestIcon,
           },
           {
             path: "/contractor/reports",
-            name: "Settings",
+            name: t('sidebar.settings'),
             icon: SettingsIconNew,
           },
         ],

@@ -1548,3 +1548,168 @@ export const QuickTipIcon = ({ className, ...props }) => (
     </defs>
   </svg>
 );
+
+// Globe Icon for Language Selector
+export const GlobeIcon = ({ className, ...props }) => (
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 20 20"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+    {...props}
+  >
+    <path
+      d="M10 18.3334C14.6024 18.3334 18.3334 14.6024 18.3334 10C18.3334 5.39765 14.6024 1.66669 10 1.66669C5.39765 1.66669 1.66669 5.39765 1.66669 10C1.66669 14.6024 5.39765 18.3334 10 18.3334Z"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M6.66669 2.5H7.50002C5.87502 7.36667 5.87502 12.6333 7.50002 17.5H6.66669"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M12.5 2.5C14.125 7.36667 14.125 12.6333 12.5 17.5"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M2.5 13.3334V12.5C7.36667 14.125 12.6333 14.125 17.5 12.5V13.3334"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M2.5 7.50002C7.36667 5.87502 12.6333 5.87502 17.5 7.50002"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+// Chevron Right Icon
+export const ChevronRightIcon = ({ className, ...props }) => (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 16 16"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+    {...props}
+  >
+    <path
+      d="M6 12L10 8L6 4"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+// User Circle Icon
+export const UserCircleIcon = ({ className, ...props }) => (
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 20 20"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+    {...props}
+  >
+    <path
+      d="M10 10C12.3012 10 14.1667 8.13452 14.1667 5.83333C14.1667 3.53215 12.3012 1.66667 10 1.66667C7.69885 1.66667 5.83337 3.53215 5.83337 5.83333C5.83337 8.13452 7.69885 10 10 10Z"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M17.1583 18.3333C17.1583 15.1083 13.95 12.5 10 12.5C6.05 12.5 2.84167 15.1083 2.84167 18.3333"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+// Log Out Icon
+export const LogOutIcon = ({ className, ...props }) => (
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 20 20"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+    {...props}
+  >
+    <path
+      d="M7.41669 6.29999C7.67502 3.29999 9.21669 2.07499 12.5917 2.07499H12.7C16.425 2.07499 17.9167 3.56666 17.9167 7.29166V12.725C17.9167 16.45 16.425 17.9417 12.7 17.9417H12.5917C9.24169 17.9417 7.70002 16.7333 7.42502 13.7833"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M12.5 10H3.01666"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M4.87498 7.20834L2.08331 10L4.87498 12.7917"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+// Toggle On Icon
+export const ToggleOnIcon = ({ className, ...props }) => (
+  <svg
+    width="44"
+    height="24"
+    viewBox="0 0 44 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+    {...props}
+  >
+    <rect width="44" height="24" rx="12" fill="#1B84C5" />
+    <circle cx="32" cy="12" r="9" fill="white" />
+  </svg>
+);
+
+// Toggle Off Icon
+export const ToggleOffIcon = ({ className, ...props }) => (
+  <svg
+    width="44"
+    height="24"
+    viewBox="0 0 44 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+    {...props}
+  >
+    <rect width="44" height="24" rx="12" fill="#D1D5DB" />
+    <circle cx="12" cy="12" r="9" fill="white" />
+  </svg>
+);

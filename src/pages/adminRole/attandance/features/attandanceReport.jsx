@@ -3,9 +3,12 @@ import ReusableDataTable from "../../../../components/ReusableDataTable";
 import ReusableFilter from "../../../../components/ReusableFilter";
 import { Building2, Search } from "lucide-react";
 import { FaMapMarkerAlt } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 
 const AttendanceReport = () => {
+    const { t } = useTranslation();
+
     // Demo Data exactly matching the screenshot
     const demoData = [
         {
@@ -18,6 +21,7 @@ const AttendanceReport = () => {
             duration: "2h 15m",
             note: "On Time",
         },
+        // ... (keeping other data same for brevity, can translate values if needed)
         {
             id: 2,
             name: "Michael Chen",
@@ -85,7 +89,7 @@ const AttendanceReport = () => {
         },
         {
             key: "name",
-            label: "Employee Name",
+            label: t('table.name'),
             width: "200px",
             render: (row) => (
                 <div className="flex items-center gap-3 py-2">
@@ -98,7 +102,7 @@ const AttendanceReport = () => {
         },
         {
             key: "checkIn",
-            label: "Check-in Time",
+            label: t('attendance.checkIn'),
             width: "180px",
             render: (row) => (
                 <div className="flex items-center gap-3">
@@ -112,7 +116,7 @@ const AttendanceReport = () => {
         },
         {
             key: "workplace",
-            label: "Workplace",
+            label: t('workplace.workplaceName'),
             width: "160px",
             render: (row) => (
                 <div className="flex items-center gap-2">
@@ -123,7 +127,7 @@ const AttendanceReport = () => {
         },
         {
             key: "checkOut",
-            label: "Check-Out",
+            label: t('attendance.checkOut'),
             width: "180px",
             render: (row) => (
                 <div className="flex items-center gap-3">
@@ -137,7 +141,7 @@ const AttendanceReport = () => {
         },
         {
             key: "type",
-            label: "Type",
+            label: t('attendance.type'),
             width: "100px",
             render: (row) => (
                 <span className="text-[#111827] font-semibold text-[13px]">{row.type}</span>
@@ -145,7 +149,7 @@ const AttendanceReport = () => {
         },
         {
             key: "duration",
-            label: "Duration",
+            label: t('attendance.duration'),
             width: "100px",
             render: (row) => (
                 <span className="text-[#111827] font-semibold text-[13px]">{row.duration}</span>
@@ -153,7 +157,7 @@ const AttendanceReport = () => {
         },
         {
             key: "note",
-            label: "Manger Note",
+            label: t('attendance.managerNote'),
             render: (row) => (
                 <span className="text-[#111827] font-semibold text-[13px]">{row.note}</span>
             )
@@ -163,17 +167,17 @@ const AttendanceReport = () => {
     const filterConfig = [
         {
             key: "workplace",
-            label: "All Workplaces",
+            label: t('attendance.allWorkplaces'),
             options: [
-                { label: "All Workplaces", value: "" },
+                { label: t('attendance.allWorkplaces'), value: "" },
                 { label: "Headquarters", value: "Headquarters" }
             ]
         },
         {
             key: "type",
-            label: "Type",
+            label: t('attendance.type'),
             options: [
-                { label: "Type", value: "" },
+                { label: t('attendance.type'), value: "" },
                 { label: "QR Scan", value: "QR Scan" }
             ]
         },
@@ -235,17 +239,17 @@ const AttendanceReport = () => {
             {/* Header Section */}
             <div className="p-6">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
-                    <h2 className="text-[#111827] text-xl font-bold font-inter">Employee Attendance</h2>
+                    <h2 className="text-[#111827] text-xl font-bold font-inter">{t('attendance.employeeAttendance')}</h2>
                     <div className="flex flex-col items-end">
                         <span className="text-[#111827] text-2xl font-bold font-inter tracking-tight">29h 45m</span>
-                        <span className="text-gray-400 text-[10px] font-medium font-inter">Total Worked Hours (All Employees)</span>
+                        <span className="text-gray-400 text-[10px] font-medium font-inter">{t('attendance.totalWorkedHours')}</span>
                     </div>
                 </div>
 
                 {/* Filter Section */}
                 <div className="w-full">
                     <ReusableFilter
-                        searchConfig={{ placeholder: "Search employees..." }}
+                        searchConfig={{ placeholder: t('employee.searchEmployee') }}
                         filters={filterConfig}
                         data={demoData}
                         onFilteredDataChange={setFilteredData}

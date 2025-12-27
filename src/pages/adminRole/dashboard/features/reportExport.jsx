@@ -11,6 +11,7 @@ import {
     ChevronDownIconLarge,
     CalendarIconLarge,
 } from "../../../../assets/icons/icons";
+import { useTranslation } from "react-i18next";
 
 const ExportCard = ({
     title,
@@ -62,6 +63,7 @@ const CustomLabel = ({ label }) => (
 );
 
 const ReportExport = () => {
+    const { t } = useTranslation();
     const startDateRef = useRef(null);
     const endDateRef = useRef(null);
     const [startDate, setStartDate] = React.useState("2024-12-01");
@@ -71,15 +73,15 @@ const ReportExport = () => {
         <div className="w-full relative bg-transparent space-y-6">
             {/* Full Monthly Export */}
             <ExportCard
-                title="Full Monthly Export"
-                description="Export complete monthly attendance data with all details"
+                title={t('report.fullMonthlyExport')}
+                description={t('report.fullMonthlyExportDesc')}
                 icon={FullMonthlyExportIcon}
                 iconBgColor="bg-green-50"
                 className="w-full"
             >
                 <div className="flex flex-col lg:flex-row items-end gap-6 mb-6">
                     <div className="w-full lg:w-72">
-                        <CustomLabel label="Select Month" />
+                        <CustomLabel label={t('report.selectMonth')} />
                         <div className="relative">
                             <Select
                                 options={[{ value: "December 2024", label: "December 2024" }]}
@@ -92,23 +94,23 @@ const ReportExport = () => {
                         </div>
                     </div>
                     <ExportButton
-                        text="Export Monthly Attendance (Excel)"
+                        text={t('report.exportMonthlyExcel')}
                         className="w-full lg:w-auto"
                     />
                 </div>
 
                 <div className="w-full bg-gray-50 rounded-md border border-gray-200 p-4">
                     <h4 className="text-gray-900 text-sm font-medium font-inter mb-4">
-                        Export includes:
+                        {t('report.exportIncludes')}
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-8">
                         {[
-                            "Employee Name",
-                            "Workplace/Object Name",
-                            "Check-in/out Times",
-                            "Total Hours",
-                            "Location Verification",
-                            "Manual Entry & Notes",
+                            t('table.name'),
+                            t('workplace.workplaceName'),
+                            t('report.checkInOut'),
+                            t('report.totalHours'),
+                            t('report.locationVerification'),
+                            t('report.manualEntryNotes'),
                         ].map((item, index) => (
                             <div key={index} className="flex items-center gap-2">
                                 <CheckIconCyan className="w-2.5 h-3 flex-shrink-0" />
@@ -123,8 +125,8 @@ const ReportExport = () => {
 
             {/* Date-Range Export */}
             <ExportCard
-                title="Date-Range Export"
-                description="Export attendance data for a custom date range"
+                title={t('report.dateRangeExport')}
+                description={t('report.dateRangeExportDesc')}
                 icon={DateRangeExportIcon}
                 iconBgColor="bg-blue-100"
                 className="w-full"
@@ -133,7 +135,7 @@ const ReportExport = () => {
                     <div className="w-full lg:w-60">
                         <ReusableInput
                             ref={startDateRef}
-                            label="Start Date"
+                            label={t('report.startDate')}
                             value={startDate}
                             onChange={(e) => setStartDate(e.target.value)}
                             type="date"
@@ -151,7 +153,7 @@ const ReportExport = () => {
                     <div className="w-full lg:w-60">
                         <ReusableInput
                             ref={endDateRef}
-                            label="End Date"
+                            label={t('report.endDate')}
                             value={endDate}
                             onChange={(e) => setEndDate(e.target.value)}
                             type="date"
@@ -167,7 +169,7 @@ const ReportExport = () => {
                         />
                     </div>
                     <div className="w-full lg:w-60">
-                        <CustomLabel label="Export Format" />
+                        <CustomLabel label={t('report.exportFormat')} />
                         <div className="relative">
                             <Select
                                 options={[{ value: "Excel (.xlsx)", label: "Excel (.xlsx)" }]}
@@ -179,7 +181,7 @@ const ReportExport = () => {
                             </div>
                         </div>
                     </div>
-                    <ExportButton text="Export Range" className="w-full lg:w-60" />
+                    <ExportButton text={t('report.exportRange')} className="w-full lg:w-60" />
                 </div>
             </ExportCard>
 
@@ -187,15 +189,15 @@ const ReportExport = () => {
             <div className="flex flex-col lg:flex-row gap-6 w-full">
                 {/* Employee Attendance Export */}
                 <ExportCard
-                    title="Employee Attendance Export"
-                    description="Export individual employee data"
+                    title={t('report.employeeExport')}
+                    description={t('report.employeeExportDesc')}
                     icon={EmployeeExportIcon}
                     iconBgColor="bg-purple-100"
                     className="flex-1"
                 >
                     <div className="space-y-6">
                         <div>
-                            <CustomLabel label="Select Employee" />
+                            <CustomLabel label={t('report.selectEmployee')} />
                             <div className="relative">
                                 <Select
                                     options={[{ value: "John Smith", label: "John Smith" }]}
@@ -208,7 +210,7 @@ const ReportExport = () => {
                             </div>
                         </div>
                         <div>
-                            <CustomLabel label="Month" />
+                            <CustomLabel label={t('report.month')} />
                             <div className="relative">
                                 <Select
                                     options={[{ value: "December 2024", label: "December 2024" }]}
@@ -220,21 +222,21 @@ const ReportExport = () => {
                                 </div>
                             </div>
                         </div>
-                        <ExportButton text="Export Employee Attendance" className="w-full" />
+                        <ExportButton text={t('report.exportEmployeeAttendance')} className="w-full" />
                     </div>
                 </ExportCard>
 
                 {/* Workplace Attendance Export */}
                 <ExportCard
-                    title="Workplace Attendance Export"
-                    description="Export workplace-specific data"
+                    title={t('report.workplaceExport')}
+                    description={t('report.workplaceExportDesc')}
                     icon={WorkplaceExportIcon}
                     iconBgColor="bg-orange-100"
                     className="flex-1"
                 >
                     <div className="space-y-6">
                         <div>
-                            <CustomLabel label="Select Workplace" />
+                            <CustomLabel label={t('workplace.selectWorkplaceTitle')} />
                             <div className="relative">
                                 <Select
                                     options={[{ value: "Main Office - Downtown", label: "Main Office - Downtown" }]}
@@ -247,7 +249,7 @@ const ReportExport = () => {
                             </div>
                         </div>
                         <div>
-                            <CustomLabel label="Month" />
+                            <CustomLabel label={t('report.month')} />
                             <div className="relative">
                                 <Select
                                     options={[{ value: "December 2024", label: "December 2024" }]}
@@ -259,7 +261,7 @@ const ReportExport = () => {
                                 </div>
                             </div>
                         </div>
-                        <ExportButton text="Export Workplace Attendance" className="w-full" />
+                        <ExportButton text={t('report.exportWorkplaceAttendance')} className="w-full" />
                     </div>
                 </ExportCard>
             </div>
