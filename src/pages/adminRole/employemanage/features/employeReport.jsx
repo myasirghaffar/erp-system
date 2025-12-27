@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import ReusableDataTable from "../../../../components/ReusableDataTable";
 import ReusableFilter from "../../../../components/ReusableFilter";
 import ReusablePagination from "../../../../components/ReusablePagination";
@@ -11,66 +11,172 @@ import {
     Trash2
 } from "lucide-react";
 
-const EmployeeReport = () => {
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 5;
-    const totalItems = 248;
-    // Demo Data exactly matching the screenshot
-    const demoData = [
-        {
-            id: 1,
-            name: "John Smith",
-            title: "Senior Developer",
-            email: "john.smith@company.com",
-            phone: "+1 (555) 234-5678",
-            status: "Active",
-            avatar: "JS"
-        },
-        {
-            id: 2,
-            name: "Emily Davis",
-            title: "Marketing Manager",
-            email: "emily.davis@company.com",
-            phone: "+1 (555) 234-5678",
-            status: "Active",
-            avatar: "ED"
-        },
-        {
-            id: 3,
-            name: "Michael Johnson",
-            title: "Sales Representative",
-            email: "michael.johnson@company.com",
-            phone: "+1 (555) 345-6789",
-            status: "Inactive",
-            avatar: "MJ"
-        },
-        {
-            id: 4,
-            name: "Sarah Wilson",
-            title: "UX Designer",
-            email: "sarah.wilson@company.com",
-            phone: "+1 (555) 456-7890",
-            status: "Active",
-            avatar: "SW"
-        },
-        {
-            id: 5,
-            name: "David Brown",
-            title: "Financial Analyst",
-            email: "david.brown@company.com",
-            phone: "+1 (555) 567-8901",
-            status: "Active",
-            avatar: "DB"
-        }
-    ];
+const itemsPerPage = 5;
 
+// Demo Data expanded for pagination
+const demoData = [
+    {
+        id: 1,
+        name: "John Smith",
+        title: "Senior Developer",
+        email: "john.smith@company.com",
+        phone: "+1 (555) 234-5678",
+        status: "Active",
+        avatar: "JS"
+    },
+    {
+        id: 2,
+        name: "Emily Davis",
+        title: "Marketing Manager",
+        email: "emily.davis@company.com",
+        phone: "+1 (555) 234-5678",
+        status: "Active",
+        avatar: "ED"
+    },
+    {
+        id: 3,
+        name: "Michael Johnson",
+        title: "Sales Representative",
+        email: "michael.johnson@company.com",
+        phone: "+1 (555) 345-6789",
+        status: "Inactive",
+        avatar: "MJ"
+    },
+    {
+        id: 4,
+        name: "Sarah Wilson",
+        title: "UX Designer",
+        email: "sarah.wilson@company.com",
+        phone: "+1 (555) 456-7890",
+        status: "Active",
+        avatar: "SW"
+    },
+    {
+        id: 5,
+        name: "David Brown",
+        title: "Financial Analyst",
+        email: "david.brown@company.com",
+        phone: "+1 (555) 567-8901",
+        status: "Active",
+        avatar: "DB"
+    },
+    {
+        id: 6,
+        name: "James Wilson",
+        title: "Product Manager",
+        email: "james.wilson@company.com",
+        phone: "+1 (555) 678-9012",
+        status: "Active",
+        avatar: "JW"
+    },
+    {
+        id: 7,
+        name: "Linda Martinez",
+        title: "HR Specialist",
+        email: "linda.martinez@company.com",
+        phone: "+1 (555) 789-0123",
+        status: "Inactive",
+        avatar: "LM"
+    },
+    {
+        id: 8,
+        name: "Robert Taylor",
+        title: "Software Engineer",
+        email: "robert.taylor@company.com",
+        phone: "+1 (555) 890-1234",
+        status: "Active",
+        avatar: "RT"
+    },
+    {
+        id: 9,
+        name: "Jennifer Garcia",
+        title: "Content Writer",
+        email: "jennifer.garcia@company.com",
+        phone: "+1 (555) 901-2345",
+        status: "Active",
+        avatar: "JG"
+    },
+    {
+        id: 10,
+        name: "William Anderson",
+        title: "DevOps Engineer",
+        email: "william.anderson@company.com",
+        phone: "+1 (555) 012-3456",
+        status: "Active",
+        avatar: "WA"
+    },
+    {
+        id: 11,
+        name: "Elizabeth Thomas",
+        title: "Data Scientist",
+        email: "elizabeth.thomas@company.com",
+        phone: "+1 (555) 123-4567",
+        status: "Inactive",
+        avatar: "ET"
+    },
+    {
+        id: 12,
+        name: "Christopher Jackson",
+        title: "System Administrator",
+        email: "christopher.jackson@company.com",
+        phone: "+1 (555) 234-5678",
+        status: "Active",
+        avatar: "CJ"
+    }
+];
+
+const filterConfig = [
+    {
+        key: "department",
+        label: "All Departments",
+        options: [
+            { label: "All Departments", value: "" },
+            { label: "Engineering", value: "Engineering" },
+            { label: "Marketing", value: "Marketing" }
+        ]
+    },
+    {
+        key: "role",
+        label: "All Roles",
+        options: [
+            { label: "All Roles", value: "" },
+            { label: "Developer", value: "Developer" },
+            { label: "Manager", value: "Manager" }
+        ]
+    },
+    {
+        key: "status",
+        label: "All Status",
+        options: [
+            { label: "All Status", value: "" },
+            { label: "Active", value: "Active" },
+            { label: "Inactive", value: "Inactive" }
+        ]
+    }
+];
+
+const EmployeeReport = ({ onViewProfile }) => {
+    const [currentPage, setCurrentPage] = useState(1);
     const [filteredData, setFilteredData] = useState(demoData);
+
+    // Reset pagination when filter changes
+    const handleFilteredDataChange = useCallback((newData) => {
+        setFilteredData(newData);
+        setCurrentPage(1);
+    }, []);
+
+    // Calculate pagination slice
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentTableData = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+    const totalItems = filteredData.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
 
     const columns = [
         {
             key: "selection",
             label: "",
-            width: "60px",
+            width: "3.75rem", // 60px
             render: () => (
                 <div className="flex justify-center w-full">
                     <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-sky-500 focus:ring-sky-500 cursor-pointer" />
@@ -80,7 +186,8 @@ const EmployeeReport = () => {
         {
             key: "name",
             label: "Name",
-            width: "300px",
+            minWidth: "18.75rem", // 300px
+            grow: 1,
             render: (row) => (
                 <div className="flex items-center gap-3 py-3">
                     <div className="w-10 h-10 rounded-full border-2 border-white shadow-sm overflow-hidden shrink-0 flex items-center justify-center bg-gray-100">
@@ -90,8 +197,8 @@ const EmployeeReport = () => {
                         </div>
                     </div>
                     <div className="flex flex-col">
-                        <span className="text-[#111827] font-bold text-[14px] leading-tight">{row.name}</span>
-                        <span className="text-gray-400 text-[12px] font-medium mt-0.5">{row.title}</span>
+                        <span className="text-[#111827] font-bold text-[0.875rem] leading-tight">{row.name}</span>
+                        <span className="text-gray-400 text-[0.75rem] font-medium mt-0.5">{row.title}</span>
                     </div>
                 </div>
             )
@@ -99,24 +206,27 @@ const EmployeeReport = () => {
         {
             key: "email",
             label: "Email",
+            minWidth: "12.5rem", // 200px
+            grow: 1,
             render: (row) => (
-                <span className="text-[#374151] font-medium text-[13px]">{row.email}</span>
+                <span className="text-[#374151] font-medium text-[0.8125rem]">{row.email}</span>
             )
         },
         {
             key: "phone",
             label: "Phone",
+            minWidth: "10rem", // 160px
             render: (row) => (
-                <span className="text-[#374151] font-medium text-[13px]">{row.phone}</span>
+                <span className="text-[#374151] font-medium text-[0.8125rem]">{row.phone}</span>
             )
         },
         {
             key: "status",
             label: "Status",
-            width: "120px",
+            minWidth: "7.5rem", // 120px
             render: (row) => (
                 <div
-                    className={`px-3.5 py-1 rounded-full text-[11px] font-bold inline-flex items-center justify-center transition-colors ${row.status === "Active"
+                    className={`px-3.5 py-1 rounded-full text-[0.6875rem] font-bold inline-flex items-center justify-center transition-colors ${row.status === "Active"
                         ? "bg-green-50 text-green-500"
                         : "bg-red-50 text-red-500"
                         }`}
@@ -128,13 +238,13 @@ const EmployeeReport = () => {
         {
             key: "actions",
             label: "Actions",
-            width: "200px",
+            width: "12.5rem", // 200px
             render: () => (
                 <div className="flex items-center gap-5">
                     <button className="text-gray-400 hover:text-sky-500 transition-colors">
                         <CheckSquare size={18} strokeWidth={2} />
                     </button>
-                    <button className="text-gray-400 hover:text-sky-500 transition-colors">
+                    <button onClick={onViewProfile} className="text-gray-400 hover:text-sky-500 transition-colors">
                         <Eye size={18} strokeWidth={2} />
                     </button>
                     <button className="text-gray-400 hover:text-sky-500 transition-colors">
@@ -147,80 +257,6 @@ const EmployeeReport = () => {
             )
         }
     ];
-
-    const filterConfig = [
-        {
-            key: "department",
-            label: "All Departments",
-            options: [
-                { label: "All Departments", value: "" },
-                { label: "Engineering", value: "Engineering" },
-                { label: "Marketing", value: "Marketing" }
-            ]
-        },
-        {
-            key: "role",
-            label: "All Roles",
-            options: [
-                { label: "All Roles", value: "" },
-                { label: "Developer", value: "Developer" },
-                { label: "Manager", value: "Manager" }
-            ]
-        },
-        {
-            key: "status",
-            label: "All Status",
-            options: [
-                { label: "All Status", value: "" },
-                { label: "Active", value: "Active" },
-                { label: "Inactive", value: "Inactive" }
-            ]
-        }
-    ];
-
-    const customTableStyles = {
-        tableWrapper: {
-            style: {
-                borderRadius: "0",
-                border: "none",
-                boxShadow: "none",
-            },
-        },
-        headRow: {
-            style: {
-                backgroundColor: "#f9fafb",
-                minHeight: "48px",
-                borderBottom: "1px solid #f3f4f6",
-                borderTop: "1px solid #f3f4f6",
-            },
-        },
-        headCells: {
-            style: {
-                color: "#6b7280",
-                fontSize: "12px",
-                fontWeight: "600",
-                textTransform: "none",
-                paddingLeft: "16px",
-                paddingRight: "16px",
-            },
-        },
-        rows: {
-            style: {
-                minHeight: "82px",
-                borderBottom: "1px solid #f3f4f6 !important",
-                transition: "background-color 0.2s ease",
-                "&:hover": {
-                    backgroundColor: "#f9fafb",
-                },
-            },
-        },
-        cells: {
-            style: {
-                paddingLeft: "16px",
-                paddingRight: "16px",
-            }
-        }
-    };
 
     const [activeDropdown, setActiveDropdown] = useState(null);
 
@@ -262,7 +298,7 @@ const EmployeeReport = () => {
                             <ReusableFilter
                                 filters={[filter]}
                                 data={demoData}
-                                onFilteredDataChange={setFilteredData}
+                                onFilteredDataChange={handleFilteredDataChange}
                                 className="w-full"
                                 filterClassName="w-full"
                                 dropdownClassName="min-w-full"
@@ -280,7 +316,7 @@ const EmployeeReport = () => {
                 <div className="p-6 pb-6 flex justify-between items-center bg-white">
                     <div>
                         <h2 className="text-[#111827] text-[18px] font-bold font-inter">Employee Directory</h2>
-                        <p className="text-gray-400 text-[13px] font-medium mt-0.5">248 total employees</p>
+                        <p className="text-gray-400 text-[13px] font-medium mt-0.5">{totalItems} total employees</p>
                     </div>
                     <button className="p-2.5 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm">
                         <Download size={18} strokeWidth={2} />
@@ -288,22 +324,9 @@ const EmployeeReport = () => {
                 </div>
 
                 <div className="w-full">
-                    <style>
-                        {`
-                            .rdt_TableHeadRow {
-                                background-color: #f9fafb !important;
-                                border-top: 1px solid #f3f4f6 !important;
-                                border-bottom: 1px solid #f3f4f6 !important;
-                            }
-                            .rdt_TableRow {
-                                border-bottom: 1px solid #f3f4f6 !important;
-                            }
-                        `}
-                    </style>
                     <ReusableDataTable
                         columns={columns}
-                        data={filteredData}
-                        customStyles={customTableStyles}
+                        data={currentTableData}
                     />
                 </div>
 
@@ -313,7 +336,7 @@ const EmployeeReport = () => {
                     itemsPerPage={itemsPerPage}
                     currentPage={currentPage}
                     onPageChange={(page) => setCurrentPage(page)}
-                    totalPages={Math.ceil(totalItems / itemsPerPage)}
+                    totalPages={totalPages}
                 />
             </div>
         </div>

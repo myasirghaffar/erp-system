@@ -46,7 +46,7 @@ const ReusableDataTable = ({
     return col;
   });
 
-  // Default styles for DataTable (matching snapshot)
+  // Default styles for DataTable (matching provided screenshot)
   const defaultStyles = {
     table: {
       style: {
@@ -57,51 +57,50 @@ const ReusableDataTable = ({
     },
     tableWrapper: {
       style: {
-        borderRadius: "12px 12px 0px 0px",
-        overflow: "hidden",
+        borderRadius: "0",
+        border: "none",
+        boxShadow: "none",
         backgroundColor: "#ffffff",
-        boxShadow:
-          "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-        border: "1px solid #D1D1D1",
       },
     },
     headRow: {
       style: {
-        backgroundColor: "#58398D", // primary-500 color
-        minHeight: "60px",
-        borderBottom: "none",
-        fontFamily: '"Poppins", sans-serif',
+        backgroundColor: "#f9fafb",
+        minHeight: "3rem", // 48px
+        borderBottom: "0.0625rem solid #f3f4f6", // 1px
+        borderTop: "0.0625rem solid #f3f4f6", // 1px
+        fontFamily: '"Inter", sans-serif',
       },
     },
     headCells: {
       style: {
-        padding: "16px 12px",
-        fontWeight: "400",
-        color: "#ffffff",
-        fontSize: "14px",
-        fontFamily: '"Poppins", sans-serif',
+        padding: "0 1rem", // 16px
+        fontWeight: "600",
+        color: "#6b7280", // Gray-500
+        fontSize: "0.75rem", // 12px
+        fontFamily: '"Inter", sans-serif',
         borderBottom: "none",
         whiteSpace: "nowrap",
         overflow: "hidden",
         textOverflow: "ellipsis",
         textAlign: "left",
-        display: "flex",
-        alignItems: "left",
-        justifyContent: "left",
-        "&:last-child": {
-          borderRight: "none",
+        textTransform: "none",
+        alignItems: "center",
+        justifyContent: "center",
+        "&:first-of-type": {
+          justifyContent: "flex-start",
         },
       },
     },
     rows: {
       style: {
-        fontSize: "12px",
+        fontSize: "0.8125rem", // 13px
         fontWeight: "400",
-        minHeight: "60px",
+        minHeight: "4.5rem", // 72px
         backgroundColor: "#ffffff",
-        color: "#A0A0A0",
+        color: "#111827", // Gray-900
         transition: "all 0.2s ease",
-        borderBottom: "2px solid #D1D1D1 !important",
+        borderBottom: "0.0625rem solid #f3f4f6 !important", // 1px
         "&:hover": {
           backgroundColor: "#f9fafb",
         },
@@ -112,21 +111,20 @@ const ReusableDataTable = ({
     },
     cells: {
       style: {
-        padding: "12px 12px",
-        fontSize: "12px",
-        fontWeight: "600",
-        fontFamily: "Inter",
+        padding: "0 1rem", // 16px
+        fontSize: "0.8125rem", // 13px
+        fontWeight: "500",
+        fontFamily: '"Inter", sans-serif',
         whiteSpace: "nowrap",
         overflow: "hidden",
         textOverflow: "ellipsis",
-        textAlign: "left",
-        display: "flex",
-        alignItems: "left",
-        // justifyContent: "center",
-        // borderRight: "1px solid #e5e7eb",
-        cursor: "pointer",
-        "&:last-child": {
-          borderRight: "none",
+        alignItems: "center",
+        justifyContent: "center",
+        "&:first-of-type": {
+          justifyContent: "flex-start",
+        },
+        "&:nth-of-type(2)": {
+          justifyContent: "flex-start",
         },
       },
     },
@@ -139,18 +137,34 @@ const ReusableDataTable = ({
     headRow: {
       ...defaultStyles.headRow,
       ...customStyles.headRow,
+      style: {
+        ...defaultStyles.headRow.style,
+        ...(customStyles.headRow?.style || {}),
+      },
     },
     headCells: {
       ...defaultStyles.headCells,
       ...customStyles.headCells,
+      style: {
+        ...defaultStyles.headCells.style,
+        ...(customStyles.headCells?.style || {}),
+      },
     },
     rows: {
       ...defaultStyles.rows,
       ...customStyles.rows,
+      style: {
+        ...defaultStyles.rows.style,
+        ...(customStyles.rows?.style || {}),
+      },
     },
     cells: {
       ...defaultStyles.cells,
       ...customStyles.cells,
+      style: {
+        ...defaultStyles.cells.style,
+        ...(customStyles.cells?.style || {}),
+      },
     },
   };
 
@@ -161,7 +175,7 @@ const ReusableDataTable = ({
       style: {
         color: "#A0A0A0",
         backgroundColor: "#FFFFFF",
-        borderBottom: "2px solid #D1D1D1",
+        borderBottom: "1px solid #D1D1D1",
       },
     },
   ];
@@ -171,7 +185,7 @@ const ReusableDataTable = ({
       <style>
         {`
           .rdt_TableRow {
-            border-bottom: 3px solid #D1D1D1 !important;
+            border-bottom: 1px solid #D1D1D1 !important;
           }
           .rdt_TableRow:last-child {
             border-bottom: none !important;

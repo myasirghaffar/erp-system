@@ -7,7 +7,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { authenticateUser } from "../data/dummyUsers";
 
-import loginForm from "../assets/images/login-form.png";
+import loginForm from "../assets/images/login-form.jpg";
 
 const Login = () => {
   const [error, setError] = useState(null);
@@ -18,15 +18,7 @@ const Login = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (auth.isAuthenticated && auth.user) {
-      const userRole = auth.user.role;
-      const roleRouteMap = {
-        admin: "admin",
-        user: "user",
-        contractor: "contractor",
-      };
-
-      const rolePath = roleRouteMap[userRole] || "admin";
-      navigate(`/${rolePath}/dashboard`, { replace: true });
+      navigate("/admin/dashboard", { replace: true });
     }
   }, [auth.isAuthenticated, auth.user, navigate]);
 
@@ -69,7 +61,7 @@ const Login = () => {
         });
 
         // Navigate to the appropriate dashboard
-        navigate(`/${authenticatedUser.route}/dashboard`);
+        navigate("/admin/dashboard");
       } else {
         // Show error toast for invalid credentials
         toast.error("Auto login failed. Please try again.", {
@@ -123,7 +115,7 @@ const Login = () => {
         });
 
         // Navigate to the appropriate dashboard
-        navigate(`/${authenticatedUser.route}/dashboard`);
+        navigate("/admin/dashboard");
       } else {
         // Show error toast for invalid credentials
         toast.error("Incorrect email or password. Please try again.", {
@@ -301,83 +293,9 @@ const Login = () => {
                 >
                   Auto Login as Admin
                 </button>
-                <button
-                  onClick={() => handleAutoLogin("user@example.com", "user123")}
-                  className="w-full bg-secondary text-white py-2 px-3 rounded text-xs font-medium hover:bg-secondary/90 transition-colors"
-                >
-                  Auto Login as User
-                </button>
-                <button
-                  onClick={() =>
-                    handleAutoLogin("contractor@example.com", "contractor123")
-                  }
-                  className="w-full bg-gray-600 text-white py-2 px-3 rounded text-xs font-medium hover:bg-gray-700 transition-colors"
-                >
-                  Auto Login as Contractor
-                </button>
               </div>
             </div>
 
-            {/* Separator */}
-            <div className="flex items-center my-6">
-              <div className="flex-1 border-t border-gray-300"></div>
-              <span className="px-4 text-gray-500 text-sm">
-                Login with Others
-              </span>
-              <div className="flex-1 border-t border-gray-300"></div>
-            </div>
-
-            {/* Social Login Buttons */}
-            <div className="space-y-3">
-              {/* Google Login Button */}
-              <button className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-white border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="-3 0 262 262"
-                  xmlns="http://www.w3.org/2000/svg"
-                  preserveAspectRatio="xMidYMid"
-                  fill="currentColor"
-                >
-                  <g>
-                    <path
-                      d="M255.878 133.451c0-10.734-.871-18.567-2.756-26.69H130.55v48.448h71.947c-1.45 12.04-9.283 30.172-26.69 42.356l-.244 1.622 38.755 30.023 2.685.268c24.659-22.774 38.875-56.282 38.875-96.027"
-                      fill="#4285F4"
-                    ></path>
-                    <path
-                      d="M130.55 261.1c35.248 0 64.839-11.605 86.453-31.622l-41.196-31.913c-11.024 7.688-25.82 13.055-45.257 13.055-34.523 0-63.824-22.773-74.269-54.25l-1.531.13-40.298 31.187-.527 1.465C35.393 231.798 79.49 261.1 130.55 261.1"
-                      fill="#34A853"
-                    ></path>
-                    <path
-                      d="M56.281 156.37c-2.756-8.123-4.351-16.827-4.351-25.82 0-8.994 1.595-17.697 4.206-25.82l-.073-1.73L15.26 71.312l-1.335.635C5.077 89.644 0 109.517 0 130.55s5.077 40.905 13.925 58.602l42.356-32.782"
-                      fill="#FBBC05"
-                    ></path>
-                    <path
-                      d="M130.55 50.479c24.514 0 41.05 10.589 50.479 19.438l36.844-35.974C195.245 12.91 165.798 0 130.55 0 79.49 0 35.393 29.301 13.925 71.947l42.211 32.783c10.59-31.477 39.891-54.251 74.414-54.251"
-                      fill="#EB4335"
-                    ></path>
-                  </g>
-                </svg>
-                Login with google
-              </button>
-
-              {/* Facebook Login Button */}
-              <button className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-white border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24V15.563H7.078V12.073H10.125V9.413C10.125 6.387 11.917 4.716 14.658 4.716C15.97 4.716 17.344 4.951 17.344 4.951V7.923H15.83C14.34 7.923 13.875 8.853 13.875 9.808V12.073H17.203L16.671 15.563H13.875V24C19.612 23.094 24 18.1 24 12.073Z"
-                    fill="#1877F2"
-                  />
-                </svg>
-                Login with Facebook
-              </button>
-            </div>
           </form>
 
           {/* Signup Link */}

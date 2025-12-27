@@ -143,52 +143,10 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar }) {
         bottom: [],
       },
     };
-
-    return menu[role] || {};
-  };
-  const currentRole = useSelector((state) => state.auth.user?.role);
-
-  // Extract role from URL path as fallback
-  const getRoleFromPath = (pathname) => {
-    if (pathname.startsWith("/admin")) return "admin";
-    if (pathname.startsWith("/user")) return "user";
-    if (pathname.startsWith("/contractor")) return "contractor";
-    return null;
   };
 
-  // Use URL-based role detection first, then Redux role as fallback
-  const urlBasedRole = getRoleFromPath(location.pathname);
-  const detectedRole = urlBasedRole || currentRole;
-
-  // Map role values to menu keys
-  const roleName =
-    detectedRole === "admin"
-      ? "admin"
-      : detectedRole === "user"
-        ? "user"
-        : detectedRole === "contractor"
-          ? "contractor"
-          : null;
-
-  // Additional fallback for role detection based on URL
-  const finalRoleName =
-    roleName ||
-    (location.pathname.startsWith("/user")
-      ? "user"
-      : location.pathname.startsWith("/contractor")
-        ? "contractor"
-        : "admin");
-
-  const menuItems = getRoleBasedMenuItems(finalRoleName);
-
-  // Fallback for testing - if no role is detected, show appropriate menu based on URL
-  const finalMenuItems = menuItems?.main
-    ? menuItems
-    : location.pathname.startsWith("/user")
-      ? getRoleBasedMenuItems("user")
-      : location.pathname.startsWith("/contractor")
-        ? getRoleBasedMenuItems("contractor")
-        : getRoleBasedMenuItems("admin");
+  const menuItems = getMenuItems();
+  const finalMenuItems = menuItems;
 
   // Utility function to render NavLink items
   const handleLogout = () => {
@@ -375,7 +333,20 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar }) {
             </div>
           </nav>
 
-
+          {/* Logout Button */}
+          <div className="p-4 border-t border-gray-700 mt-auto">
+            <button
+              onClick={handleLogout}
+              className="flex items-center w-full h-12 pl-4 pr-4 gap-3 group transition-all duration-200 relative rounded-lg cursor-pointer text-white hover:bg-white/5"
+            >
+              <div className="w-5 h-5 flex items-center justify-center text-white">
+                <LogoutIcon />
+              </div>
+              <span className="text-sm leading-6 font-normal font-inter">
+                Logout
+              </span>
+            </button>
+          </div>
         </div>
       </div>
     );

@@ -10,14 +10,18 @@ const ReusablePagination = ({
   showPageInfo = false,
 }) => {
   const getVisiblePages = () => {
-    const delta = 1; // Show one page on each side of the current page for a compact look
+    if (totalPages <= 7) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+
+    const delta = 1;
     const range = [];
     const rangeWithDots = [];
 
     // Always show first page
     rangeWithDots.push(1);
 
-    // Calculate range around current page
+    // Calculate range around current page, but don't include 1 or totalPages
     for (
       let i = Math.max(2, currentPage - delta);
       i <= Math.min(totalPages - 1, currentPage + delta);
@@ -26,7 +30,7 @@ const ReusablePagination = ({
       range.push(i);
     }
 
-    // Add dots before range if there's a gap
+    // Add dots before range if there's a gap > 1
     if (currentPage - delta > 2) {
       rangeWithDots.push("...");
     }
@@ -34,15 +38,13 @@ const ReusablePagination = ({
     // Add the range
     rangeWithDots.push(...range);
 
-    // Add dots after range if there's a gap
+    // Add dots after range if there's a gap > 1
     if (currentPage + delta < totalPages - 1) {
       rangeWithDots.push("...");
     }
 
-    // Always show last page if there's more than one page
-    if (totalPages > 1) {
-      rangeWithDots.push(totalPages);
-    }
+    // Always show last page
+    rangeWithDots.push(totalPages);
 
     return rangeWithDots;
   };

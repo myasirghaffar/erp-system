@@ -23,7 +23,7 @@ const DashboardBanner = ({ title, description, rightContent, onBack }) => {
                         </button>
                     )}
                     <div className="flex flex-col justify-center">
-                        <div className="text-gray-50 text-2xl md:text-3xl font-bold font-inter leading-tight mb-2">
+                        <div className="text-gray-50 text-xl md:text-3xl font-bold font-inter leading-tight mb-2">
                             {title}
                         </div>
                         <div className="text-gray-50 text-base md:text-xl font-normal font-inter leading-snug">

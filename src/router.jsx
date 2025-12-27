@@ -9,9 +9,11 @@ import AuthRedirect from "./utils/AuthRedirect";
 
 // Dashboard imports
 import AdminDashboard from "./pages/adminRole/dashboard";
-import UserDashboard from "./pages/userRole/dashboard";
-import ContractorDashboard from "./pages/contractorRole/dashboard";
 import ManageWorkplaces from "./pages/adminRole/manageWorkplaces";
+import ManageQrCode from "./pages/adminRole/manageQrCode";
+import SettingsPage from "./pages/adminRole/settingspage";
+import ApproveRequests from "./pages/adminRole/approverequests";
+import ViewMap from "./pages/adminRole/viewMap";
 import AttendanceDashboard from "./pages/adminRole/attandance";
 import EmployeeDashboard from "./pages/adminRole/employemanage";
 
@@ -41,33 +43,11 @@ const AppRouter = () => {
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="users" element={<EmployeeDashboard />} />
         <Route path="manage-workplaces" element={<ManageWorkplaces />} />
+        <Route path="manage-qr-code" element={<ManageQrCode />} />
+        <Route path="settings" element={<SettingsPage />} />
+        <Route path="approve-requests" element={<ApproveRequests />} />
+        <Route path="view-map" element={<ViewMap />} />
         <Route path="attendance" element={<AttendanceDashboard />} />
-      </Route>
-
-      {/* User Dashboard Routes - Using AppLayout */}
-      <Route
-        path="/user"
-        element={
-          <AuthGuard>
-            <AppLayout />
-          </AuthGuard>
-        }
-      >
-        <Route index element={<UserDashboard />} />
-        <Route path="dashboard" element={<UserDashboard />} />
-      </Route>
-
-      {/* Contractor Dashboard Routes - Using AppLayout */}
-      <Route
-        path="/contractor"
-        element={
-          <AuthGuard>
-            <AppLayout />
-          </AuthGuard>
-        }
-      >
-        <Route index element={<ContractorDashboard />} />
-        <Route path="dashboard" element={<ContractorDashboard />} />
       </Route>
 
       {/* Catch all route for 404 */}
