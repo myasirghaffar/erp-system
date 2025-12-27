@@ -18,6 +18,7 @@ import {
   LogoutIcon,
   XIcon,
   TeacherIcon,
+  RolesIcon,
 } from "../../assets/icons";
 import { main_logo } from "../../assets/logos";
 
@@ -78,6 +79,7 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar }) {
             name: t('sidebar.approveRequest'),
             icon: ApproveRequestIcon,
           },
+          { path: "/admin/roles", name: "Roles & Permissions", icon: RolesIcon },
           {
             path: "/admin/settings",
             name: t('sidebar.settings'),

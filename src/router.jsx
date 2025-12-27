@@ -16,6 +16,7 @@ import ApproveRequests from "./pages/adminRole/approverequests";
 import ViewMap from "./pages/adminRole/viewMap";
 import AttendanceDashboard from "./pages/adminRole/attandance";
 import EmployeeDashboard from "./pages/adminRole/employemanage";
+import RolesManage from "./pages/adminRole/rolesmanage";
 
 const AppRouter = () => {
   return (
@@ -42,6 +43,7 @@ const AppRouter = () => {
         <Route index element={<AdminDashboard />} />
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="users" element={<EmployeeDashboard />} />
+        <Route path="roles" element={<RolesManage />} />
         <Route path="manage-workplaces" element={<ManageWorkplaces />} />
         <Route path="manage-qr-code" element={<ManageQrCode />} />
         <Route path="settings" element={<SettingsPage />} />

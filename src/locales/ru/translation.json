@@ -492,5 +492,26 @@
         "manualEntryNotes": "Ручные записи и заметки",
         "month": "Месяц",
         "selectEmployee": "Выберите сотрудника"
+    },
+    "roles": {
+        "title": "Назначение ролей и прав",
+        "description": "Управление ролями пользователей и контроль прав доступа",
+        "roleTypes": "Типы ролей",
+        "permissionsMatrix": "Матрица прав",
+        "globalAccessToggle": "Глобальный переключатель доступа",
+        "permissions": "Права",
+        "superAdmin": "Супер Администратор",
+        "employee": "Сотрудник",
+        "manager": "Менеджер",
+        "fullSystemAccess": "Полный доступ к системе",
+        "onlyMobileAccess": "Только мобильное приложение",
+        "teamManagement": "Управление командой",
+        "usersCount": "{{count}} пользователей",
+        "userManagement": "Управление пользователями",
+        "contentCreation": "Создание контента",
+        "contentEditing": "Редактирование контента",
+        "contentDeletion": "Удаление контента",
+        "analyticsAccess": "Доступ к аналитике",
+        "systemSettings": "Системные настройки"
     }
 }

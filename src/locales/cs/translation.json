@@ -492,5 +492,26 @@
         "manualEntryNotes": "Ruční záznamy a poznámky",
         "month": "Měsíc",
         "selectEmployee": "Vybrat zaměstnance"
+    },
+    "roles": {
+        "title": "Přiřazení rolí a oprávnění",
+        "description": "Spravujte uživatelské role a řiďte přístupová oprávnění",
+        "roleTypes": "Typy rolí",
+        "permissionsMatrix": "Matice oprávnění",
+        "globalAccessToggle": "Globální přepínač přístupu",
+        "permissions": "Oprávnění",
+        "superAdmin": "Super administrátor",
+        "employee": "Zaměstnanec",
+        "manager": "Manažer",
+        "fullSystemAccess": "Úplný přístup k systému",
+        "onlyMobileAccess": "Pouze přístup z mobilní aplikace",
+        "teamManagement": "Řízení týmu",
+        "usersCount": "{{count}} uživatelů",
+        "userManagement": "Správa uživatelů",
+        "contentCreation": "Tvorba obsahu",
+        "contentEditing": "Úprava obsahu",
+        "contentDeletion": "Mazání obsahu",
+        "analyticsAccess": "Přístup k analytice",
+        "systemSettings": "Nastavení systému"
     }
 }

@@ -492,5 +492,26 @@
         "manualEntryNotes": "Manual Entry & Notes",
         "month": "Month",
         "selectEmployee": "Select Employee"
+    },
+    "roles": {
+        "title": "Role & Permissions Assignment",
+        "description": "Manage user roles and control access permissions",
+        "roleTypes": "Role Types",
+        "permissionsMatrix": "Permissions Matrix",
+        "globalAccessToggle": "Global Access Toggle",
+        "permissions": "Permissions",
+        "superAdmin": "Super Admin",
+        "employee": "Employee",
+        "manager": "Manager",
+        "fullSystemAccess": "Full system access",
+        "onlyMobileAccess": "Only Mobile app Access",
+        "teamManagement": "Team management",
+        "usersCount": "{{count}} users",
+        "userManagement": "User Management",
+        "contentCreation": "Content Creation",
+        "contentEditing": "Content Editing",
+        "contentDeletion": "Content Deletion",
+        "analyticsAccess": "Analytics Access",
+        "systemSettings": "System Settings"
     }
 }
