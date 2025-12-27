@@ -52,6 +52,9 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar }) {
     };
   }, [isMobileSidebarOpen, toggleSidebar]);
 
+  const { user } = useSelector((state) => state.auth);
+  const role = user?.role || 'admin'; // Default fallback
+
   const getRoleBasedMenuItems = (role) => {
     const menu = {
       admin: {
@@ -61,22 +64,22 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar }) {
           { path: "/admin/attendance", name: t('sidebar.attendance'), icon: AttendanceIcon },
           { path: "/admin/manage-workplaces", name: t('sidebar.manageWorkplaces'), icon: ManageWorkplacesIcon },
           {
-            path: "/admin/bids",
+            path: "/admin/manage-qr-code",
             name: t('sidebar.manageQrCode'),
             icon: ManageQrCodeIcon,
           },
           {
-            path: "/admin/work-orders",
+            path: "/admin/view-map", // Corrected path to match typical expectation for View Map
             name: t('sidebar.viewMap'),
             icon: ViewMapIcon,
           },
           {
-            path: "/admin/payments",
+            path: "/admin/approve-requests",
             name: t('sidebar.approveRequest'),
             icon: ApproveRequestIcon,
           },
           {
-            path: "/admin/reports",
+            path: "/admin/settings",
             name: t('sidebar.settings'),
             icon: SettingsIconNew,
           },
@@ -143,9 +146,10 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar }) {
         bottom: [],
       },
     };
+    return menu[role] || menu['admin']; // Fallback to admin if role doesn't match
   };
 
-  const menuItems = getMenuItems();
+  const menuItems = getRoleBasedMenuItems(role);
   const finalMenuItems = menuItems;
 
   // Utility function to render NavLink items

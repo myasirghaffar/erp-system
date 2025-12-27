@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react";
 
 const DashboardBanner = ({ title, description, rightContent, onBack }) => {
     return (
-        <div className="w-full relative rounded-[10px] overflow-hidden min-h-[12rem] flex items-center">
+        <div className="w-full relative rounded-[10px] overflow-hidden min-h-[12rem] flex items-center mt-4 md:mt-0">
             <img
                 className="w-full h-full object-cover absolute inset-0"
                 src={RectangleBanner}

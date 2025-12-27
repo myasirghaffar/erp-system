@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Check, X, Clock, Calendar, Filter } from "lucide-react";
 import DashboardBanner from "../../../components/DashboardBanner";
 import ReusableDataTable from "../../../components/ReusableDataTable";
@@ -58,9 +59,11 @@ const leaveRequestsData = [
 ];
 
 const ApproveRequests = () => {
+    const { t } = useTranslation();
+
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 6;
-    
+
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [isApproveModalOpen, setIsApproveModalOpen] = useState(false);
     const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
@@ -104,9 +107,9 @@ const ApproveRequests = () => {
     };
 
     // Filter Options
-    const statusOptions = [{ label: "All Requests", value: "All Requests" }, { label: "Pending", value: "Pending" }];
-    const typeOptions = [{ label: "All Types", value: "All Types" }, { label: "Annual Leave", value: "Annual Leave" }];
-    const deptOptions = [{ label: "All Departments", value: "All Departments" }, { label: "Engineering", value: "Engineering" }];
+    const statusOptions = [{ label: t('common.all'), value: "All Requests" }, { label: t('status.pending'), value: "Pending" }];
+    const typeOptions = [{ label: t('common.all'), value: "All Types" }, { label: "Annual Leave", value: "Annual Leave" }];
+    const deptOptions = [{ label: t('employee.allDepartments'), value: "All Departments" }, { label: "Engineering", value: "Engineering" }];
 
     // Columns Definition
     const columns = [
@@ -122,7 +125,7 @@ const ApproveRequests = () => {
         },
         {
             key: "employee",
-            label: "Employee",
+            label: t('map.employees'),
             minWidth: "250px",
             render: (row) => (
                 <div className="flex items-center gap-3 py-2">
@@ -136,20 +139,20 @@ const ApproveRequests = () => {
         },
         {
             key: "leaveType",
-            label: "Leave Type",
+            label: t('request.leaveType'),
             minWidth: "150px",
             render: (row) => {
                 let bgClass = "bg-blue-50 text-blue-600";
-                if(row.leaveType === "Sick Leave") bgClass = "bg-red-50 text-red-600";
-                if(row.leaveType === "Personal Leave") bgClass = "bg-purple-50 text-purple-600";
-                if(row.leaveType === "Maternity Leave") bgClass = "bg-pink-50 text-pink-600";
-                
+                if (row.leaveType === "Sick Leave") bgClass = "bg-red-50 text-red-600";
+                if (row.leaveType === "Personal Leave") bgClass = "bg-purple-50 text-purple-600";
+                if (row.leaveType === "Maternity Leave") bgClass = "bg-pink-50 text-pink-600";
+
                 return (
                     <span className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 w-fit ${bgClass}`}>
-                         {row.leaveType === "Annual Leave" && "✈️"}
-                         {row.leaveType === "Sick Leave" && "❤️"} 
-                         {row.leaveType === "Personal Leave" && "👤"}
-                         {row.leaveType === "Maternity Leave" && "👶"}
+                        {row.leaveType === "Annual Leave" && "✈️"}
+                        {row.leaveType === "Sick Leave" && "❤️"}
+                        {row.leaveType === "Personal Leave" && "👤"}
+                        {row.leaveType === "Maternity Leave" && "👶"}
                         {row.leaveType}
                     </span>
                 );
@@ -157,7 +160,7 @@ const ApproveRequests = () => {
         },
         {
             key: "dateRange",
-            label: "Date Range",
+            label: t('request.dateRange'),
             minWidth: "200px",
             render: (row) => (
                 <div className="flex flex-col">
@@ -168,13 +171,13 @@ const ApproveRequests = () => {
         },
         {
             key: "duration",
-            label: "Duration",
+            label: t('request.duration'),
             width: "120px",
             render: (row) => <span className="text-[#374151] font-semibold text-[13px]">{row.duration}</span>
         },
         {
             key: "status",
-            label: "Status",
+            label: t('map.status'),
             width: "120px",
             render: (row) => (
                 <span className="px-3 py-1 rounded-full bg-orange-50 text-orange-500 text-[11px] font-bold flex items-center gap-1 w-fit">
@@ -184,15 +187,15 @@ const ApproveRequests = () => {
         },
         {
             key: "actions",
-            label: "Actions",
+            label: t('common.actions'),
             width: "220px",
             render: (row) => (
                 <div className="flex items-center gap-2">
                     <button onClick={() => handleApproveClick(row)} className="flex items-center gap-1 px-4 py-1.5 bg-[#22B3E8] hover:bg-[#1fa0d1] text-white rounded-lg text-xs font-bold transition-colors">
-                        <Check size={14} /> Approve
+                        <Check size={14} /> {t('common.approve')}
                     </button>
                     <button onClick={() => handleRejectClick(row)} className="flex items-center gap-1 px-4 py-1.5 bg-[#EF4444] hover:bg-[#d42d2d] text-white rounded-lg text-xs font-bold transition-colors">
-                        <X size={14} /> Reject
+                        <X size={14} /> {t('common.reject')}
                     </button>
                 </div>
             )
@@ -201,18 +204,19 @@ const ApproveRequests = () => {
 
     return (
         <div className="min-h-screen bg-gray-100 p-4 md:p-6 pb-20 overflow-x-hidden">
-             <div className="space-y-6 max-w-full">
-                 <DashboardBanner
-                    title="Leave Requests"
-                    description="Review and approve employee leave requests"
+            <div className="space-y-6 max-w-full">
+                <DashboardBanner
+                    title={t('request.leaveTitle')}
+                    description={t('request.description')}
                 />
+
 
                 {/* Stats Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <StatCard title="Pending Requests" value="24" icon={Clock} iconBg="bg-blue-50" iconColor="text-blue-500" />
-                    <StatCard title="Approved Today" value="12" icon={Check} iconBg="bg-green-50" iconColor="text-green-500" />
-                    <StatCard title="Rejected Today" value="3" icon={X} iconBg="bg-red-50" iconColor="text-red-500" />
-                    <StatCard title="Total This Month" value="156" icon={Calendar} iconBg="bg-sky-50" iconColor="text-sky-500" />
+                    <StatCard title={t('request.pendingRequests')} value="24" icon={Clock} iconBg="bg-blue-50" iconColor="text-blue-500" />
+                    <StatCard title={t('request.approvedToday')} value="12" icon={Check} iconBg="bg-green-50" iconColor="text-green-500" />
+                    <StatCard title={t('request.rejectedToday')} value="3" icon={X} iconBg="bg-red-50" iconColor="text-red-500" />
+                    <StatCard title={t('request.totalMonth')} value="156" icon={Calendar} iconBg="bg-sky-50" iconColor="text-sky-500" />
                 </div>
 
                 {/* Main Content Area */}
@@ -220,22 +224,22 @@ const ApproveRequests = () => {
                     {/* Filters Bar */}
                     <div className="flex flex-col lg:flex-row justify-between items-end gap-4 mb-6">
                         <div className="flex flex-col md:flex-row gap-4 w-full">
-                             <div className="w-full md:w-48 space-y-1">
-                                <label className="text-gray-600 text-[11px] font-bold pl-1">Status</label>
+                            <div className="w-full md:w-48 space-y-1">
+                                <label className="text-gray-600 text-[11px] font-bold pl-1">{t('map.status')}</label>
                                 <Select options={statusOptions} value={filters.status} name="status" onChange={handleFilterChange} className="w-full h-10 text-sm bg-white" />
-                             </div>
-                             <div className="w-full md:w-48 space-y-1">
-                                <label className="text-gray-600 text-[11px] font-bold pl-1">Leave Type</label>
+                            </div>
+                            <div className="w-full md:w-48 space-y-1">
+                                <label className="text-gray-600 text-[11px] font-bold pl-1">{t('request.leaveType')}</label>
                                 <Select options={typeOptions} value={filters.type} name="type" onChange={handleFilterChange} className="w-full h-10 text-sm bg-white" />
-                             </div>
-                             <div className="w-full md:w-48 space-y-1">
-                                <label className="text-gray-600 text-[11px] font-bold pl-1">Department</label>
+                            </div>
+                            <div className="w-full md:w-48 space-y-1">
+                                <label className="text-gray-600 text-[11px] font-bold pl-1">{t('employee.department')}</label>
                                 <Select options={deptOptions} value={filters.department} name="department" onChange={handleFilterChange} className="w-full h-10 text-sm bg-white" />
-                             </div>
+                            </div>
                         </div>
-                        
+
                         <button className="flex items-center gap-2 px-5 py-2.5 bg-[#22B3E8] hover:bg-[#1fa0d1] text-white rounded-xl text-sm font-bold shadow-sm shadow-sky-100 whitespace-nowrap">
-                            <Filter size={16} /> Apply Filters
+                            <Filter size={16} /> {t('request.applyFilters')}
                         </button>
                     </div>
 
@@ -245,29 +249,31 @@ const ApproveRequests = () => {
                             columns={columns}
                             data={leaveRequestsData}
                         />
-                         <div className="border-t border-gray-100">
-                             <ReusablePagination
+                        <div className="border-t border-gray-100">
+                            <ReusablePagination
                                 totalItems={leaveRequestsData.length}
                                 itemsPerPage={itemsPerPage}
                                 currentPage={currentPage}
                                 onPageChange={setCurrentPage}
                                 totalPages={1}
-                             />
+                            />
                         </div>
                     </div>
                 </div>
-             </div>
+            </div>
 
-             {/* Modals */}
-            <ApproveModal 
-                isOpen={isApproveModalOpen} 
-                onClose={closeModals} 
-                onConfirm={confirmApprove} 
+            {/* Modals */}
+            <ApproveModal
+                isOpen={isApproveModalOpen}
+                onClose={closeModals}
+                onConfirm={confirmApprove}
+                t={t}
             />
-            <RejectModal 
-                isOpen={isRejectModalOpen} 
-                onClose={closeModals} 
-                onConfirm={confirmReject} 
+            <RejectModal
+                isOpen={isRejectModalOpen}
+                onClose={closeModals}
+                onConfirm={confirmReject}
+                t={t}
             />
         </div>
     );
@@ -280,30 +286,30 @@ const StatCard = ({ title, value, icon: Icon, iconBg, iconColor }) => (
             <h3 className="text-[#111827] text-2xl font-bold">{value}</h3>
         </div>
         <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${iconBg} ${iconColor}`}>
-             <Icon size={20} strokeWidth={2.5} />
+            <Icon size={20} strokeWidth={2.5} />
         </div>
     </div>
 );
 
-const ApproveModal = ({ isOpen, onClose, onConfirm }) => {
+const ApproveModal = ({ isOpen, onClose, onConfirm, t }) => {
     if (!isOpen) return null;
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
             <div className="bg-white rounded-2xl p-8 w-[400px] shadow-2xl transform transition-all animate-in fade-in zoom-in-95 duration-200">
-                <h3 className="text-2xl font-bold text-center text-gray-900 mb-2 font-inter">Approve Leave Request</h3>
-                <p className="text-center text-gray-600 mb-8 font-medium">Are you sure you want to approve this leave request?</p>
+                <h3 className="text-2xl font-bold text-center text-gray-900 mb-2 font-inter">{t('request.approveModalTitle')}</h3>
+                <p className="text-center text-gray-600 mb-8 font-medium">{t('request.approveModalDesc')}</p>
                 <div className="flex gap-4">
-                    <button onClick={onClose} className="flex-1 py-3 border border-gray-200 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition-colors">Cancel</button>
-                    <button onClick={onConfirm} className="flex-1 py-3 bg-[#22B3E8] rounded-xl font-bold text-white hover:bg-[#1fa0d1] shadow-lg shadow-sky-100 transition-colors">Approve</button>
+                    <button onClick={onClose} className="flex-1 py-3 border border-gray-200 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition-colors">{t('common.cancel')}</button>
+                    <button onClick={onConfirm} className="flex-1 py-3 bg-[#22B3E8] rounded-xl font-bold text-white hover:bg-[#1fa0d1] shadow-lg shadow-sky-100 transition-colors">{t('common.confirm')}</button>
                 </div>
             </div>
         </div>
     )
 }
 
-const RejectModal = ({ isOpen, onClose, onConfirm }) => {
+const RejectModal = ({ isOpen, onClose, onConfirm, t }) => {
     const [reason, setReason] = useState("");
-    
+
     // Reset reason when modal opens
     React.useEffect(() => {
         if (isOpen) setReason("");
@@ -313,22 +319,22 @@ const RejectModal = ({ isOpen, onClose, onConfirm }) => {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
             <div className="bg-white rounded-2xl p-8 w-[450px] shadow-2xl transform transition-all animate-in fade-in zoom-in-95 duration-200">
-                <h3 className="text-2xl font-bold text-center text-gray-900 mb-2 font-inter">Reject Leave Request</h3>
-                <p className="text-center text-gray-600 mb-6 font-medium">Are you sure you want to reject this leave request?</p>
-                
+                <h3 className="text-2xl font-bold text-center text-gray-900 mb-2 font-inter">{t('request.rejectModalTitle')}</h3>
+                <p className="text-center text-gray-600 mb-6 font-medium">{t('request.rejectModalDesc')}</p>
+
                 <div className="mb-8">
-                     <label className="block text-sm font-bold text-gray-900 mb-2">Reason for Rejection</label>
-                     <textarea 
+                    <label className="block text-sm font-bold text-gray-900 mb-2">{t('request.rejectionReason')}</label>
+                    <textarea
                         value={reason}
                         onChange={(e) => setReason(e.target.value)}
                         placeholder="Enter"
                         className="w-full h-32 p-4 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-sky-500/20 text-gray-700 font-medium placeholder-gray-400"
-                     />
+                    />
                 </div>
 
                 <div className="flex gap-4">
-                    <button onClick={onClose} className="flex-1 py-3 border border-gray-200 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition-colors">Cancel</button>
-                    <button onClick={() => onConfirm(reason)} className="flex-1 py-3 bg-[#22B3E8] rounded-xl font-bold text-white hover:bg-[#1fa0d1] shadow-lg shadow-sky-100 transition-colors">Reject</button>
+                    <button onClick={onClose} className="flex-1 py-3 border border-gray-200 rounded-xl font-bold text-gray-500 hover:bg-gray-50 transition-colors">{t('common.cancel')}</button>
+                    <button onClick={() => onConfirm(reason)} className="flex-1 py-3 bg-[#22B3E8] rounded-xl font-bold text-white hover:bg-[#1fa0d1] shadow-lg shadow-sky-100 transition-colors">{t('common.confirm')}</button>
                 </div>
             </div>
         </div>

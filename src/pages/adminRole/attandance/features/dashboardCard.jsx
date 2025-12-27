@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import {
   ActiveEmployeesIcon,
   HoursWorkedIcon,
@@ -8,27 +9,29 @@ import DashboardCards from "../../../../components/itechResuable/DashboardCards"
 
 // Dashboard Cards Container Component
 const DashboardCardsContainer = () => {
+  const { t } = useTranslation();
+
   const cards = [
     {
-      title: "Active Employees Today",
+      title: t('dashboard.activeEmployees'),
       value: "14",
-      description: ["Employees currently clocked in", "at any workplace."],
+      description: [t('dashboard.activeEmployeesDesc')],
       icon: ActiveEmployeesIcon,
     },
     {
-      title: "Hours Worked This Month",
+      title: t('dashboard.hoursWorked'),
       value: "286h 40m",
-      description: ["Total hours recorded this", "calendar month."],
+      description: [t('dashboard.hoursWorkedDesc')],
       icon: HoursWorkedIcon,
     },
     {
-      title: "Cleanings This Month",
+      title: t('dashboard.cleanings'),
       value: "112",
-      description: ["Number of completed cleaning", "visits this month."],
+      description: [t('dashboard.cleaningsDesc')],
       icon: CleaningsIcon,
     },
     {
-      title: "Quick Export to Excel",
+      title: t('dashboard.quickExport'),
       isExportCard: true,
       icon: QuickExportIcon,
     },

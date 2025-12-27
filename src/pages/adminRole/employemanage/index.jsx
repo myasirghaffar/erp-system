@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { LuPlus } from "react-icons/lu";
 import DashboardBanner from "../../../components/DashboardBanner";
 import EmployeeReport from "./features/employeReport";
@@ -6,6 +7,7 @@ import AddEditEmployee from "./features/AddEditEmployee";
 import EmployeeProfile from "./features/EmployeeProfile";
 
 const EmployeeDashboard = () => {
+  const { t } = useTranslation();
   const [view, setView] = useState("list"); // 'list', 'add', or 'profile'
 
   if (view === "add") {
@@ -33,8 +35,8 @@ const EmployeeDashboard = () => {
           <div className=" space-y-6">
             {/* Welcome Card */}
             <DashboardBanner
-              title="Employee Management"
-              description="Manage your team members and their information"
+              title={t('employee.managementTitle')}
+              description={t('employee.managementDesc')}
               rightContent={
                 <div
                   onClick={() => setView("add")}
@@ -42,7 +44,7 @@ const EmployeeDashboard = () => {
                 >
                   <LuPlus className="w-4 h-4 text-white" />
                   <span className="text-white text-sm font-medium whitespace-nowrap">
-                    Add Employee
+                    {t('employee.addBtn')}
                   </span>
                 </div>
               }
