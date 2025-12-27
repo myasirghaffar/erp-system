@@ -93,6 +93,7 @@ function Header({ toggleSidebar }) {
   const languages = [
     { code: "en", name: "English", flag: "🇬🇧" },
     { code: "cs", name: "Čeština", flag: "🇨🇿" },
+    { code: "ru", name: "Русский", flag: "🇷🇺" },
   ];
 
   return (
