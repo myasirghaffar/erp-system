@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Building2, QrCode, Download, Printer, Info, Check, Image as ImageIcon, FileText } from "lucide-react";
 import { QRCodeCanvas } from 'qrcode.react';
 import ReusableInput from "../../../../components/ReusableInput";
@@ -6,6 +7,7 @@ import Select from "../../../../components/Form/Select";
 import DashboardBanner from "../../../../components/DashboardBanner";
 
 const WorkPlaceQrForm = ({ onBack }) => {
+    const { t } = useTranslation();
     const [formData, setFormData] = useState({
         companyName: "",
         workplaceLocation: "",
@@ -23,10 +25,10 @@ const WorkPlaceQrForm = ({ onBack }) => {
     const handleGenerate = () => {
         // Basic validation: Ensure at least Company Name and Workplace Location are present
         if (!formData.companyName || !formData.workplaceLocation) {
-            alert("Please fill in Company Name and Workplace Location to generate QR code.");
+            alert(t('qrCode.fillRequired') || "Please fill in Company Name and Workplace Location to generate QR code.");
             return;
         }
-        
+
         // Create a structured string or JSON for the QR code
         // Simple JSON format for now
         const qrContent = JSON.stringify({
@@ -37,7 +39,7 @@ const WorkPlaceQrForm = ({ onBack }) => {
             e: formData.email,
             ts: Date.now() // Timestamp to make unique if needed
         });
-        
+
         setQrCodeValue(qrContent);
     };
 
@@ -69,9 +71,9 @@ const WorkPlaceQrForm = ({ onBack }) => {
 
     return (
         <div className="w-full space-y-6">
-             <DashboardBanner
-                title="Generate Workplace QR Code"
-                description="Create and download QR codes for workplace identification and tracking"
+            <DashboardBanner
+                title={t('qrCode.generateTitle')}
+                description={t('qrCode.generateDesc')}
                 onBack={onBack}
             />
 
@@ -85,10 +87,10 @@ const WorkPlaceQrForm = ({ onBack }) => {
                         </div>
                         <div>
                             <h2 className="text-[#111827] text-lg font-bold font-inter leading-6">
-                                Select Workplace
+                                {t('workplace.selectWorkplaceTitle')}
                             </h2>
                             <p className="text-gray-400 text-sm font-medium mt-1">
-                                Choose a workplace to generate QR code
+                                {t('workplace.selectWorkplaceDesc')}
                             </p>
                         </div>
                     </div>
@@ -97,12 +99,12 @@ const WorkPlaceQrForm = ({ onBack }) => {
                     <div className="space-y-5 flex-grow">
                         {/* Company Name */}
                         <div className="space-y-2">
-                             <label className="text-gray-700 text-xs font-bold font-inter">
-                                Company Name
+                            <label className="text-gray-700 text-xs font-bold font-inter">
+                                {t('workplace.companyName')}
                             </label>
                             <ReusableInput
                                 name="companyName"
-                                placeholder="Enter"
+                                placeholder={t('common.enter')}
                                 value={formData.companyName}
                                 onChange={handleChange}
                                 backgroundColor="bg-gray-50"
@@ -112,28 +114,28 @@ const WorkPlaceQrForm = ({ onBack }) => {
                         </div>
 
                         {/* Workplace Location */}
-                         <div className="space-y-2">
+                        <div className="space-y-2">
                             <label className="text-gray-700 text-xs font-bold font-inter">
-                                Workplace Location
+                                {t('workplace.location')}
                             </label>
                             <Select
                                 name="workplaceLocation"
                                 value={formData.workplaceLocation}
                                 onChange={handleChange}
                                 options={workplaceOptions}
-                                placeholder="Select a workplace..."
+                                placeholder={t('workplace.selectWorkplaceTitle')}
                                 className="w-full h-12 bg-gray-50 border border-gray-200 rounded-xl px-4 text-gray-900 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
                             />
                         </div>
 
                         {/* Department */}
-                         <div className="space-y-2">
+                        <div className="space-y-2">
                             <label className="text-gray-700 text-xs font-bold font-inter">
-                                Department
+                                {t('employee.department')}
                             </label>
                             <ReusableInput
                                 name="department"
-                                placeholder="Enter"
+                                placeholder={t('common.enter')}
                                 value={formData.department}
                                 onChange={handleChange}
                                 backgroundColor="bg-gray-50"
@@ -144,12 +146,12 @@ const WorkPlaceQrForm = ({ onBack }) => {
 
                         {/* Contact Number */}
                         <div className="space-y-2">
-                             <label className="text-gray-700 text-xs font-bold font-inter">
-                                Contact Number
+                            <label className="text-gray-700 text-xs font-bold font-inter">
+                                {t('employee.contact')}
                             </label>
                             <ReusableInput
                                 name="contactNumber"
-                                placeholder="Enter"
+                                placeholder={t('common.enter')}
                                 type="tel"
                                 value={formData.contactNumber}
                                 onChange={handleChange}
@@ -160,13 +162,13 @@ const WorkPlaceQrForm = ({ onBack }) => {
                         </div>
 
                         {/* Email */}
-                         <div className="space-y-2">
-                             <label className="text-gray-700 text-xs font-bold font-inter">
-                                Email
+                        <div className="space-y-2">
+                            <label className="text-gray-700 text-xs font-bold font-inter">
+                                {t('table.email')}
                             </label>
                             <ReusableInput
                                 name="email"
-                                placeholder="Enter"
+                                placeholder={t('common.enter')}
                                 type="email"
                                 value={formData.email}
                                 onChange={handleChange}
@@ -179,12 +181,12 @@ const WorkPlaceQrForm = ({ onBack }) => {
 
                     {/* Generate Button */}
                     <div className="mt-8 pt-6">
-                        <button 
+                        <button
                             onClick={handleGenerate}
                             className="w-full h-12 bg-[#22B3E8] hover:bg-[#1fa0d1] transition-colors rounded-xl shadow-lg shadow-sky-100 flex items-center justify-center gap-2 text-white font-bold text-sm"
                         >
                             <QrCode size={18} />
-                            <span>Generate QR Code</span>
+                            <span>{t('qrCode.generateQrCode')}</span>
                         </button>
                     </div>
                 </div>
@@ -198,10 +200,10 @@ const WorkPlaceQrForm = ({ onBack }) => {
                         </div>
                         <div>
                             <h2 className="text-[#111827] text-lg font-bold font-inter leading-6">
-                                QR Code Preview
+                                {t('workplace.qrPreviewTitle')}
                             </h2>
                             <p className="text-gray-400 text-sm font-medium mt-1">
-                                Preview and download your QR code
+                                {t('workplace.qrPreviewDesc')}
                             </p>
                         </div>
                     </div>
@@ -209,15 +211,15 @@ const WorkPlaceQrForm = ({ onBack }) => {
                     {/* Preview Area */}
                     <div className="w-full aspect-square max-h-[300px] mx-auto bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 flex items-center justify-center mb-8 relative">
                         {qrCodeValue ? (
-                             <div className="p-4 bg-white rounded-xl shadow-sm">
-                                <QRCodeCanvas 
+                            <div className="p-4 bg-white rounded-xl shadow-sm">
+                                <QRCodeCanvas
                                     id="qr-code-canvas"
-                                    value={qrCodeValue} 
-                                    size={200} 
+                                    value={qrCodeValue}
+                                    size={200}
                                     level={"H"}
                                     includeMargin={true}
                                 />
-                             </div>
+                            </div>
                         ) : (
                             <div className="flex flex-col items-center gap-3">
                                 <div className="w-16 h-16 bg-gray-200 rounded-xl flex items-center justify-center">
@@ -225,10 +227,10 @@ const WorkPlaceQrForm = ({ onBack }) => {
                                 </div>
                                 <div className="text-center">
                                     <p className="text-gray-500 text-sm font-bold">
-                                        No QR Code Generated
+                                        {t('workplace.noQrCode')}
                                     </p>
                                     <p className="text-gray-400 text-xs font-medium mt-1">
-                                        Select a workplace and click generate
+                                        {t('workplace.noQrCodeDesc')}
                                     </p>
                                 </div>
                             </div>
@@ -237,28 +239,28 @@ const WorkPlaceQrForm = ({ onBack }) => {
 
                     {/* Action Buttons */}
                     <div className="space-y-3">
-                        <button 
+                        <button
                             onClick={handleDownloadPNG}
                             disabled={!qrCodeValue}
                             className={`w-full h-11 transition-colors rounded-xl text-white font-semibold text-sm flex items-center justify-center gap-2 ${!qrCodeValue ? 'bg-gray-300 cursor-not-allowed' : 'bg-[#4285F4] hover:bg-blue-600'}`}
                         >
                             <ImageIcon size={16} />
-                            Download PNG
+                            {t('common.download')} PNG
                         </button>
-                         <button 
+                        <button
                             disabled={!qrCodeValue}
                             className={`w-full h-11 border transition-colors rounded-xl font-semibold text-sm flex items-center justify-center gap-2 ${!qrCodeValue ? 'border-gray-200 text-gray-400 cursor-not-allowed bg-gray-50' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'}`}
-                         >
+                        >
                             <FileText size={16} />
-                            Download PDF
+                            {t('common.download')} PDF
                         </button>
-                         <button 
+                        <button
                             disabled={!qrCodeValue}
                             onClick={() => window.print()}
                             className={`w-full h-11 border transition-colors rounded-xl font-semibold text-sm flex items-center justify-center gap-2 ${!qrCodeValue ? 'border-gray-200 text-gray-400 cursor-not-allowed bg-gray-50' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'}`}
-                         >
+                        >
                             <Printer size={16} />
-                            Print QR Code
+                            {t('qrCode.print')}
                         </button>
                     </div>
 
@@ -269,11 +271,10 @@ const WorkPlaceQrForm = ({ onBack }) => {
                         </div>
                         <div>
                             <h4 className="text-[#0D47A1] text-xs font-bold font-inter">
-                                Quick Tip
+                                {t('workplace.quickTip')}
                             </h4>
                             <p className="text-[#1565C0] text-xs font-medium font-inter leading-relaxed mt-1">
-                                Print the QR code on durable material and place it in a visible
-                                location at the workplace for easy scanning.
+                                {t('workplace.quickTipDesc')}
                             </p>
                         </div>
                     </div>

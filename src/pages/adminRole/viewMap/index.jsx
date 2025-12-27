@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+
 import { MapContainer, TileLayer, Marker, Popup, ScaleControl } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -25,20 +27,23 @@ const employees = [
 ];
 
 const ViewMap = () => {
+    const { t } = useTranslation();
+
     // Center map on the first workplace or a default location
     const defaultCenter = [51.505, -0.09];
-    
+
     return (
         <div className="min-h-screen bg-gray-100 p-4 md:p-6 pb-20 overflow-x-hidden flex flex-col">
             <DashboardBanner
-                title="View Map"
-                description="Visualize workplaces and real-time employee locations"
+                title={t('map.title')}
+                description={t('map.description')}
             />
-            
+
+
             <div className="flex-1 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden relative min-h-[500px] md:min-h-[600px] z-0">
-                <MapContainer 
-                    center={defaultCenter} 
-                    zoom={13} 
+                <MapContainer
+                    center={defaultCenter}
+                    zoom={13}
                     style={{ height: "100%", width: "100%", position: "absolute", top: 0, left: 0 }}
                     scrollWheelZoom={true}
                 >
@@ -46,7 +51,7 @@ const ViewMap = () => {
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
-                    
+
                     {/* Workplace Markers */}
                     {workplaces.map(place => (
                         <Marker key={`wp-${place.id}`} position={[place.lat, place.lng]}>
@@ -73,18 +78,21 @@ const ViewMap = () => {
                         </Marker>
                     ))}
                 </MapContainer>
-                
+
                 {/* Overlay Legend or Controls could go here */}
                 <div className="absolute bottom-4 right-4 bg-white p-3 rounded-xl shadow-lg border border-gray-100 z-[400] text-sm">
-                    <h4 className="font-bold text-gray-700 mb-2">Legend</h4>
+                    <h4 className="font-bold text-gray-700 mb-2">{t('map.legend')}</h4>
+
                     <div className="flex items-center gap-2 mb-1">
                         <span className="w-3 h-3 rounded-full bg-blue-500"></span>
-                        <span className="text-gray-600">Workplaces</span>
+                        <span className="text-gray-600">{t('map.workplaces')}</span>
                     </div>
+
                     <div className="flex items-center gap-2">
                         <span className="w-3 h-3 rounded-full bg-blue-500"></span> {/* Leaflet default is blue, usually we'd customize icons */}
-                        <span className="text-gray-600">Employees</span>
+                        <span className="text-gray-600">{t('map.employees')}</span>
                     </div>
+
                 </div>
             </div>
         </div>

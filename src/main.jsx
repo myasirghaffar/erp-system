@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import "./index.css";
 import "./styles/global.css";
+import "./i18n"; // Initialize i18n
 import AppRouter from "./router.jsx";
 import ErrorBoundary from "./components/ErrorBoundary.jsx";
 import store, { persistor } from "./store";

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { ExportButtonIcon } from "../../assets/icons/icons";
 
 const DashboardCards = ({
@@ -8,6 +9,10 @@ const DashboardCards = ({
   isExportCard = false,
   className = "",
 }) => {
+  const { t } = useTranslation();
+
+  const descLines = Array.isArray(description) ? description : [description];
+
   if (isExportCard) {
     return (
       <div className={`w-full min-h-[15rem] flex flex-col p-6 bg-gradient-to-br from-sky-600 to-blue-700 rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] border-gray-200 ${className}`}>
@@ -20,7 +25,7 @@ const DashboardCards = ({
         <button className="mt-auto w-full h-12 bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] border-gray-200 flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors">
           <ExportButtonIcon className="w-4 h-6" />
           <span className="text-blue-700 text-base font-semibold font-poppins">
-            Export to Excel
+            {t('common.exportExcel')}
           </span>
         </button>
       </div>
@@ -36,12 +41,9 @@ const DashboardCards = ({
         {title}
       </div>
       <div className="text-gray-500 text-xs font-normal font-poppins mb-6">
-        {description && (
-          <>
-            <div>{description[0]}</div>
-            <div>{description[1]}</div>
-          </>
-        )}
+        {descLines.map((line, i) => (
+          <div key={i}>{line}</div>
+        ))}
       </div>
       <div className="mt-auto text-gray-900 text-4xl font-bold font-poppins">
         {value}

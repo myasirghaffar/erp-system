@@ -4,161 +4,103 @@ import ReusableFilter from "../../../../components/ReusableFilter";
 import ReusablePagination from "../../../../components/ReusablePagination";
 import { Building2, Search } from "lucide-react";
 import { FaMapMarkerAlt } from "react-icons/fa";
-
-
-const itemsPerPage = 5;
-
-const demoData = [
-    {
-        id: 1,
-        name: "Michael Chen",
-        checkIn: { time: "08:45 AM", date: "Dec 24, 2024", color: "text-green-500" },
-        workplace: "Headquarters",
-        checkOut: { time: "05:00 PM", date: "Dec 24, 2024", color: "text-green-500" },
-        type: "QR Scan",
-        duration: "8h 15m",
-        note: "On Time",
-    },
-    {
-        id: 2,
-        name: "Michael Chen",
-        checkIn: { time: "09:30 AM", date: "Dec 25, 2024", color: "text-red-500" },
-        workplace: "Headquarters",
-        checkOut: { time: "01:30 PM", date: "Dec 25, 2024", color: "text-green-500" },
-        type: "QR Scan",
-        duration: "4h 00m",
-        note: "Half day leave",
-    },
-    {
-        id: 3,
-        name: "Michael Chen",
-        checkIn: { time: "08:45 AM", date: "Dec 26, 2024", color: "text-gray-400" },
-        workplace: "Headquarters",
-        checkOut: { time: "06:15 PM", date: "Dec 26, 2024", color: "text-green-500" },
-        type: "QR Scan",
-        duration: "9h 30m",
-        note: "Overtime approved",
-    },
-    {
-        id: 4,
-        name: "Michael Chen",
-        checkIn: { time: "08:45 AM", date: "Dec 27, 2024", color: "text-green-500" },
-        workplace: "Headquarters",
-        checkOut: { time: "04:45 PM", date: "Dec 27, 2024", color: "text-red-500" },
-        type: "QR Scan",
-        duration: "8h 00m",
-        note: "On Time",
-    },
-    {
-        id: 5,
-        name: "Michael Chen",
-        checkIn: { time: "09:00 AM", date: "Dec 28, 2024", color: "text-red-500" },
-        workplace: "Headquarters",
-        checkOut: { time: "05:00 PM", date: "Dec 28, 2024", color: "text-green-500" },
-        type: "QR Scan",
-        duration: "8h 00m",
-        note: "On Time",
-    },
-    {
-        id: 6,
-        name: "Michael Chen",
-        checkIn: { time: "08:45 AM", date: "Dec 29, 2024", color: "text-green-500" },
-        workplace: "Headquarters",
-        checkOut: { time: "05:00 PM", date: "Dec 29, 2024", color: "text-green-500" },
-        type: "QR Scan",
-        duration: "8h 15m",
-        note: "On Time",
-    },
-    {
-        id: 7,
-        name: "Michael Chen",
-        checkIn: { time: "08:45 AM", date: "Dec 30, 2024", color: "text-green-500" },
-        workplace: "Headquarters",
-        checkOut: { time: "05:00 PM", date: "Dec 30, 2024", color: "text-green-500" },
-        type: "QR Scan",
-        duration: "8h 15m",
-        note: "On Time",
-    },
-    {
-        id: 8,
-        name: "Michael Chen",
-        checkIn: { time: "08:45 AM", date: "Dec 31, 2024", color: "text-green-500" },
-        workplace: "Headquarters",
-        checkOut: { time: "05:00 PM", date: "Dec 31, 2024", color: "text-green-500" },
-        type: "QR Scan",
-        duration: "8h 15m",
-        note: "On Time",
-    },
-    {
-        id: 9,
-        name: "Michael Chen",
-        checkIn: { time: "08:45 AM", date: "Jan 01, 2025", color: "text-green-500" },
-        workplace: "Headquarters",
-        checkOut: { time: "05:00 PM", date: "Jan 01, 2025", color: "text-green-500" },
-        type: "QR Scan",
-        duration: "8h 15m",
-        note: "On Time",
-    },
-    {
-        id: 10,
-        name: "Michael Chen",
-        checkIn: { time: "08:45 AM", date: "Jan 02, 2025", color: "text-green-500" },
-        workplace: "Headquarters",
-        checkOut: { time: "05:00 PM", date: "Jan 02, 2025", color: "text-green-500" },
-        type: "QR Scan",
-        duration: "8h 15m",
-        note: "On Time",
-    },
-    {
-        id: 11,
-        name: "Michael Chen",
-        checkIn: { time: "08:45 AM", date: "Jan 03, 2025", color: "text-green-500" },
-        workplace: "Headquarters",
-        checkOut: { time: "05:00 PM", date: "Jan 03, 2025", color: "text-green-500" },
-        type: "QR Scan",
-        duration: "8h 15m",
-        note: "On Time",
-    },
-    {
-        id: 12,
-        name: "Michael Chen",
-        checkIn: { time: "08:45 AM", date: "Jan 04, 2025", color: "text-green-500" },
-        workplace: "Headquarters",
-        checkOut: { time: "05:00 PM", date: "Jan 04, 2025", color: "text-green-500" },
-        type: "QR Scan",
-        duration: "8h 15m",
-        note: "On Time",
-    }
-];
-
-const filterConfig = [
-    {
-        key: "workplace",
-        label: "All Workplaces",
-        options: [
-            { label: "All Workplaces", value: "" },
-            { label: "Headquarters", value: "Headquarters" }
-        ]
-    },
-    {
-        key: "type",
-        label: "Type",
-        options: [
-            { label: "Type", value: "" },
-            { label: "QR Scan", value: "QR Scan" }
-        ]
-    },
-    {
-        key: "dateRange",
-        label: "Today",
-        options: [
-            { label: "Today", value: "today" },
-            { label: "Yesterday", value: "yesterday" }
-        ]
-    }
-];
+import { useTranslation } from "react-i18next";
 
 const AttendanceReport = () => {
+    const { t } = useTranslation();
+    const itemsPerPage = 10;
+
+    // Demo Data exactly matching the screenshot
+    const demoData = React.useMemo(() => [
+        {
+            id: 1,
+            name: "Michael Chen",
+            checkIn: { time: "08:45 AM", date: "Dec 24, 2024", color: "text-green-500" },
+            workplace: "Headquarters",
+            checkOut: { time: "08:45 AM", date: "Dec 24, 2024", color: "text-green-500" },
+            type: "QR Scan",
+            duration: "2h 15m",
+            note: "On Time",
+        },
+        {
+            id: 2,
+            name: "Michael Chen",
+            checkIn: { time: "08:45 AM", date: "Dec 24, 2024", color: "text-red-500" },
+            workplace: "Headquarters",
+            checkOut: { time: "08:45 AM", date: "Dec 24, 2024", color: "text-green-500" },
+            type: "QR Scan",
+            duration: "2h 15m",
+            note: "Half day leave",
+        },
+        {
+            id: 3,
+            name: "Michael Chen",
+            checkIn: { time: "08:45 AM", date: "Dec 24, 2024", color: "text-gray-400" },
+            workplace: "Headquarters",
+            checkOut: { time: "08:45 AM", date: "Dec 24, 2024", color: "text-green-500" },
+            type: "QR Scan",
+            duration: "2h 15m",
+            note: "Overtime approved",
+        },
+        {
+            id: 4,
+            name: "Michael Chen",
+            checkIn: { time: "08:45 AM", date: "Dec 24, 2024", color: "text-green-500" },
+            workplace: "Headquarters",
+            checkOut: { time: "08:45 AM", date: "Dec 24, 2024", color: "text-red-500" },
+            type: "QR Scan",
+            duration: "2h 15m",
+            note: "On Time",
+        },
+        {
+            id: 5,
+            name: "Michael Chen",
+            checkIn: { time: "08:45 AM", date: "Dec 24, 2024", color: "text-red-500" },
+            workplace: "Headquarters",
+            checkOut: { time: "08:45 AM", date: "Dec 24, 2024", color: "text-green-500" },
+            type: "QR Scan",
+            duration: "2h 15m",
+            note: "On Time",
+        },
+        {
+            id: 6,
+            name: "Michael Chen",
+            checkIn: { time: "08:45 AM", date: "Dec 24, 2024", color: "text-green-500" },
+            workplace: "Headquarters",
+            checkOut: { time: "08:45 AM", date: "Dec 24, 2024", color: "text-green-500" },
+            type: "QR Scan",
+            duration: "2h 15m",
+            note: "On Time",
+        }
+    ], []);
+
+    const filterConfig = React.useMemo(() => [
+        {
+            key: "workplace",
+            label: t('attendance.allWorkplaces'),
+            options: [
+                { label: t('attendance.allWorkplaces'), value: "" },
+                { label: "Headquarters", value: "Headquarters" }
+            ]
+        },
+        {
+            key: "type",
+            label: t('attendance.type'),
+            options: [
+                { label: t('attendance.type'), value: "" },
+                { label: "QR Scan", value: "QR Scan" }
+            ]
+        },
+        {
+            key: "dateRange",
+            label: "Today",
+            options: [
+                { label: "Today", value: "today" },
+                { label: "Yesterday", value: "yesterday" }
+            ]
+        }
+    ], [t]);
+
     const [currentPage, setCurrentPage] = useState(1);
     const [filteredData, setFilteredData] = useState(demoData);
 
@@ -173,7 +115,7 @@ const AttendanceReport = () => {
     const totalItems = filteredData.length;
     const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-    const columns = [
+    const columns = React.useMemo(() => [
         {
             key: "selection",
             label: "",
@@ -186,7 +128,7 @@ const AttendanceReport = () => {
         },
         {
             key: "name",
-            label: "Employee Name",
+            label: t('table.name'), // Localized
             minWidth: "12.5rem", // 200px
             grow: 1, // Allow this column to grow to fill empty space
             render: (row) => (
@@ -200,7 +142,7 @@ const AttendanceReport = () => {
         },
         {
             key: "checkIn",
-            label: "Check-in Time",
+            label: t('attendance.checkIn'), // Localized
             minWidth: "11.25rem", // 180px
             render: (row) => (
                 <div className="flex items-center gap-3">
@@ -214,7 +156,7 @@ const AttendanceReport = () => {
         },
         {
             key: "workplace",
-            label: "Workplace",
+            label: t('workplace.workplaceName'), // Localized
             minWidth: "10rem", // 160px
             render: (row) => (
                 <div className="flex items-center gap-2">
@@ -225,7 +167,7 @@ const AttendanceReport = () => {
         },
         {
             key: "checkOut",
-            label: "Check-Out",
+            label: t('attendance.checkOut'), // Localized
             minWidth: "11.25rem", // 180px
             render: (row) => (
                 <div className="flex items-center gap-3">
@@ -239,7 +181,7 @@ const AttendanceReport = () => {
         },
         {
             key: "type",
-            label: "Type",
+            label: t('attendance.type'), // Localized
             minWidth: "6.25rem", // 100px
             render: (row) => (
                 <span className="text-[#111827] font-semibold text-[0.8125rem]">{row.type}</span>
@@ -247,7 +189,7 @@ const AttendanceReport = () => {
         },
         {
             key: "duration",
-            label: "Duration",
+            label: t('attendance.duration'), // Localized
             minWidth: "6.25rem", // 100px
             render: (row) => (
                 <span className="text-[#111827] font-semibold text-[0.8125rem]">{row.duration}</span>
@@ -255,30 +197,30 @@ const AttendanceReport = () => {
         },
         {
             key: "note",
-            label: "Manger Note",
+            label: t('attendance.managerNote'), // Localized (and fixed typo "Manger")
             minWidth: "10rem", // Added minWidth to ensure it doesn't collapse
             render: (row) => (
                 <span className="text-[#111827] font-semibold text-[0.8125rem]">{row.note}</span>
             )
         }
-    ];
+    ], [t]);
 
     return (
         <div className="w-full bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mt-6">
             {/* Header Section */}
             <div className="p-6">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
-                    <h2 className="text-[#111827] text-xl font-bold font-inter">Employee Attendance</h2>
+                    <h2 className="text-[#111827] text-xl font-bold font-inter">{t('attendance.employeeAttendance')}</h2>
                     <div className="flex flex-col items-end">
                         <span className="text-[#111827] text-2xl font-bold font-inter tracking-tight">29h 45m</span>
-                        <span className="text-gray-400 text-[10px] font-medium font-inter">Total Worked Hours (All Employees)</span>
+                        <span className="text-gray-400 text-[10px] font-medium font-inter">{t('attendance.totalWorkedHours')}</span>
                     </div>
                 </div>
 
                 {/* Filter Section */}
                 <div className="w-full">
                     <ReusableFilter
-                        searchConfig={{ placeholder: "Search employees..." }}
+                        searchConfig={{ placeholder: t('employee.searchEmployee') }}
                         filters={filterConfig}
                         data={demoData}
                         onFilteredDataChange={handleFilteredDataChange}
@@ -296,9 +238,9 @@ const AttendanceReport = () => {
                     columns={columns}
                     data={currentTableData}
                 />
-                
+
                 {/* Pagination */}
-                 <div className="border-t border-gray-100">
+                <div className="border-t border-gray-100">
                     <ReusablePagination
                         totalItems={totalItems}
                         itemsPerPage={itemsPerPage}

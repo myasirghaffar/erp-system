@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../store/slices/authSlice";
 import { persistor } from "../../store";
+import { useTranslation } from "react-i18next";
 import {
   DashboardIconNew,
   ManageEmployeeIcon,
@@ -16,7 +17,7 @@ import {
   SettingsIconNew,
   LogoutIcon,
   XIcon,
-  TeacherIcon, // Keep for nested menu indicator if needed, or replace
+  TeacherIcon,
 } from "../../assets/icons";
 import { main_logo } from "../../assets/logos";
 
@@ -24,6 +25,7 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
   const [expandedMenus, setExpandedMenus] = useState({});
 
   // Close sidebar when clicking outside on mobile
@@ -50,47 +52,104 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar }) {
     };
   }, [isMobileSidebarOpen, toggleSidebar]);
 
-  const getMenuItems = () => {
-    return {
-      main: [
-        { path: "/admin/dashboard", name: "Dashboard", icon: DashboardIconNew },
-        {
-          path: "/admin/users",
-          name: "Manage employee",
-          icon: ManageEmployeeIcon,
-        },
-        { path: "/admin/attendance", name: "Attendance", icon: AttendanceIcon },
-        {
-          path: "/admin/manage-workplaces",
-          name: "Manage workplaces",
-          icon: ManageWorkplacesIcon,
-        },
-        {
-          path: "/admin/manage-qr-code",
-          name: "Manage QR Code",
-          icon: ManageQrCodeIcon,
-        },
-        {
-          path: "/admin/view-map",
-          name: "View map",
-          icon: ViewMapIcon,
-        },
-        {
-          path: "/admin/approve-requests",
-          name: "Approve Request",
-          icon: ApproveRequestIcon,
-        },
-        {
-          path: "/admin/settings",
-          name: "Settings",
-          icon: SettingsIconNew,
-        },
-      ],
-      bottom: [],
+  const { user } = useSelector((state) => state.auth);
+  const role = user?.role || 'admin'; // Default fallback
+
+  const getRoleBasedMenuItems = (role) => {
+    const menu = {
+      admin: {
+        main: [
+          { path: "/admin/dashboard", name: t('sidebar.dashboard'), icon: DashboardIconNew },
+          { path: "/admin/users", name: t('sidebar.manageEmployee'), icon: ManageEmployeeIcon },
+          { path: "/admin/attendance", name: t('sidebar.attendance'), icon: AttendanceIcon },
+          { path: "/admin/manage-workplaces", name: t('sidebar.manageWorkplaces'), icon: ManageWorkplacesIcon },
+          {
+            path: "/admin/manage-qr-code",
+            name: t('sidebar.manageQrCode'),
+            icon: ManageQrCodeIcon,
+          },
+          {
+            path: "/admin/view-map", // Corrected path to match typical expectation for View Map
+            name: t('sidebar.viewMap'),
+            icon: ViewMapIcon,
+          },
+          {
+            path: "/admin/approve-requests",
+            name: t('sidebar.approveRequest'),
+            icon: ApproveRequestIcon,
+          },
+          {
+            path: "/admin/settings",
+            name: t('sidebar.settings'),
+            icon: SettingsIconNew,
+          },
+        ],
+        bottom: [],
+      },
+      user: {
+        main: [
+          { path: "/user/dashboard", name: t('sidebar.dashboard'), icon: DashboardIconNew },
+          { path: "/user/jobs", name: t('sidebar.manageWorkplaces'), icon: ManageWorkplacesIcon },
+          { path: "/user/attendance", name: t('sidebar.attendance'), icon: AttendanceIcon },
+          {
+            path: "/user/bids",
+            name: t('sidebar.manageQrCode'),
+            icon: ManageQrCodeIcon,
+          },
+          {
+            path: "/user/work-orders",
+            name: t('sidebar.viewMap'),
+            icon: ViewMapIcon,
+          },
+          {
+            path: "/user/payments",
+            name: t('sidebar.approveRequest'),
+            icon: ApproveRequestIcon,
+          },
+        ],
+        bottom: [],
+      },
+      contractor: {
+        main: [
+          {
+            path: "/contractor/dashboard",
+            name: t('sidebar.dashboard'),
+            icon: DashboardIconNew,
+          },
+          {
+            path: "/contractor/jobs",
+            name: t('sidebar.manageWorkplaces'),
+            icon: ManageWorkplacesIcon,
+          },
+          { path: "/contractor/attendance", name: t('sidebar.attendance'), icon: AttendanceIcon },
+          {
+            path: "/contractor/bids",
+            name: t('sidebar.manageQrCode'),
+            icon: ManageQrCodeIcon,
+          },
+          {
+            path: "/contractor/work-orders",
+            name: t('sidebar.viewMap'),
+            icon: ViewMapIcon,
+          },
+          {
+            path: "/contractor/payments",
+            name: t('sidebar.approveRequest'),
+            icon: ApproveRequestIcon,
+          },
+          {
+            path: "/contractor/reports",
+            name: t('sidebar.settings'),
+            icon: SettingsIconNew,
+          },
+        ],
+        bottom: [],
+      },
     };
+    return menu[role] || menu['admin']; // Fallback to admin if role doesn't match
   };
 
-  const menuItems = getMenuItems();
+  const menuItems = getRoleBasedMenuItems(role);
   const finalMenuItems = menuItems;
 
   // Utility function to render NavLink items

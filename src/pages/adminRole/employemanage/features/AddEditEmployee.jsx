@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Info } from "lucide-react";
 import { LuPlus } from "react-icons/lu";
 import ReusableInput from "../../../../components/ReusableInput";
@@ -6,29 +7,31 @@ import Select from "../../../../components/Form/Select";
 import DashboardBanner from "../../../../components/DashboardBanner";
 
 const AddEditEmployee = ({ onBack }) => {
+    const { t } = useTranslation();
+
     return (
         <div className="w-full space-y-6">
             <DashboardBanner
-                title="Add/ Edit Employee"
-                description="Create a new employee profile"
+                title={t('employee.addEditTitle')}
+                description={t('employee.managementDesc')} // Use managementDesc or similar generic desc
                 onBack={onBack}
             />
 
             {/* Form Section */}
             <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100">
                 <div className="mb-8">
-                    <h2 className="text-[#111827] text-lg font-bold font-inter">Basic Information</h2>
-                    <p className="text-gray-400 text-sm font-medium mt-1">Please fill in the employee details below</p>
+                    <h2 className="text-[#111827] text-lg font-bold font-inter">{t('employee.basicInfo')}</h2>
+                    <p className="text-gray-400 text-sm font-medium mt-1">{t('employee.basicInfoDesc')}</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                     {/* Full Name */}
                     <div className="space-y-2">
                         <label className="text-gray-700 text-[13px] font-semibold flex items-center gap-1">
-                            Full Name<span className="text-red-500">*</span>
+                            {t('employee.fullName')}<span className="text-red-500">*</span>
                         </label>
                         <ReusableInput
-                            placeholder="Enter employee's full name"
+                            placeholder={t('employee.fullNamePlaceholder')}
                             classes="h-12 rounded-xl border-gray-200 focus:ring-sky-500/20"
                         />
                     </div>
@@ -36,10 +39,10 @@ const AddEditEmployee = ({ onBack }) => {
                     {/* Email Address */}
                     <div className="space-y-2">
                         <label className="text-gray-700 text-[13px] font-semibold flex items-center gap-1">
-                            Email Address<span className="text-red-500">*</span>
+                            {t('employee.emailAddress')}<span className="text-red-500">*</span>
                         </label>
                         <ReusableInput
-                            placeholder="employee@company.com"
+                            placeholder={t('employee.emailPlaceholder')}
                             classes="h-12 rounded-xl border-gray-200 focus:ring-sky-500/20"
                         />
                     </div>
@@ -47,10 +50,10 @@ const AddEditEmployee = ({ onBack }) => {
                     {/* Phone Number */}
                     <div className="space-y-2">
                         <label className="text-gray-700 text-[13px] font-semibold">
-                            Phone Number (optional)
+                            {t('employee.phoneOptional')}
                         </label>
                         <ReusableInput
-                            placeholder="+1 (555) 123-4567"
+                            placeholder={t('employee.phonePlaceholder')}
                             classes="h-12 rounded-xl border-gray-200 focus:ring-sky-500/20"
                         />
                     </div>
@@ -58,10 +61,10 @@ const AddEditEmployee = ({ onBack }) => {
                     {/* Position */}
                     <div className="space-y-2">
                         <label className="text-gray-700 text-[13px] font-semibold flex items-center gap-1">
-                            Position<span className="text-red-500">*</span>
+                            {t('table.role') || "Position"}<span className="text-red-500">*</span>
                         </label>
                         <ReusableInput
-                            placeholder="e.g. Software Developer, Marketing Manager"
+                            placeholder={t('employee.positionPlaceholder')}
                             classes="h-12 rounded-xl border-gray-200 focus:ring-sky-500/20"
                         />
                     </div>
@@ -69,15 +72,15 @@ const AddEditEmployee = ({ onBack }) => {
                     {/* Role Dropdown */}
                     <div className="space-y-2">
                         <label className="text-gray-700 text-[13px] font-semibold">
-                            Select Role (optional)
+                            {t('employee.selectRole')}
                         </label>
                         <Select
-                            placeholder="Choose a role"
+                            placeholder={t('employee.chooseRole')}
                             className="w-full h-12 bg-white text-gray-700 rounded-xl border border-gray-200"
                             options={[
-                                { label: "Admin", value: "admin" },
-                                { label: "User", value: "user" },
-                                { label: "Contractor", value: "contractor" }
+                                { label: t('employee.admin'), value: "admin" },
+                                { label: t('employee.user'), value: "user" },
+                                { label: t('employee.contractor'), value: "contractor" }
                             ]}
                         />
                     </div>
@@ -89,11 +92,11 @@ const AddEditEmployee = ({ onBack }) => {
                         onClick={onBack}
                         className="px-8 py-2.5 rounded-xl border border-gray-200 text-gray-700 font-bold text-sm hover:bg-gray-50 transition-colors"
                     >
-                        Cancel
+                        {t('common.cancel')}
                     </button>
                     <button className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#4FC3F7] text-white font-bold text-sm shadow-md shadow-sky-100 hover:bg-[#29B6F6] transition-transform active:scale-95">
                         <LuPlus size={18} />
-                        Create Employee
+                        {t('employee.createBtn')}
                     </button>
                 </div>
             </div>
@@ -104,9 +107,9 @@ const AddEditEmployee = ({ onBack }) => {
                     <Info size={14} />
                 </div>
                 <div>
-                    <h4 className="text-[#0D47A1] text-sm font-bold font-inter">Need Help?</h4>
+                    <h4 className="text-[#0D47A1] text-sm font-bold font-inter">{t('employee.needHelp')}</h4>
                     <p className="text-[#1976D2] text-[13px] font-medium mt-0.5 font-inter">
-                        Make sure all required fields are filled correctly. The employee will receive an invitation email to set up their account.
+                        {t('employee.helpDesc')}
                     </p>
                 </div>
             </div>
