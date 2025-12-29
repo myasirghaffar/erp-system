@@ -151,7 +151,7 @@ const EmployeeProfile = ({ onBack, onEdit }) => {
           </div>
 
           <div className="space-y-1">
-            <div className="text-xs text-gray-500 font-medium">{t('table.role')}</div>
+            <div className="text-xs text-gray-400 font-medium">{t('employee.role')}</div>
             <div className="text-sm font-semibold text-[#111827]">{employeeData.role}</div>
           </div>
 

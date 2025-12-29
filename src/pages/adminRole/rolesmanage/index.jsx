@@ -100,7 +100,7 @@ const RolesManage = () => {
                                 </div>
                                 <div>
                                     <h3 className="text-[#111827] text-sm font-bold font-inter">{role.title}</h3>
-                                    <p className="text-gray-400 text-xs font-medium mt-0.5">{role.description}</p>
+                                    <p className="text-gray-600 text-xs font-medium mt-0.5">{role.description}</p>
                                 </div>
                             </div>
                             <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${role.badgeColor}`}>
@@ -116,7 +116,7 @@ const RolesManage = () => {
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                     <h2 className="text-[#111827] text-lg font-bold font-inter">{t('roles.permissionsMatrix')}</h2>
                     <div className="flex items-center gap-3">
-                        <span className="text-gray-500 text-sm font-medium">{t('roles.globalAccessToggle')}</span>
+                        <span className="text-gray-700 text-sm font-semibold">{t('roles.globalAccessToggle')}</span>
                         <button
                             onClick={() => setGlobalToggle(!globalToggle)}
                             className={`w-11 h-6 rounded-full transition-colors relative ${globalToggle ? 'bg-sky-500' : 'bg-gray-200'}`}
@@ -130,7 +130,7 @@ const RolesManage = () => {
                     <table className="w-full min-w-[600px]">
                         <thead>
                             <tr className="border-b border-gray-100">
-                                <th className="text-left py-4 px-4 text-gray-500 text-sm font-bold font-inter w-1/3">{t('roles.permissions')}</th>
+                                <th className="text-left py-4 px-4 text-[#111827] text-sm font-bold font-inter w-1/3">{t('roles.permissions')}</th>
                                 <th className="text-center py-4 px-4 text-[#111827] text-sm font-bold font-inter">{t('roles.superAdmin')}</th>
                                 <th className="text-center py-4 px-4 text-[#111827] text-sm font-bold font-inter">{t('roles.employee')}</th>
                                 <th className="text-center py-4 px-4 text-[#111827] text-sm font-bold font-inter">{t('roles.manager')}</th>

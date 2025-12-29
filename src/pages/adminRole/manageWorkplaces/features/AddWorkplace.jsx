@@ -21,17 +21,17 @@ const AddWorkplace = ({ onBack }) => {
                 <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100 flex flex-col h-full">
                     <div className="mb-8">
                         <h2 className="text-[#111827] text-lg font-bold font-inter">{t('workplace.infoTitle')}</h2>
-                        <p className="text-gray-400 text-sm font-medium mt-1">{t('workplace.infoDesc')}</p>
+                        <p className="text-gray-600 text-sm font-medium mt-1">{t('workplace.infoDesc')}</p>
                     </div>
 
                     <div className="space-y-6 flex-grow">
                         {/* Workplace Name */}
                         <div className="space-y-2">
                             <label className="text-gray-700 text-[13px] font-semibold flex items-center gap-1">
-                                {t('workplace.name')}<span className="text-red-500">*</span>
+                                {t('workplace.workplaceName')}<span className="text-red-500">*</span>
                             </label>
                             <ReusableInput
-                                placeholder={t('workplace.namePlaceholder') || "e.g., Headquarters, Branch Office"}
+                                placeholder={t('workplace.namePlaceholder')}
                                 iconLeft={<Building2 size={18} className="text-gray-400" />}
                                 classes="h-12 rounded-xl border-gray-200 focus:ring-sky-500/20"
                             />
@@ -43,17 +43,17 @@ const AddWorkplace = ({ onBack }) => {
                                 {t('workplace.address')}<span className="text-red-500">*</span>
                             </label>
                             <ReusableInput
-                                placeholder={t('map.searchPlaceholder') || "Search for address..."}
+                                placeholder={t('map.searchPlaceholder')}
                                 iconLeft={<MapPin size={18} className="text-gray-400" />}
                                 classes="h-12 rounded-xl border-gray-200 focus:ring-sky-500/20"
                             />
-                            <p className="text-gray-400 text-xs font-medium">{t('workplace.addressDesc')}</p>
+                            <p className="text-gray-600 text-xs font-medium">{t('workplace.addressDesc')}</p>
                         </div>
 
                         {/* Geofence Radius */}
                         <div className="space-y-3">
                             <label className="text-gray-700 text-[13px] font-semibold flex items-center gap-1">
-                                {t('workplace.radius')}<span className="text-red-500">*</span>
+                                {t('workplace.geofenceRadius')}<span className="text-red-500">*</span>
                             </label>
 
                             {/* Radius Input with meters addon */}
@@ -67,7 +67,7 @@ const AddWorkplace = ({ onBack }) => {
                                     onChange={(e) => setRadius(Number(e.target.value))}
                                     className="w-full h-12 pl-10 pr-16 rounded-xl border border-gray-200 focus:outline-none focus:ring-1 focus:ring-sky-500/20 text-[#111827] font-medium"
                                 />
-                                <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm font-medium">{t('common.meters')}</span>
+                                <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm font-medium">{t('workplace.meters')}</span>
                             </div>
 
                             {/* Slider */}
@@ -112,7 +112,7 @@ const AddWorkplace = ({ onBack }) => {
                         </button>
                         <button className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#22B3E8] text-white font-bold text-sm shadow-md shadow-sky-100 hover:bg-[#1fa0d1] transition-transform active:scale-95">
                             <Check size={18} />
-                            {t('workplace.save')}
+                            {t('workplace.saveWorkplace')}
                         </button>
                     </div>
                 </div>

@@ -34,8 +34,9 @@
         "approve": "Approve",
         "reject": "Reject",
         "visit": "Visit",
-        "exportExcel": "Export In Excel",
-        "selectMonth": "Select Month"
+        "exportExcel": "Export to Excel",
+        "selectMonth": "Select Month",
+        "enter": "Enter"
     },
     "header": {
         "selectLanguage": "Select Language",
@@ -113,7 +114,7 @@
         "helpDesc": "Make sure all required fields are filled correctly. The employee will receive an invitation email to set up their account.",
         "profileTitle": "Employee Profile",
         "visitProfile": "Visit {{name}} Profile",
-        "exportExcel": "Export In Excel",
+        "exportExcel": "Export to Excel",
         "attendanceHistory": "Monthly Attendance History",
         "selectMonth": "Select Month",
         "assignRoles": "Assign Roles",
@@ -130,6 +131,7 @@
         "lastName": "Last Name",
         "email": "Email",
         "phone": "Phone",
+        "contact": "Contact Number",
         "position": "Position",
         "department": "Department",
         "joinDate": "Join Date",
@@ -212,6 +214,9 @@
         "mapPreviewDesc": "Visual representation of workplace location and geofence area",
         "geofenceArea": "Geofence Area",
         "saveWorkplace": "Save Workplace",
+        "namePlaceholder": "Enter workplace name",
+        "addressDesc": "Enter the physical address of the workplace",
+        "save": "Save Workplace",
         "todaysCheckIns": "Today's Check-ins",
         "checkInsToday": "check-ins today",
         "allLocations": "All Locations",
@@ -221,7 +226,7 @@
         "deleteWorkplace": "Delete Workplace",
         "workplaceList": "Workplace List",
         "workplaceDetails": "Workplace Details",
-        "workplaceName": "Workplace Name",
+        "workplaceName": "Workplace/Object Name",
         "location": "Location",
         "companyName": "Company Name",
         "contactNumber": "Contact Number",
@@ -294,7 +299,8 @@
         "currentLocation": "Current Location",
         "directions": "Get Directions",
         "distance": "Distance",
-        "estimatedTime": "Estimated Time"
+        "estimatedTime": "Estimated Time",
+        "searchPlaceholder": "Search for a location..."
     },
     "request": {
         "leaveTitle": "Leave Requests",
@@ -439,7 +445,7 @@
     },
     "table": {
         "serialNo": "S.No",
-        "name": "Name",
+        "name": "Employee Name",
         "email": "Email",
         "phone": "Phone",
         "status": "Status",

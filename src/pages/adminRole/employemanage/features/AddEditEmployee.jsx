@@ -21,7 +21,7 @@ const AddEditEmployee = ({ onBack }) => {
             <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100">
                 <div className="mb-8">
                     <h2 className="text-[#111827] text-lg font-bold font-inter">{t('employee.basicInfo')}</h2>
-                    <p className="text-gray-400 text-sm font-medium mt-1">{t('employee.basicInfoDesc')}</p>
+                    <p className="text-gray-600 text-sm font-medium mt-1">{t('employee.basicInfoDesc')}</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
@@ -61,7 +61,7 @@ const AddEditEmployee = ({ onBack }) => {
                     {/* Position */}
                     <div className="space-y-2">
                         <label className="text-gray-700 text-[13px] font-semibold flex items-center gap-1">
-                            {t('table.role') || "Position"}<span className="text-red-500">*</span>
+                            {t('employee.position')}<span className="text-red-500">*</span>
                         </label>
                         <ReusableInput
                             placeholder={t('employee.positionPlaceholder')}
@@ -76,7 +76,7 @@ const AddEditEmployee = ({ onBack }) => {
                         </label>
                         <Select
                             placeholder={t('employee.chooseRole')}
-                            className="w-full h-12 bg-white text-gray-700 rounded-xl border border-gray-200"
+                            className="w-full h-12 bg-white text-black font-medium rounded-xl border border-gray-200"
                             options={[
                                 { label: t('employee.admin'), value: "admin" },
                                 { label: t('employee.user'), value: "user" },

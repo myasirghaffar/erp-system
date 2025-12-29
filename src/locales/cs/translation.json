@@ -35,7 +35,8 @@
         "reject": "Zamítnout",
         "visit": "Navštívit",
         "exportExcel": "Exportovat do Excelu",
-        "selectMonth": "Vybrat měsíc"
+        "selectMonth": "Vybrat měsíc",
+        "enter": "Zadejte"
     },
     "header": {
         "selectLanguage": "Vyberte jazyk",
@@ -130,6 +131,7 @@
         "lastName": "Příjmení",
         "email": "E-mail",
         "phone": "Telefon",
+        "contact": "Kontaktní číslo",
         "position": "Pozice",
         "department": "Oddělení",
         "joinDate": "Datum nástupu",
@@ -212,6 +214,9 @@
         "mapPreviewDesc": "Vizuální reprezentace polohy pracoviště a oblasti geofence",
         "geofenceArea": "Oblast geofence",
         "saveWorkplace": "Uložit pracoviště",
+        "namePlaceholder": "Zadejte název pracoviště",
+        "addressDesc": "Zadejte fyzickou adresu pracoviště",
+        "save": "Uložit pracoviště",
         "todaysCheckIns": "Dnešní přihlášení",
         "checkInsToday": "přihlášení dnes",
         "allLocations": "Všechna místa",
@@ -221,7 +226,7 @@
         "deleteWorkplace": "Smazat pracoviště",
         "workplaceList": "Seznam pracovišť",
         "workplaceDetails": "Detaily pracoviště",
-        "workplaceName": "Název pracoviště",
+        "workplaceName": "Pracoviště / Název objektu",
         "location": "Umístění",
         "companyName": "Název společnosti",
         "contactNumber": "Kontaktní číslo",
@@ -294,7 +299,8 @@
         "currentLocation": "Aktuální poloha",
         "directions": "Získat směr",
         "distance": "Vzdálenost",
-        "estimatedTime": "Odhadovaný čas"
+        "estimatedTime": "Odhadovaný čas",
+        "searchPlaceholder": "Hledat lokalitu..."
     },
     "request": {
         "leaveTitle": "Žádosti o dovolenou",
@@ -439,7 +445,7 @@
     },
     "table": {
         "serialNo": "Č.",
-        "name": "Jméno",
+        "name": "Jméno zaměstnance",
         "email": "E-mail",
         "phone": "Telefon",
         "status": "Stav",

@@ -5,6 +5,7 @@ import DashboardBanner from "../../../components/DashboardBanner";
 import ReusableDataTable from "../../../components/ReusableDataTable";
 import ReusablePagination from "../../../components/ReusablePagination";
 import Select from "../../../components/Form/Select";
+import StatCard from "../../../components/itechResuable/StatCard";
 
 // Mock Data
 const leaveRequestsData = [
@@ -225,16 +226,16 @@ const ApproveRequests = () => {
                     <div className="flex flex-col lg:flex-row justify-between items-end gap-4 mb-6">
                         <div className="flex flex-col md:flex-row gap-4 w-full">
                             <div className="w-full md:w-48 space-y-1">
-                                <label className="text-gray-600 text-[11px] font-bold pl-1">{t('map.status')}</label>
-                                <Select options={statusOptions} value={filters.status} name="status" onChange={handleFilterChange} className="w-full h-10 text-sm bg-white" />
+                                <label className="text-gray-700 text-[11px] font-bold pl-1">{t('map.status')}</label>
+                                <Select options={statusOptions} value={filters.status} name="status" onChange={handleFilterChange} className="w-full h-10 text-sm bg-white text-black font-medium" />
                             </div>
                             <div className="w-full md:w-48 space-y-1">
-                                <label className="text-gray-600 text-[11px] font-bold pl-1">{t('request.leaveType')}</label>
-                                <Select options={typeOptions} value={filters.type} name="type" onChange={handleFilterChange} className="w-full h-10 text-sm bg-white" />
+                                <label className="text-gray-700 text-[11px] font-bold pl-1">{t('request.leaveType')}</label>
+                                <Select options={typeOptions} value={filters.type} name="type" onChange={handleFilterChange} className="w-full h-10 text-sm bg-white text-black font-medium" />
                             </div>
                             <div className="w-full md:w-48 space-y-1">
-                                <label className="text-gray-600 text-[11px] font-bold pl-1">{t('employee.department')}</label>
-                                <Select options={deptOptions} value={filters.department} name="department" onChange={handleFilterChange} className="w-full h-10 text-sm bg-white" />
+                                <label className="text-gray-700 text-[11px] font-bold pl-1">{t('employee.department')}</label>
+                                <Select options={deptOptions} value={filters.department} name="department" onChange={handleFilterChange} className="w-full h-10 text-sm bg-white text-black font-medium" />
                             </div>
                         </div>
 
@@ -279,17 +280,7 @@ const ApproveRequests = () => {
     );
 };
 
-const StatCard = ({ title, value, icon: Icon, iconBg, iconColor }) => (
-    <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex items-center justify-between">
-        <div>
-            <p className="text-gray-400 text-xs font-bold mb-1">{title}</p>
-            <h3 className="text-[#111827] text-2xl font-bold">{value}</h3>
-        </div>
-        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${iconBg} ${iconColor}`}>
-            <Icon size={20} strokeWidth={2.5} />
-        </div>
-    </div>
-);
+
 
 const ApproveModal = ({ isOpen, onClose, onConfirm, t }) => {
     if (!isOpen) return null;

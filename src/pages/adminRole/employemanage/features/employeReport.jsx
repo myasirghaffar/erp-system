@@ -80,6 +80,7 @@ const EmployeeReport = ({ onViewProfile }) => {
         {
             key: "department",
             label: t('employee.allDepartments'),
+            groupLabel: t('employee.department'),
             options: [
                 { label: t('employee.allDepartments'), value: "" },
                 { label: "Engineering", value: "Engineering" },
@@ -89,6 +90,7 @@ const EmployeeReport = ({ onViewProfile }) => {
         {
             key: "role",
             label: t('employee.allRoles'),
+            groupLabel: t('employee.role'),
             options: [
                 { label: t('employee.allRoles'), value: "" },
                 { label: "Developer", value: "Developer" },
@@ -98,6 +100,7 @@ const EmployeeReport = ({ onViewProfile }) => {
         {
             key: "status",
             label: t('employee.allStatus'),
+            groupLabel: t('map.status'),
             options: [
                 { label: t('employee.allStatus'), value: "" },
                 { label: "Active", value: "Active" },
@@ -132,7 +135,7 @@ const EmployeeReport = ({ onViewProfile }) => {
                     </div>
                     <div className="flex flex-col">
                         <span className="text-[#111827] font-bold text-[0.875rem] leading-tight">{row.name}</span>
-                        <span className="text-gray-400 text-[0.75rem] font-medium mt-0.5">{row.title}</span>
+                        <span className="text-gray-600 text-[0.75rem] font-medium mt-0.5">{row.title}</span>
                     </div>
                 </div>
             )
@@ -175,16 +178,16 @@ const EmployeeReport = ({ onViewProfile }) => {
             width: "12.5rem", // 200px
             render: () => (
                 <div className="flex items-center gap-5">
-                    <button className="text-gray-400 hover:text-sky-500 transition-colors">
+                    <button className="text-gray-600 hover:text-sky-500 transition-colors">
                         <CheckSquare size={18} strokeWidth={2} />
                     </button>
-                    <button onClick={onViewProfile} className="text-gray-400 hover:text-sky-500 transition-colors">
+                    <button onClick={onViewProfile} className="text-gray-600 hover:text-sky-500 transition-colors">
                         <Eye size={18} strokeWidth={2} />
                     </button>
-                    <button className="text-gray-400 hover:text-sky-500 transition-colors">
+                    <button className="text-gray-600 hover:text-sky-500 transition-colors">
                         <Edit3 size={18} strokeWidth={2} />
                     </button>
-                    <button className="text-gray-400 hover:text-red-500 transition-colors">
+                    <button className="text-gray-600 hover:text-red-500 transition-colors">
                         <Trash2 size={18} strokeWidth={2} />
                     </button>
                 </div>
@@ -214,21 +217,21 @@ const EmployeeReport = ({ onViewProfile }) => {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                     {/* Search Field */}
                     <div className="space-y-2">
-                        <label className="text-gray-500 text-[13px] font-semibold block">{t('common.search')}</label>
+                        <label className="text-gray-700 text-[13px] font-semibold block">{t('common.search')}</label>
                         <div className="relative">
                             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                             <input
                                 type="text"
-                                placeholder={t('common.search') + "..."}
-                                className="w-full pl-11 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-[13px] font-inter focus:outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 transition-all placeholder:text-gray-400 font-medium"
+                                placeholder={t('employee.searchEmployee')}
+                                className="w-full pl-11 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-[13px] text-black font-inter focus:outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 transition-all placeholder:text-gray-400 font-medium"
                             />
                         </div>
                     </div>
 
                     {/* Filter Dropdowns */}
                     {filterConfig.map((filter) => (
-                        <div key={filter.key} className="space-y-2 text-left filter-dropdown">
-                            <label className="text-gray-500 text-[13px] font-semibold block">{filter.key.charAt(0).toUpperCase() + filter.key.slice(1)}</label>
+                        <div key={filter.key} className="space-y-1.5 text-left filter-dropdown">
+                            <label className="text-gray-700 text-[13px] font-bold pl-1 uppercase tracking-tight">{filter.groupLabel}</label>
                             <ReusableFilter
                                 filters={[filter]}
                                 data={demoData}
@@ -250,7 +253,7 @@ const EmployeeReport = ({ onViewProfile }) => {
                 <div className="p-6 pb-6 flex justify-between items-center bg-white">
                     <div>
                         <h2 className="text-[#111827] text-[18px] font-bold font-inter">{t('employee.directoryTitle')}</h2>
-                        <p className="text-gray-400 text-[13px] font-medium mt-0.5">{totalItems} {t('employee.totalCount')}</p>
+                        <p className="text-gray-600 text-[13px] font-medium mt-0.5">{totalItems} {t('employee.totalCount')}</p>
                     </div>
                     <button className="p-2.5 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm">
                         <Download size={18} strokeWidth={2} />

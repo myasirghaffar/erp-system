@@ -35,7 +35,8 @@
         "reject": "Отклонить",
         "visit": "Посетить",
         "exportExcel": "Экспорт в Excel",
-        "selectMonth": "Выберите месяц"
+        "selectMonth": "Выберите месяц",
+        "enter": "Введите"
     },
     "header": {
         "selectLanguage": "Выберите язык",
@@ -130,13 +131,14 @@
         "lastName": "Фамилия",
         "email": "Email",
         "phone": "Телефон",
+        "contact": "Контактный номер",
         "position": "Должность",
         "department": "Отдел",
         "joinDate": "Дата присоединения",
         "status": "Статус",
         "active": "Активен",
         "inactive": "Неактивен",
-        "searchEmployee": "Поиск сотрудника...",
+        "searchEmployee": "Поиск сотрудников...",
         "noEmployeesFound": "Сотрудники не найдены",
         "employeeAdded": "Сотрудник успешно добавлен",
         "employeeUpdated": "Сотрудник успешно обновлен",
@@ -212,6 +214,9 @@
         "mapPreviewDesc": "Визуальное представление местоположения и геозоны",
         "geofenceArea": "Область геозоны",
         "saveWorkplace": "Сохранить рабочее место",
+        "namePlaceholder": "Введите название рабочего места",
+        "addressDesc": "Введите физический адрес рабочего места",
+        "save": "Сохранить рабочее место",
         "todaysCheckIns": "Отметки сегодня",
         "checkInsToday": "отметок сегодня",
         "allLocations": "Все локации",
@@ -221,7 +226,7 @@
         "deleteWorkplace": "Удалить рабочее место",
         "workplaceList": "Список рабочих мест",
         "workplaceDetails": "Детали рабочего места",
-        "workplaceName": "Название рабочего места",
+        "workplaceName": "Рабочее место / Название объекта",
         "location": "Местоположение",
         "companyName": "Название компании",
         "contactNumber": "Контактный номер",
@@ -294,7 +299,8 @@
         "currentLocation": "Текущее местоположение",
         "directions": "Маршрут",
         "distance": "Расстояние",
-        "estimatedTime": "Расчетное время"
+        "estimatedTime": "Расчетное время",
+        "searchPlaceholder": "Поиск местоположения..."
     },
     "request": {
         "leaveTitle": "Запросы на отпуск",
@@ -439,7 +445,7 @@
     },
     "table": {
         "serialNo": "№",
-        "name": "Имя",
+        "name": "Имя сотрудника",
         "email": "Email",
         "phone": "Телефон",
         "status": "Статус",

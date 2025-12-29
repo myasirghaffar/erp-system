@@ -132,7 +132,7 @@ const ReportExport = () => {
                 className="w-full"
             >
                 <div className="flex flex-col lg:flex-row items-end gap-6">
-                    <div className="w-full lg:w-60">
+                    <div className="w-full lg:flex-1">
                         <ReusableInput
                             ref={startDateRef}
                             label={t('report.startDate')}
@@ -150,7 +150,7 @@ const ReportExport = () => {
                             classes="h-11 md:h-11 rounded-md border border-gray-300 bg-white !text-black text-sm font-normal font-inter [&::-webkit-calendar-picker-indicator]:hidden"
                         />
                     </div>
-                    <div className="w-full lg:w-60">
+                    <div className="w-full lg:flex-1">
                         <ReusableInput
                             ref={endDateRef}
                             label={t('report.endDate')}
@@ -168,7 +168,7 @@ const ReportExport = () => {
                             classes="h-11 md:h-11 rounded-md border border-gray-300 bg-white !text-black text-sm font-normal font-inter [&::-webkit-calendar-picker-indicator]:hidden"
                         />
                     </div>
-                    <div className="w-full lg:w-60">
+                    <div className="w-full lg:flex-1">
                         <CustomLabel label={t('report.exportFormat')} />
                         <div className="relative">
                             <Select
@@ -181,7 +181,7 @@ const ReportExport = () => {
                             </div>
                         </div>
                     </div>
-                    <ExportButton text={t('report.exportRange')} className="w-full lg:w-60" />
+                    <ExportButton text={t('report.exportRange')} className="w-full lg:flex-1" />
                 </div>
             </ExportCard>
 

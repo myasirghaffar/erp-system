@@ -198,8 +198,8 @@ const ReusableFilter = ({
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border transition-colors min-w-[120px] justify-between whitespace-nowrap text-[13px] font-inter ${fullWidth ? "w-full" : ""
                   } ${selectedFilters[filter.key]
                     ? "bg-primary-50 border-primary-200 text-primary-700"
-                    : "bg-white hover:bg-gray-50 text-gray-700 border-gray-200"
-                  }`}
+                    : "bg-white hover:bg-gray-50 text-black border-gray-200"
+                  } custom-select-button`}
               >
                 <span className="font-normal truncate">
                   {filter.options?.find(
@@ -225,7 +225,7 @@ const ReusableFilter = ({
                       onClick={() =>
                         handleFilterSelect(filter.key, option.value)
                       }
-                      className={`w-full text-left px-4 py-3 text-[0.75rem] font-poppins text-gray-700 hover:bg-gray-50 transition-colors ${selectedFilters[filter.key] === option.value
+                      className={`w-full text-left px-4 py-3 text-[0.75rem] font-poppins text-black hover:bg-gray-50 transition-colors ${selectedFilters[filter.key] === option.value
                         ? "bg-primary-50 text-primary-700"
                         : ""
                         }`}

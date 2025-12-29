@@ -33,7 +33,7 @@ const ReusableDataTable = ({
         <span
           className="text-xs"
           style={{
-            color: "#A0A0A0",
+            color: "#4B5563",
             fontWeight: "600",
             fontFamily: "Inter",
           }}
@@ -76,7 +76,7 @@ const ReusableDataTable = ({
       style: {
         padding: "0 1rem", // 16px
         fontWeight: "600",
-        color: "#6b7280", // Gray-500
+        color: "#374151", // Gray-700 (Darker)
         fontSize: "0.75rem", // 12px
         fontFamily: '"Inter", sans-serif',
         borderBottom: "none",
@@ -173,7 +173,7 @@ const ReusableDataTable = ({
     {
       when: (row, index) => true, // Apply to all rows
       style: {
-        color: "#A0A0A0",
+        color: "#4B5563",
         backgroundColor: "#FFFFFF",
         borderBottom: "1px solid #D1D1D1",
       },

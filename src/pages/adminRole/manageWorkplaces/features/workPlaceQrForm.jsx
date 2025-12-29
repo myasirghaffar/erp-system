@@ -99,7 +99,7 @@ const WorkPlaceQrForm = ({ onBack }) => {
                     <div className="space-y-5 flex-grow">
                         {/* Company Name */}
                         <div className="space-y-2">
-                            <label className="text-gray-700 text-xs font-bold font-inter">
+                            <label className="text-gray-700 text-[13px] font-semibold flex items-center gap-1">
                                 {t('workplace.companyName')}
                             </label>
                             <ReusableInput
@@ -115,7 +115,7 @@ const WorkPlaceQrForm = ({ onBack }) => {
 
                         {/* Workplace Location */}
                         <div className="space-y-2">
-                            <label className="text-gray-700 text-xs font-bold font-inter">
+                            <label className="text-gray-700 text-[13px] font-semibold flex items-center gap-1">
                                 {t('workplace.location')}
                             </label>
                             <Select
@@ -130,7 +130,7 @@ const WorkPlaceQrForm = ({ onBack }) => {
 
                         {/* Department */}
                         <div className="space-y-2">
-                            <label className="text-gray-700 text-xs font-bold font-inter">
+                            <label className="text-gray-700 text-[13px] font-semibold flex items-center gap-1">
                                 {t('employee.department')}
                             </label>
                             <ReusableInput
@@ -146,7 +146,7 @@ const WorkPlaceQrForm = ({ onBack }) => {
 
                         {/* Contact Number */}
                         <div className="space-y-2">
-                            <label className="text-gray-700 text-xs font-bold font-inter">
+                            <label className="text-gray-700 text-[13px] font-semibold flex items-center gap-1">
                                 {t('employee.contact')}
                             </label>
                             <ReusableInput
@@ -163,7 +163,7 @@ const WorkPlaceQrForm = ({ onBack }) => {
 
                         {/* Email */}
                         <div className="space-y-2">
-                            <label className="text-gray-700 text-xs font-bold font-inter">
+                            <label className="text-gray-700 text-[13px] font-semibold flex items-center gap-1">
                                 {t('table.email')}
                             </label>
                             <ReusableInput
