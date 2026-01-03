@@ -171,7 +171,7 @@ const ReusableFilter = ({
               }
               value={searchTerm}
               onChange={handleSearchChange}
-              className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-lg text-[0.75rem] font-poppins placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
+              className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-300 rounded-lg text-[0.75rem] font-poppins placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
             />
             {searchTerm && (
               <button
@@ -198,7 +198,7 @@ const ReusableFilter = ({
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border transition-colors min-w-[120px] justify-between whitespace-nowrap text-[13px] font-inter ${fullWidth ? "w-full" : ""
                   } ${selectedFilters[filter.key]
                     ? "bg-primary-50 border-primary-200 text-primary-700"
-                    : "bg-white hover:bg-gray-50 text-black border-gray-200"
+                    : "bg-white hover:bg-gray-50 text-black border-gray-300"
                   } custom-select-button`}
               >
                 <span className="font-normal truncate">
@@ -207,7 +207,7 @@ const ReusableFilter = ({
                   )?.label || filter.label}
                 </span>
                 <ChevronDown
-                  className={`w-4 h-4 text-gray-400 transition-transform flex-shrink-0 ${openDropdowns[filter.key] ? "rotate-180" : ""
+                  className={`w-4 h-4 text-gray-500 transition-transform flex-shrink-0 ${openDropdowns[filter.key] ? "rotate-180" : ""
                     }`}
                 />
               </button>

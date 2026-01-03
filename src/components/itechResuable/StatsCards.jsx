@@ -13,7 +13,7 @@ const StatCard = ({
           <div className="mb-4">
             <Icon className={`w-8 h-8 ${iconColor}`} />
           </div>
-          <div className="lg:text-2xl sm:text-lg text-lg font-light font-inter mb-2">{label}</div>
+          <div className="lg:text-2xl sm:text-lg text-lg font-light text-gray-700 font-inter mb-2">{label}</div>
         </div>
         <div
           className={`${

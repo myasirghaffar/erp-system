@@ -78,7 +78,7 @@ export const login = (credentials) => async (dispatch) => {
 
     const { data } = await api.post(`/api/auth/login`, credentials);
 
-    const token = data?.data?.token;
+    const token = data?.data?.accessToken;
     const user = data?.data?.user;
 
     dispatch(setUser({ ...user, token }));
@@ -98,8 +98,8 @@ export const login = (credentials) => async (dispatch) => {
     //   },
     // });
     console.log(error, 'data in error')
-    dispatch(setError(error.response?.data?.error || error.message || "Login failed"));
-    return { success: false, error: error.response?.data?.error };
+    dispatch(setError(error.response?.data?.message || error.response?.data?.error || error.message || "Login failed"));
+    return { success: false, error: error.response?.data?.message || error.response?.data?.error || error.message };
   } finally {
     dispatch(setLoading(false));
   }

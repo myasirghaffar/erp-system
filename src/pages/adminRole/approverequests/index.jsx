@@ -1,13 +1,42 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Check, X, Clock, Calendar, Filter } from "lucide-react";
 import DashboardBanner from "../../../components/DashboardBanner";
 import ReusableDataTable from "../../../components/ReusableDataTable";
 import ReusablePagination from "../../../components/ReusablePagination";
 import Select from "../../../components/Form/Select";
-import StatCard from "../../../components/itechResuable/StatCard";
+import {
+    useGetAllLeaveRequestsQuery,
+    useGetLeaveRequestStatisticsQuery,
+    useUpdateLeaveRequestStatusMutation,
+} from "../../../services/Api";
+import { toast } from "react-toastify";
+import moment from "moment";
 
-// Mock Data
+// Mapping functions for leave types (backend values <-> display names)
+const leaveTypeMap = {
+    'vacation': 'Annual Leave',
+    'sick': 'Sick Leave',
+    'personal': 'Personal Leave',
+    'other': 'Other'
+};
+
+const leaveTypeReverseMap = {
+    'Annual Leave': 'vacation',
+    'Sick Leave': 'sick',
+    'Personal Leave': 'personal',
+    'Other': 'other'
+};
+
+const getLeaveTypeDisplay = (backendValue) => {
+    return leaveTypeMap[backendValue] || backendValue || 'Annual Leave';
+};
+
+const getLeaveTypeBackend = (displayValue) => {
+    return leaveTypeReverseMap[displayValue] || displayValue;
+};
+
+// Mock Data (fallback)
 const leaveRequestsData = [
     {
         id: 1,
@@ -69,6 +98,78 @@ const ApproveRequests = () => {
     const [isApproveModalOpen, setIsApproveModalOpen] = useState(false);
     const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
 
+    // Filters State
+    const [filters, setFilters] = useState({
+        status: "Pending",
+        type: "All Types"
+    });
+
+    // Prepare API query parameters
+    const apiParams = useMemo(() => {
+        const params = {
+            page: currentPage,
+            limit: itemsPerPage
+        };
+
+        // Map status filter - backend expects lowercase: pending, approved, rejected
+        if (filters.status && filters.status !== "All Requests") {
+            params.status = filters.status.toLowerCase();
+        }
+
+        // Map type filter - convert display name to backend value
+        if (filters.type && filters.type !== "All Types") {
+            params.type = getLeaveTypeBackend(filters.type);
+        }
+
+        return params;
+    }, [currentPage, filters]);
+
+    // Fetch leave requests from API
+    const { data: leaveRequestsData, isLoading, refetch } = useGetAllLeaveRequestsQuery(apiParams);
+
+    // Fetch statistics
+    const { data: statisticsData } = useGetLeaveRequestStatisticsQuery();
+
+    // Mutation
+    const [updateLeaveRequestStatus, { isLoading: isUpdating }] = useUpdateLeaveRequestStatusMutation();
+
+    // Transform API data
+    const transformedData = useMemo(() => {
+        if (!leaveRequestsData?.data?.requests) return leaveRequestsData || [];
+        
+        return leaveRequestsData.data.requests.map((request) => {
+            const startDate = moment(request.start_date);
+            const endDate = moment(request.end_date);
+            const duration = endDate.diff(startDate, 'days') + 1;
+            
+            // Map backend status to display format (capitalize first letter)
+            const statusDisplay = request.status 
+                ? request.status.charAt(0).toUpperCase() + request.status.slice(1)
+                : "Pending";
+            
+            // Map backend type to display name
+            const leaveTypeDisplay = getLeaveTypeDisplay(request.type);
+            
+            return {
+                id: request.id,
+                employee: {
+                    name: request.user?.full_name || "Unknown",
+                    role: request.user?.position || request.user?.role || "Employee",
+                    avatar: request.user?.profile_picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(request.user?.full_name || "Unknown")}`,
+                },
+                leaveType: leaveTypeDisplay,
+                dateRange: {
+                    start: startDate.format("MMM DD"),
+                    end: endDate.format("MMM DD, YYYY"),
+                    applied: moment(request.created_at).fromNow(),
+                },
+                duration: `${duration} ${duration === 1 ? 'day' : 'days'}`,
+                status: statusDisplay,
+                requestData: request,
+            };
+        });
+    }, [leaveRequestsData]);
+
     const handleApproveClick = (row) => {
         setSelectedRequest(row);
         setIsApproveModalOpen(true);
@@ -85,32 +186,78 @@ const ApproveRequests = () => {
         setSelectedRequest(null);
     };
 
-    const confirmApprove = () => {
-        console.log("Approved request:", selectedRequest);
-        closeModals();
+    const confirmApprove = async () => {
+        if (!selectedRequest) return;
+        
+        try {
+            await updateLeaveRequestStatus({
+                id: selectedRequest.id || selectedRequest.requestData?.id,
+                data: { status: "approved" }
+            }).unwrap();
+            toast.success(t('request.approveSuccess') || "Leave request approved successfully");
+            refetch();
+            closeModals();
+        } catch (error) {
+            toast.error(error?.data?.message || t('request.approveError') || "Failed to approve request");
+        }
     };
 
-    const confirmReject = (reason) => {
-        console.log("Rejected request:", selectedRequest, "Reason:", reason);
-        closeModals();
+    const confirmReject = async (reason) => {
+        if (!selectedRequest) return;
+        
+        try {
+            await updateLeaveRequestStatus({
+                id: selectedRequest.id || selectedRequest.requestData?.id,
+                data: { status: "rejected", rejection_reason: reason }
+            }).unwrap();
+            toast.success(t('request.rejectSuccess') || "Leave request rejected successfully");
+            refetch();
+            closeModals();
+        } catch (error) {
+            toast.error(error?.data?.message || t('request.rejectError') || "Failed to reject request");
+        }
     };
-
-    // Filters State
-    const [filters, setFilters] = useState({
-        status: "All Requests",
-        type: "All Types",
-        department: "All Departments"
-    });
 
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
         setFilters(prev => ({ ...prev, [name]: value }));
+        setCurrentPage(1);
     };
 
+    // Get statistics from API
+    const stats = useMemo(() => {
+        if (!statisticsData?.data) {
+            return {
+                pending: 24,
+                approvedToday: 12,
+                rejectedToday: 3,
+                totalMonth: 156,
+            };
+        }
+        
+        return {
+            pending: statisticsData.data.pending || 0,
+            approvedToday: statisticsData.data.approved_today || 0,
+            rejectedToday: statisticsData.data.rejected_today || 0,
+            totalMonth: statisticsData.data.total_this_month || 0,
+        };
+    }, [statisticsData]);
+
     // Filter Options
-    const statusOptions = [{ label: t('common.all'), value: "All Requests" }, { label: t('status.pending'), value: "Pending" }];
-    const typeOptions = [{ label: t('common.all'), value: "All Types" }, { label: "Annual Leave", value: "Annual Leave" }];
-    const deptOptions = [{ label: t('employee.allDepartments'), value: "All Departments" }, { label: "Engineering", value: "Engineering" }];
+    const statusOptions = [
+        { label: "All Requests", value: "All Requests" },
+        { label: "Pending", value: "Pending" },
+        { label: "Approved", value: "Approved" },
+        { label: "Rejected", value: "Rejected" }
+    ];
+    
+    const typeOptions = [
+        { label: t('common.all'), value: "All Types" },
+        { label: "Annual Leave", value: "Annual Leave" },
+        { label: "Sick Leave", value: "Sick Leave" },
+        { label: "Personal Leave", value: "Personal Leave" },
+        { label: "Other", value: "Other" }
+    ];
 
     // Columns Definition
     const columns = [
@@ -146,14 +293,19 @@ const ApproveRequests = () => {
                 let bgClass = "bg-blue-50 text-blue-600";
                 if (row.leaveType === "Sick Leave") bgClass = "bg-red-50 text-red-600";
                 if (row.leaveType === "Personal Leave") bgClass = "bg-purple-50 text-purple-600";
-                if (row.leaveType === "Maternity Leave") bgClass = "bg-pink-50 text-pink-600";
+                if (row.leaveType === "Other") bgClass = "bg-gray-50 text-gray-600";
+
+                const getIcon = () => {
+                    if (row.leaveType === "Annual Leave") return "✈️";
+                    if (row.leaveType === "Sick Leave") return "❤️";
+                    if (row.leaveType === "Personal Leave") return "👤";
+                    if (row.leaveType === "Other") return "📋";
+                    return "";
+                };
 
                 return (
                     <span className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 w-fit ${bgClass}`}>
-                        {row.leaveType === "Annual Leave" && "✈️"}
-                        {row.leaveType === "Sick Leave" && "❤️"}
-                        {row.leaveType === "Personal Leave" && "👤"}
-                        {row.leaveType === "Maternity Leave" && "👶"}
+                        {getIcon()}
                         {row.leaveType}
                     </span>
                 );
@@ -180,11 +332,24 @@ const ApproveRequests = () => {
             key: "status",
             label: t('map.status'),
             width: "120px",
-            render: (row) => (
-                <span className="px-3 py-1 rounded-full bg-orange-50 text-orange-500 text-[11px] font-bold flex items-center gap-1 w-fit">
-                    <Clock size={12} /> {row.status}
-                </span>
-            )
+            render: (row) => {
+                let bgClass = "bg-orange-50 text-orange-500";
+                let icon = <Clock size={12} />;
+                
+                if (row.status === "Approved") {
+                    bgClass = "bg-green-50 text-green-500";
+                    icon = <Check size={12} />;
+                } else if (row.status === "Rejected") {
+                    bgClass = "bg-red-50 text-red-500";
+                    icon = <X size={12} />;
+                }
+                
+                return (
+                    <span className={`px-3 py-1 rounded-full ${bgClass} text-[11px] font-bold flex items-center gap-1 w-fit`}>
+                        {icon} {row.status}
+                    </span>
+                );
+            }
         },
         {
             key: "actions",
@@ -214,10 +379,10 @@ const ApproveRequests = () => {
 
                 {/* Stats Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <StatCard title={t('request.pendingRequests')} value="24" icon={Clock} iconBg="bg-blue-50" iconColor="text-blue-500" />
-                    <StatCard title={t('request.approvedToday')} value="12" icon={Check} iconBg="bg-green-50" iconColor="text-green-500" />
-                    <StatCard title={t('request.rejectedToday')} value="3" icon={X} iconBg="bg-red-50" iconColor="text-red-500" />
-                    <StatCard title={t('request.totalMonth')} value="156" icon={Calendar} iconBg="bg-sky-50" iconColor="text-sky-500" />
+                    <StatCard title={t('request.pendingRequests')} value={stats.pending.toString()} icon={Clock} iconBg="bg-blue-50" iconColor="text-blue-500" />
+                    <StatCard title={t('request.approvedToday')} value={stats.approvedToday.toString()} icon={Check} iconBg="bg-green-50" iconColor="text-green-500" />
+                    <StatCard title={t('request.rejectedToday')} value={stats.rejectedToday.toString()} icon={X} iconBg="bg-red-50" iconColor="text-red-500" />
+                    <StatCard title={t('request.totalMonth')} value={stats.totalMonth.toString()} icon={Calendar} iconBg="bg-sky-50" iconColor="text-sky-500" />
                 </div>
 
                 {/* Main Content Area */}
@@ -227,38 +392,36 @@ const ApproveRequests = () => {
                         <div className="flex flex-col md:flex-row gap-4 w-full">
                             <div className="w-full md:w-48 space-y-1">
                                 <label className="text-gray-700 text-[11px] font-bold pl-1">{t('map.status')}</label>
-                                <Select options={statusOptions} value={filters.status} name="status" onChange={handleFilterChange} className="w-full h-10 text-sm bg-white text-black font-medium" />
+                                <Select options={statusOptions} value={filters.status} name="status" onChange={handleFilterChange} className="w-full h-10 text-sm bg-white" />
                             </div>
                             <div className="w-full md:w-48 space-y-1">
                                 <label className="text-gray-700 text-[11px] font-bold pl-1">{t('request.leaveType')}</label>
-                                <Select options={typeOptions} value={filters.type} name="type" onChange={handleFilterChange} className="w-full h-10 text-sm bg-white text-black font-medium" />
-                            </div>
-                            <div className="w-full md:w-48 space-y-1">
-                                <label className="text-gray-700 text-[11px] font-bold pl-1">{t('employee.department')}</label>
-                                <Select options={deptOptions} value={filters.department} name="department" onChange={handleFilterChange} className="w-full h-10 text-sm bg-white text-black font-medium" />
+                                <Select options={typeOptions} value={filters.type} name="type" onChange={handleFilterChange} className="w-full h-10 text-sm bg-white" />
                             </div>
                         </div>
-
-                        <button className="flex items-center gap-2 px-5 py-2.5 bg-[#22B3E8] hover:bg-[#1fa0d1] text-white rounded-xl text-sm font-bold shadow-sm shadow-sky-100 whitespace-nowrap">
-                            <Filter size={16} /> {t('request.applyFilters')}
-                        </button>
                     </div>
 
                     {/* Data Table */}
                     <div className="w-full">
-                        <ReusableDataTable
-                            columns={columns}
-                            data={leaveRequestsData}
-                        />
-                        <div className="border-t border-gray-100">
-                            <ReusablePagination
-                                totalItems={leaveRequestsData.length}
-                                itemsPerPage={itemsPerPage}
-                                currentPage={currentPage}
-                                onPageChange={setCurrentPage}
-                                totalPages={1}
-                            />
-                        </div>
+                        {isLoading ? (
+                            <div className="p-8 text-center text-gray-500">{t('common.loading') || "Loading..."}</div>
+                        ) : (
+                            <>
+                                <ReusableDataTable
+                                    columns={columns}
+                                    data={transformedData}
+                                />
+                                <div className="border-t border-gray-100">
+                                    <ReusablePagination
+                                        totalItems={leaveRequestsData?.data?.pagination?.total || transformedData.length}
+                                        itemsPerPage={itemsPerPage}
+                                        currentPage={currentPage}
+                                        onPageChange={setCurrentPage}
+                                        totalPages={leaveRequestsData?.data?.pagination?.totalPages || Math.ceil(transformedData.length / itemsPerPage)}
+                                    />
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>
@@ -280,7 +443,17 @@ const ApproveRequests = () => {
     );
 };
 
-
+const StatCard = ({ title, value, icon: Icon, iconBg, iconColor }) => (
+    <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex items-center justify-between">
+        <div>
+            <p className="text-gray-700 text-xs font-semibold mb-1">{title}</p>
+            <h3 className="text-[#111827] text-2xl font-bold">{value}</h3>
+        </div>
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${iconBg} ${iconColor}`}>
+            <Icon size={20} strokeWidth={2.5} />
+        </div>
+    </div>
+);
 
 const ApproveModal = ({ isOpen, onClose, onConfirm, t }) => {
     if (!isOpen) return null;

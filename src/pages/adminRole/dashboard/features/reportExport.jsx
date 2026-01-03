@@ -1,6 +1,7 @@
-import React, { useRef } from "react";
-import ReusableInput from "../../../../components/ReusableInput";
+import React, { useState, useMemo } from "react";
+import ModernDatePicker from "../../../../components/ModernDatePicker";
 import Select from "../../../../components/Form/Select";
+import ReactSelect from "react-select";
 import {
     FullMonthlyExportIcon,
     DateRangeExportIcon,
@@ -9,9 +10,13 @@ import {
     CheckIconCyan,
     ExportIconWhite,
     ChevronDownIconLarge,
-    CalendarIconLarge,
 } from "../../../../assets/icons/icons";
 import { useTranslation } from "react-i18next";
+import { useGetAllEmployeesQuery } from "../../../../services/Api";
+import { useGetAllWorkplacesQuery } from "../../../../services/Api";
+import { API_END_POINTS } from "../../../../services/ApiEndpoints";
+import api from "../../../../utils/axios";
+import { toast } from "react-toastify";
 
 const ExportCard = ({
     title,
@@ -45,13 +50,15 @@ const ExportCard = ({
     );
 };
 
-const ExportButton = ({ text, className = "" }) => (
+const ExportButton = ({ text, className = "", onClick, disabled = false, isLoading = false }) => (
     <button
-        className={`h-11 bg-sky-400 rounded-md flex items-center justify-center gap-3 px-6 hover:bg-sky-500 transition-colors whitespace-nowrap ${className}`}
+        onClick={onClick}
+        disabled={disabled || isLoading}
+        className={`h-11 bg-sky-400 rounded-md flex items-center justify-center gap-3 px-6 hover:bg-sky-500 transition-colors whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
     >
         <ExportIconWhite className="w-4 h-4" />
         <span className="text-white text-sm font-medium font-inter">
-            {text}
+            {isLoading ? "Exporting..." : text}
         </span>
     </button>
 );
@@ -64,10 +71,225 @@ const CustomLabel = ({ label }) => (
 
 const ReportExport = () => {
     const { t } = useTranslation();
-    const startDateRef = useRef(null);
-    const endDateRef = useRef(null);
-    const [startDate, setStartDate] = React.useState("2024-12-01");
-    const [endDate, setEndDate] = React.useState("2024-12-31");
+    
+    // State for filters
+    const [selectedMonth, setSelectedMonth] = useState("");
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
+    const [selectedEmployee, setSelectedEmployee] = useState("");
+    const [selectedWorkplace, setSelectedWorkplace] = useState("");
+    const [employeeMonth, setEmployeeMonth] = useState("");
+    const [workplaceMonth, setWorkplaceMonth] = useState("");
+    const [exportFormat, setExportFormat] = useState("Excel (.xlsx)");
+    
+    // Loading states
+    const [isExportingMonthly, setIsExportingMonthly] = useState(false);
+    const [isExportingRange, setIsExportingRange] = useState(false);
+    const [isExportingEmployee, setIsExportingEmployee] = useState(false);
+    const [isExportingWorkplace, setIsExportingWorkplace] = useState(false);
+    
+    // Fetch employees and workplaces
+    // Note: Backend validation limits max limit to 100
+    const { data: employeesData } = useGetAllEmployeesQuery({ page: 1, limit: 100 });
+    const { data: workplacesData } = useGetAllWorkplacesQuery({ page: 1, limit: 100 });
+    
+    // Generate month options (years 2024 to 2035)
+    const monthOptions = useMemo(() => {
+        const options = [];
+        const startYear = 2024;
+        const endYear = 2035;
+        
+        for (let year = endYear; year >= startYear; year--) {
+            // Include all 12 months for each year
+            for (let month = 11; month >= 0; month--) {
+                const date = new Date(year, month, 1);
+                const monthStr = String(month + 1).padStart(2, '0');
+                const monthName = date.toLocaleString('default', { month: 'long' });
+                const value = `${year}-${monthStr}`;
+                const label = `${monthName} ${year}`;
+                options.push({ value, label });
+            }
+        }
+        
+        return options;
+    }, []);
+    
+    // Initialize default month
+    React.useEffect(() => {
+        if (monthOptions.length > 0 && !selectedMonth) {
+            setSelectedMonth(monthOptions[0].value);
+        }
+        if (monthOptions.length > 0 && !employeeMonth) {
+            setEmployeeMonth(monthOptions[0].value);
+        }
+        if (monthOptions.length > 0 && !workplaceMonth) {
+            setWorkplaceMonth(monthOptions[0].value);
+        }
+    }, [monthOptions, selectedMonth, employeeMonth, workplaceMonth]);
+    
+    // Initialize default dates
+    React.useEffect(() => {
+        const today = new Date();
+        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+        const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        
+        if (!startDate) {
+            setStartDate(firstDay.toISOString().split('T')[0]);
+        }
+        if (!endDate) {
+            setEndDate(lastDay.toISOString().split('T')[0]);
+        }
+    }, [startDate, endDate]);
+    
+    // Transform employees data for dropdown
+    const employeeOptions = useMemo(() => {
+        if (!employeesData?.data?.employees) return [];
+        return employeesData.data.employees.map(emp => ({
+            value: emp.id.toString(),
+            label: emp.full_name || `${emp.email || `Employee ${emp.id}`}`
+        }));
+    }, [employeesData]);
+    
+    // Transform workplaces data for dropdown
+    const workplaceOptions = useMemo(() => {
+        if (!workplacesData?.data?.workplaces) return [];
+        return workplacesData.data.workplaces.map(wp => ({
+            value: wp.id.toString(),
+            label: wp.name || `Workplace ${wp.id}`
+        }));
+    }, [workplacesData]);
+    
+    // Download file helper
+    const downloadFile = (blob, filename) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+    };
+    
+    // Export Monthly Attendance
+    const handleExportMonthly = async () => {
+        if (!selectedMonth) {
+            toast.error(t('report.selectMonth') || "Please select a month");
+            return;
+        }
+        
+        setIsExportingMonthly(true);
+        try {
+            const response = await api.get(API_END_POINTS.exportMonthlyAttendance, {
+                params: { month: selectedMonth },
+                responseType: 'blob'
+            });
+            
+            downloadFile(response.data, `monthly_attendance_${selectedMonth.replace('-', '_')}.xlsx`);
+            toast.success(t('report.exportSuccess') || "Export successful!");
+        } catch (error) {
+            console.error('Export error:', error);
+            toast.error(error.response?.data?.message || t('report.exportError') || "Export failed");
+        } finally {
+            setIsExportingMonthly(false);
+        }
+    };
+    
+    // Export Date Range
+    const handleExportRange = async () => {
+        if (!startDate || !endDate) {
+            toast.error(t('report.selectDateRange') || "Please select start and end dates");
+            return;
+        }
+        
+        if (new Date(startDate) > new Date(endDate)) {
+            toast.error(t('report.invalidDateRange') || "Start date must be before end date");
+            return;
+        }
+        
+        setIsExportingRange(true);
+        try {
+            const response = await api.get(API_END_POINTS.exportDateRangeAttendance, {
+                params: { 
+                    start_date: startDate,
+                    end_date: endDate
+                },
+                responseType: 'blob'
+            });
+            
+            downloadFile(response.data, `attendance_range_${startDate}_to_${endDate}.xlsx`);
+            toast.success(t('report.exportSuccess') || "Export successful!");
+        } catch (error) {
+            console.error('Export error:', error);
+            toast.error(error.response?.data?.message || t('report.exportError') || "Export failed");
+        } finally {
+            setIsExportingRange(false);
+        }
+    };
+    
+    // Export Employee Attendance
+    const handleExportEmployee = async () => {
+        if (!selectedEmployee) {
+            toast.error(t('report.selectEmployee') || "Please select an employee");
+            return;
+        }
+        if (!employeeMonth) {
+            toast.error(t('report.selectMonth') || "Please select a month");
+            return;
+        }
+        
+        setIsExportingEmployee(true);
+        try {
+            const response = await api.get(API_END_POINTS.exportEmployeeAttendance, {
+                params: { 
+                    user_id: selectedEmployee,
+                    month: employeeMonth
+                },
+                responseType: 'blob'
+            });
+            
+            const employeeName = employeeOptions.find(e => e.value === selectedEmployee)?.label || 'employee';
+            downloadFile(response.data, `employee_attendance_${employeeName.replace(/\s+/g, '_')}_${employeeMonth.replace('-', '_')}.xlsx`);
+            toast.success(t('report.exportSuccess') || "Export successful!");
+        } catch (error) {
+            console.error('Export error:', error);
+            toast.error(error.response?.data?.message || t('report.exportError') || "Export failed");
+        } finally {
+            setIsExportingEmployee(false);
+        }
+    };
+    
+    // Export Workplace Attendance
+    const handleExportWorkplace = async () => {
+        if (!selectedWorkplace) {
+            toast.error(t('workplace.selectWorkplaceTitle') || "Please select a workplace");
+            return;
+        }
+        if (!workplaceMonth) {
+            toast.error(t('report.selectMonth') || "Please select a month");
+            return;
+        }
+        
+        setIsExportingWorkplace(true);
+        try {
+            const response = await api.get(API_END_POINTS.exportWorkplaceAttendance, {
+                params: { 
+                    workplace_id: selectedWorkplace,
+                    month: workplaceMonth
+                },
+                responseType: 'blob'
+            });
+            
+            const workplaceName = workplaceOptions.find(w => w.value === selectedWorkplace)?.label || 'workplace';
+            downloadFile(response.data, `workplace_attendance_${workplaceName.replace(/\s+/g, '_')}_${workplaceMonth.replace('-', '_')}.xlsx`);
+            toast.success(t('report.exportSuccess') || "Export successful!");
+        } catch (error) {
+            console.error('Export error:', error);
+            toast.error(error.response?.data?.message || t('report.exportError') || "Export failed");
+        } finally {
+            setIsExportingWorkplace(false);
+        }
+    };
 
     return (
         <div className="w-full relative bg-transparent space-y-6">
@@ -84,8 +306,9 @@ const ReportExport = () => {
                         <CustomLabel label={t('report.selectMonth')} />
                         <div className="relative">
                             <Select
-                                options={[{ value: "December 2024", label: "December 2024" }]}
-                                value="December 2024"
+                                options={monthOptions}
+                                value={selectedMonth}
+                                onChange={(e) => setSelectedMonth(e.target.value)}
                                 className="w-full h-11 bg-white text-black text-sm font-normal font-inter border border-gray-300 appearance-none pr-10"
                             />
                             <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
@@ -96,6 +319,8 @@ const ReportExport = () => {
                     <ExportButton
                         text={t('report.exportMonthlyExcel')}
                         className="w-full lg:w-auto"
+                        onClick={handleExportMonthly}
+                        isLoading={isExportingMonthly}
                     />
                 </div>
 
@@ -132,48 +357,33 @@ const ReportExport = () => {
                 className="w-full"
             >
                 <div className="flex flex-col lg:flex-row items-end gap-6">
-                    <div className="w-full lg:flex-1">
-                        <ReusableInput
-                            ref={startDateRef}
+                    <div className="w-full lg:w-60">
+                        <ModernDatePicker
                             label={t('report.startDate')}
                             value={startDate}
                             onChange={(e) => setStartDate(e.target.value)}
-                            type="date"
-                            iconRight={
-                                <div
-                                    className="cursor-pointer"
-                                    onClick={() => startDateRef.current?.showPicker()}
-                                >
-                                    <CalendarIconLarge />
-                                </div>
-                            }
-                            classes="h-11 md:h-11 rounded-md border border-gray-300 bg-white !text-black text-sm font-normal font-inter [&::-webkit-calendar-picker-indicator]:hidden"
+                            placeholder={t('report.startDate') || "Select start date"}
+                            maxDate={endDate ? new Date(endDate) : null}
+                            className="h-11"
                         />
                     </div>
-                    <div className="w-full lg:flex-1">
-                        <ReusableInput
-                            ref={endDateRef}
+                    <div className="w-full lg:w-60">
+                        <ModernDatePicker
                             label={t('report.endDate')}
                             value={endDate}
                             onChange={(e) => setEndDate(e.target.value)}
-                            type="date"
-                            iconRight={
-                                <div
-                                    className="cursor-pointer"
-                                    onClick={() => endDateRef.current?.showPicker()}
-                                >
-                                    <CalendarIconLarge className="w-5 h-5" />
-                                </div>
-                            }
-                            classes="h-11 md:h-11 rounded-md border border-gray-300 bg-white !text-black text-sm font-normal font-inter [&::-webkit-calendar-picker-indicator]:hidden"
+                            placeholder={t('report.endDate') || "Select end date"}
+                            minDate={startDate ? new Date(startDate) : null}
+                            className="h-11"
                         />
                     </div>
-                    <div className="w-full lg:flex-1">
+                    <div className="w-full lg:w-60">
                         <CustomLabel label={t('report.exportFormat')} />
                         <div className="relative">
                             <Select
                                 options={[{ value: "Excel (.xlsx)", label: "Excel (.xlsx)" }]}
-                                value="Excel (.xlsx)"
+                                value={exportFormat}
+                                onChange={(e) => setExportFormat(e.target.value)}
                                 className="w-full h-11 bg-white text-black text-sm font-normal font-inter border border-gray-300 appearance-none pr-10"
                             />
                             <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
@@ -181,7 +391,12 @@ const ReportExport = () => {
                             </div>
                         </div>
                     </div>
-                    <ExportButton text={t('report.exportRange')} className="w-full lg:flex-1" />
+                    <ExportButton 
+                        text={t('report.exportRange')} 
+                        className="w-full lg:w-60"
+                        onClick={handleExportRange}
+                        isLoading={isExportingRange}
+                    />
                 </div>
             </ExportCard>
 
@@ -198,23 +413,101 @@ const ReportExport = () => {
                     <div className="space-y-6">
                         <div>
                             <CustomLabel label={t('report.selectEmployee')} />
-                            <div className="relative">
-                                <Select
-                                    options={[{ value: "John Smith", label: "John Smith" }]}
-                                    value="John Smith"
-                                    className="w-full h-11 bg-white text-black text-sm font-normal font-inter border border-gray-300 appearance-none pr-10"
-                                />
-                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                                    <ChevronDownIconLarge />
-                                </div>
-                            </div>
+                            <ReactSelect
+                                options={employeeOptions}
+                                value={employeeOptions.find(opt => opt.value === selectedEmployee) || null}
+                                onChange={(selected) => setSelectedEmployee(selected?.value || "")}
+                                placeholder={t('report.selectEmployee') || "Select Employee"}
+                                isSearchable={true}
+                                isClearable={true}
+                                className="react-select-container"
+                                classNamePrefix="react-select"
+                                menuPortalTarget={document.body}
+                                menuPosition="fixed"
+                                styles={{
+                                    control: (base, state) => ({
+                                        ...base,
+                                        minHeight: '44px',
+                                        height: '44px',
+                                        backgroundColor: 'white',
+                                        borderColor: state.isFocused ? '#0ea5e9' : '#d1d5db',
+                                        borderRadius: '0.375rem',
+                                        boxShadow: state.isFocused ? '0 0 0 1px #0ea5e9' : 'none',
+                                        '&:hover': {
+                                            borderColor: state.isFocused ? '#0ea5e9' : '#9ca3af',
+                                        },
+                                    }),
+                                    valueContainer: (base) => ({
+                                        ...base,
+                                        height: '44px',
+                                        padding: '0 8px',
+                                    }),
+                                    input: (base) => ({
+                                        ...base,
+                                        margin: '0',
+                                        padding: '0',
+                                        color: '#000',
+                                        fontSize: '14px',
+                                        fontFamily: 'Inter, sans-serif',
+                                    }),
+                                    placeholder: (base) => ({
+                                        ...base,
+                                        color: '#6b7280',
+                                        fontSize: '14px',
+                                        fontFamily: 'Inter, sans-serif',
+                                    }),
+                                    singleValue: (base) => ({
+                                        ...base,
+                                        color: '#000',
+                                        fontSize: '14px',
+                                        fontFamily: 'Inter, sans-serif',
+                                    }),
+                                    menu: (base) => ({
+                                        ...base,
+                                        zIndex: 9999,
+                                        borderRadius: '0.375rem',
+                                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                                    }),
+                                    menuPortal: (base) => ({
+                                        ...base,
+                                        zIndex: 9999,
+                                    }),
+                                    option: (base, state) => ({
+                                        ...base,
+                                        backgroundColor: state.isSelected
+                                            ? '#0ea5e9'
+                                            : state.isFocused
+                                                ? '#e0f2fe'
+                                                : 'white',
+                                        color: state.isSelected ? 'white' : '#000',
+                                        fontSize: '14px',
+                                        fontFamily: 'Inter, sans-serif',
+                                        padding: '10px 12px',
+                                        '&:active': {
+                                            backgroundColor: state.isSelected ? '#0ea5e9' : '#bae6fd',
+                                        },
+                                    }),
+                                    indicatorSeparator: () => ({
+                                        display: 'none',
+                                    }),
+                                    dropdownIndicator: (base) => ({
+                                        ...base,
+                                        color: '#6b7280',
+                                        padding: '8px',
+                                        '&:hover': {
+                                            color: '#374151',
+                                        },
+                                    }),
+                                }}
+                            />
                         </div>
                         <div>
                             <CustomLabel label={t('report.month')} />
                             <div className="relative">
                                 <Select
-                                    options={[{ value: "December 2024", label: "December 2024" }]}
-                                    value="December 2024"
+                                    options={monthOptions}
+                                    value={employeeMonth}
+                                    onChange={(e) => setEmployeeMonth(e.target.value)}
                                     className="w-full h-11 bg-white text-black text-sm font-normal font-inter border border-gray-300 appearance-none pr-10"
                                 />
                                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
@@ -222,7 +515,12 @@ const ReportExport = () => {
                                 </div>
                             </div>
                         </div>
-                        <ExportButton text={t('report.exportEmployeeAttendance')} className="w-full" />
+                        <ExportButton 
+                            text={t('report.exportEmployeeAttendance')} 
+                            className="w-full"
+                            onClick={handleExportEmployee}
+                            isLoading={isExportingEmployee}
+                        />
                     </div>
                 </ExportCard>
 
@@ -237,23 +535,101 @@ const ReportExport = () => {
                     <div className="space-y-6">
                         <div>
                             <CustomLabel label={t('workplace.selectWorkplaceTitle')} />
-                            <div className="relative">
-                                <Select
-                                    options={[{ value: "Main Office - Downtown", label: "Main Office - Downtown" }]}
-                                    value="Main Office - Downtown"
-                                    className="w-full h-11 bg-white text-black text-sm font-normal font-inter border border-gray-300 appearance-none pr-10"
-                                />
-                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                                    <ChevronDownIconLarge />
-                                </div>
-                            </div>
+                            <ReactSelect
+                                options={workplaceOptions}
+                                value={workplaceOptions.find(opt => opt.value === selectedWorkplace) || null}
+                                onChange={(selected) => setSelectedWorkplace(selected?.value || "")}
+                                placeholder={t('workplace.selectWorkplaceTitle') || "Select Workplace"}
+                                isSearchable={true}
+                                isClearable={true}
+                                className="react-select-container"
+                                classNamePrefix="react-select"
+                                menuPortalTarget={document.body}
+                                menuPosition="fixed"
+                                styles={{
+                                    control: (base, state) => ({
+                                        ...base,
+                                        minHeight: '44px',
+                                        height: '44px',
+                                        backgroundColor: 'white',
+                                        borderColor: state.isFocused ? '#0ea5e9' : '#d1d5db',
+                                        borderRadius: '0.375rem',
+                                        boxShadow: state.isFocused ? '0 0 0 1px #0ea5e9' : 'none',
+                                        '&:hover': {
+                                            borderColor: state.isFocused ? '#0ea5e9' : '#9ca3af',
+                                        },
+                                    }),
+                                    valueContainer: (base) => ({
+                                        ...base,
+                                        height: '44px',
+                                        padding: '0 8px',
+                                    }),
+                                    input: (base) => ({
+                                        ...base,
+                                        margin: '0',
+                                        padding: '0',
+                                        color: '#000',
+                                        fontSize: '14px',
+                                        fontFamily: 'Inter, sans-serif',
+                                    }),
+                                    placeholder: (base) => ({
+                                        ...base,
+                                        color: '#6b7280',
+                                        fontSize: '14px',
+                                        fontFamily: 'Inter, sans-serif',
+                                    }),
+                                    singleValue: (base) => ({
+                                        ...base,
+                                        color: '#000',
+                                        fontSize: '14px',
+                                        fontFamily: 'Inter, sans-serif',
+                                    }),
+                                    menu: (base) => ({
+                                        ...base,
+                                        zIndex: 9999,
+                                        borderRadius: '0.375rem',
+                                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                                    }),
+                                    menuPortal: (base) => ({
+                                        ...base,
+                                        zIndex: 9999,
+                                    }),
+                                    option: (base, state) => ({
+                                        ...base,
+                                        backgroundColor: state.isSelected
+                                            ? '#0ea5e9'
+                                            : state.isFocused
+                                                ? '#e0f2fe'
+                                                : 'white',
+                                        color: state.isSelected ? 'white' : '#000',
+                                        fontSize: '14px',
+                                        fontFamily: 'Inter, sans-serif',
+                                        padding: '10px 12px',
+                                        '&:active': {
+                                            backgroundColor: state.isSelected ? '#0ea5e9' : '#bae6fd',
+                                        },
+                                    }),
+                                    indicatorSeparator: () => ({
+                                        display: 'none',
+                                    }),
+                                    dropdownIndicator: (base) => ({
+                                        ...base,
+                                        color: '#6b7280',
+                                        padding: '8px',
+                                        '&:hover': {
+                                            color: '#374151',
+                                        },
+                                    }),
+                                }}
+                            />
                         </div>
                         <div>
                             <CustomLabel label={t('report.month')} />
                             <div className="relative">
                                 <Select
-                                    options={[{ value: "December 2024", label: "December 2024" }]}
-                                    value="December 2024"
+                                    options={monthOptions}
+                                    value={workplaceMonth}
+                                    onChange={(e) => setWorkplaceMonth(e.target.value)}
                                     className="w-full h-11 bg-white text-black text-sm font-normal font-inter border border-gray-300 appearance-none pr-10"
                                 />
                                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
@@ -261,7 +637,12 @@ const ReportExport = () => {
                                 </div>
                             </div>
                         </div>
-                        <ExportButton text={t('report.exportWorkplaceAttendance')} className="w-full" />
+                        <ExportButton 
+                            text={t('report.exportWorkplaceAttendance')} 
+                            className="w-full"
+                            onClick={handleExportWorkplace}
+                            isLoading={isExportingWorkplace}
+                        />
                     </div>
                 </ExportCard>
             </div>

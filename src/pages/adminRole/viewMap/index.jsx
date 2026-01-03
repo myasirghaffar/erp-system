@@ -1,10 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 import { MapContainer, TileLayer, Marker, Popup, ScaleControl } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import DashboardBanner from "../../../components/DashboardBanner";
+import {
+    useGetAllWorkplacesQuery,
+    useGetAttendanceLocationsQuery,
+} from "../../../services/Api";
 
 // Fix for default Leaflet markers in React
 delete L.Icon.Default.prototype._getIconUrl;
@@ -14,7 +18,7 @@ L.Icon.Default.mergeOptions({
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-// Mock Data
+// Mock Data (fallback)
 const workplaces = [
     { id: 1, name: "Downtown Office", lat: 51.505, lng: -0.09, type: "Workplace", address: "123 Business St" },
     { id: 2, name: "North Campus", lat: 51.51, lng: -0.1, type: "Workplace", address: "456 Education Ave" },
@@ -29,8 +33,52 @@ const employees = [
 const ViewMap = () => {
     const { t } = useTranslation();
 
+    // Fetch workplaces and attendance locations
+    const { data: workplacesData, isLoading: isLoadingWorkplaces } = useGetAllWorkplacesQuery({ limit: 100 });
+    const { data: locationsData, isLoading: isLoadingLocations } = useGetAttendanceLocationsQuery({
+        start_date: new Date().toISOString().split('T')[0],
+        end_date: new Date().toISOString().split('T')[0],
+    });
+
+    // Transform workplaces data
+    const transformedWorkplaces = useMemo(() => {
+        if (!workplacesData?.data?.workplaces) return workplaces;
+        
+        return workplacesData.data.workplaces
+            .filter(wp => wp.latitude && wp.longitude)
+            .map((wp) => ({
+                id: wp.id,
+                name: wp.name,
+                lat: parseFloat(wp.latitude),
+                lng: parseFloat(wp.longitude),
+                type: "Workplace",
+                address: wp.address || "",
+            }));
+    }, [workplacesData]);
+
+    // Transform employee locations from attendance data
+    const transformedEmployees = useMemo(() => {
+        if (!locationsData?.data?.locations) return employees;
+        
+        return locationsData.data.locations
+            .filter(loc => loc.latitude && loc.longitude)
+            .map((loc) => ({
+                id: loc.user_id || loc.id,
+                name: loc.user?.full_name || loc.employee_name || "Unknown",
+                lat: parseFloat(loc.latitude),
+                lng: parseFloat(loc.longitude),
+                type: "Employee",
+                status: loc.status || "Active",
+            }));
+    }, [locationsData]);
+
     // Center map on the first workplace or a default location
-    const defaultCenter = [51.505, -0.09];
+    const defaultCenter = useMemo(() => {
+        if (transformedWorkplaces.length > 0) {
+            return [transformedWorkplaces[0].lat, transformedWorkplaces[0].lng];
+        }
+        return [51.505, -0.09];
+    }, [transformedWorkplaces]);
 
     return (
         <div className="min-h-screen bg-gray-100 p-4 md:p-6 pb-20 overflow-x-hidden flex flex-col">
@@ -53,7 +101,7 @@ const ViewMap = () => {
                     />
 
                     {/* Workplace Markers */}
-                    {workplaces.map(place => (
+                    {transformedWorkplaces.map(place => (
                         <Marker key={`wp-${place.id}`} position={[place.lat, place.lng]}>
                             <Popup>
                                 <div className="p-1">
@@ -66,7 +114,7 @@ const ViewMap = () => {
                     ))}
 
                     {/* Employee Markers */}
-                    {employees.map(emp => (
+                    {transformedEmployees.map(emp => (
                         <Marker key={`emp-${emp.id}`} position={[emp.lat, emp.lng]}>
                             <Popup>
                                 <div className="p-1">

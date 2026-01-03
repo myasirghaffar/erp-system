@@ -20,13 +20,6 @@ export const driverApi = SplitApiSettings.injectEndpoints({
       }),
       providesTags: [{ type: "DriverProfile" }],
     }),
-    getDriverAlertReminder: builder.query({
-      query: () => ({
-        url: API_END_POINTS.getDriverAlertReminder,
-        method: "GET",
-      }),
-      providesTags: [{ type: "DriverProfile" }],
-    }),
     getDriverExpiringDocs: builder.query({
       query: () => ({
         url: API_END_POINTS.getDriverExpiringDocs,
@@ -40,6 +33,5 @@ export const driverApi = SplitApiSettings.injectEndpoints({
 export const {
   useGetDriverDashboardStatsQuery,
   useGetDriverDashboardStatusQuery,
-  useGetDriverAlertReminderQuery,
   useGetDriverExpiringDocsQuery,
 } = driverApi;

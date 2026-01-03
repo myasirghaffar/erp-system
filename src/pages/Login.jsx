@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../store/slices/authSlice";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { authenticateUser } from "../data/dummyUsers";
+import { useLoginMutation } from "../services/Api";
 import { Eye, EyeOff } from "lucide-react";
 
 import loginBg from "../assets/images/login-form.png";
@@ -18,6 +18,7 @@ const Login = () => {
   const { auth } = useSelector((state) => state);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [login, { isLoading: isLoggingIn }] = useLoginMutation();
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -40,17 +41,19 @@ const Login = () => {
   const handleAutoLogin = async (email, password) => {
     setError(null);
     try {
-      const authenticatedUser = authenticateUser(email, password);
-      if (authenticatedUser) {
-        dispatch(setUser({
-          role: authenticatedUser.role,
-          email: authenticatedUser.email,
-          name: authenticatedUser.name,
-        }));
-        toast.success(`Welcome, ${authenticatedUser.name}!`);
-        navigate("/admin/dashboard");
-      } else {
-        toast.error("Auto login failed. Please try again.");
+      const result = await login({ data: { email, password } });
+      if (result.data) {
+        const token = result.data?.data?.accessToken;
+        const user = result.data?.data?.user;
+        if (user && token) {
+          dispatch(setUser({ ...user, token }));
+          toast.success(`Welcome, ${user.name || user.email}!`);
+          navigate("/admin/dashboard");
+        } else {
+          toast.error("Auto login failed. Invalid response from server.");
+        }
+      } else if (result.error) {
+        toast.error(result.error.data?.message || result.error.data?.error || "Auto login failed. Please try again.");
       }
     } catch (error) {
       toast.error("An error occurred during auto login.");
@@ -61,17 +64,21 @@ const Login = () => {
     setError(null);
     const { email, password } = data;
     try {
-      const authenticatedUser = authenticateUser(email, password);
-      if (authenticatedUser) {
-        dispatch(setUser({
-          role: authenticatedUser.role,
-          email: authenticatedUser.email,
-          name: authenticatedUser.name,
-        }));
-        toast.success(`Welcome, ${authenticatedUser.name}!`);
-        navigate("/admin/dashboard");
-      } else {
-        toast.error("Incorrect email or password.");
+      const result = await login({ data: { email, password } });
+      if (result.data) {
+        const token = result.data?.data?.accessToken;
+        const user = result.data?.data?.user;
+        if (user && token) {
+          dispatch(setUser({ ...user, token }));
+          toast.success(`Welcome, ${user.name || user.email}!`);
+          navigate("/admin/dashboard");
+        } else {
+          toast.error("Login failed. Invalid response from server.");
+        }
+      } else if (result.error) {
+        const errorMessage = result.error.data?.message || result.error.data?.error || "Incorrect email or password.";
+        setError(errorMessage);
+        toast.error(errorMessage);
       }
     } catch (error) {
       toast.error("An error occurred during login.");
@@ -148,10 +155,10 @@ const Login = () => {
             {/* Login Button */}
             <button
               type="submit"
-              disabled={auth.loading}
+              disabled={isLoggingIn || auth.loading}
               className="w-full h-12 mt-2 bg-gradient-to-b from-sky-400 to-cyan-600 hover:from-sky-500 hover:to-cyan-700 text-white text-lg font-semibold font-urbanist rounded-xl shadow-lg transition-all transform active:scale-95 disabled:opacity-70"
             >
-              {auth.loading ? "Logging in..." : "Log in"}
+              {isLoggingIn || auth.loading ? "Logging in..." : "Log in"}
             </button>
 
             {/* Divider */}

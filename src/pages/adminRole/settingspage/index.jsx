@@ -1,36 +1,59 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Upload, Clock, FileText, Check, Save } from "lucide-react";
+import { Upload, Save, Loader2 } from "lucide-react";
 import DashboardBanner from "../../../components/DashboardBanner";
 import ReusableInput from "../../../components/ReusableInput";
 import Select from "../../../components/Form/Select";
+import {
+    useGetCompanySettingsQuery,
+    useUpdateCompanyInfoMutation,
+    useUploadCompanyLogoMutation,
+} from "../../../services/Api";
+import { toast } from "react-toastify";
 
 const SettingsPage = () => {
     const { t } = useTranslation();
 
-    // Form States
+    // Fetch company settings from backend
+    const { 
+        data: companySettingsData, 
+        isLoading: isLoadingSettings,
+        isError: isErrorLoading,
+        error: loadError
+    } = useGetCompanySettingsQuery();
+
+    const [updateCompanyInfo, { isLoading: isSavingCompanyInfo }] = useUpdateCompanyInfoMutation();
+    const [uploadCompanyLogo, { isLoading: isUploadingLogo }] = useUploadCompanyLogoMutation();
+
+    // Form States - initialized from backend
     const [companyInfo, setCompanyInfo] = useState({
-        name: "Acme Corporation",
+        name: "",
+        logo: "",
         country: "usa",
         timezone: "pst"
     });
 
-    // Working Hours State
-    const [workingHours, setWorkingHours] = useState({
-        startTime: "09:00",
-        endTime: "17:00",
-        dailyMin: "8",
-        weeklyMin: "40"
-    });
+    // Load settings from API when available
+    useEffect(() => {
+        if (companySettingsData?.data?.settings) {
+            const settings = companySettingsData.data.settings;
+            
+            // Map API settings to form state
+            setCompanyInfo({
+                name: settings.company_name || "",
+                logo: settings.company_logo || "",
+                country: settings.country || "usa",
+                timezone: settings.timezone || "pst"
+            });
+        }
+    }, [companySettingsData]);
 
-    // Overtime Rules State
-    const [overtimeRules, setOvertimeRules] = useState({
-        lunchBreak: "60",
-        shortBreak: "15",
-        overtimeThreshold: "8",
-        overtimeRate: "1.5",
-        autoDeduct: false
-    });
+    // Show error toast if loading fails
+    useEffect(() => {
+        if (isErrorLoading && loadError) {
+            toast.error(loadError?.data?.message || t('settings.loadError') || "Failed to load settings");
+        }
+    }, [isErrorLoading, loadError, t]);
 
     // Options
     const countryOptions = [
@@ -47,46 +70,104 @@ const SettingsPage = () => {
         { label: t('settings.ist'), value: "ist" }
     ];
 
-    const overtimeRateOptions = [
-        { label: t('settings.standard'), value: "1.25" },
-        { label: t('settings.timeAHalf'), value: "1.5" },
-        { label: t('settings.doubleTime'), value: "2.0" }
-    ];
-
-
     const handleCompanyChange = (e) => {
         const { name, value } = e.target;
         setCompanyInfo(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleWorkingHoursChange = (e) => {
-        const { name, value } = e.target;
-        setWorkingHours(prev => ({ ...prev, [name]: value }));
+    // Handle file input change
+    const handleFileChange = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Validate file type
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+        if (!allowedTypes.includes(file.type)) {
+            toast.error(t('settings.invalidFileType') || "Only PNG, JPG, and JPEG files are allowed");
+            return;
+        }
+
+        // Validate file size (2MB)
+        const maxSize = 2 * 1024 * 1024; // 2MB
+        if (file.size > maxSize) {
+            toast.error(t('settings.fileTooLarge') || "File size must be less than 2MB");
+            return;
+        }
+
+        try {
+            // Create FormData
+            const formData = new FormData();
+            formData.append('logo', file);
+
+            // Upload logo
+            const result = await uploadCompanyLogo(formData).unwrap();
+            
+            // Update local state with new logo URL
+            if (result?.data?.logo_url) {
+                setCompanyInfo(prev => ({ ...prev, logo: result.data.logo_url }));
+                toast.success(t('settings.logoUploaded') || "Your company logo has been updated successfully!");
+            }
+        } catch (error) {
+            toast.error(error?.data?.message || t('settings.uploadError') || "Failed to upload logo");
+        }
+
+        // Reset file input
+        e.target.value = '';
     };
 
-    const handleOvertimeChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setOvertimeRules(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
+    // Handle save company info
+    const handleSaveCompanyInfo = async () => {
+        try {
+            await updateCompanyInfo({
+                data: {
+                    company_name: companyInfo.name,
+                    company_logo: companyInfo.logo || null,
+                    country: companyInfo.country,
+                    timezone: companyInfo.timezone
+                }
+            }).unwrap();
+
+            toast.success(t('settings.companyInfoSaved') || "Company information saved successfully");
+        } catch (error) {
+            toast.error(error?.data?.message || t('settings.saveError') || "Failed to save company information");
+        }
     };
 
+    // Loading state
+    if (isLoadingSettings) {
+        return (
+            <div className="min-h-screen bg-gray-100 p-4 md:p-6 pb-20 flex items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="w-8 h-8 animate-spin text-[#22B3E8]" />
+                    <p className="text-gray-600">{t('settings.loading') || "Loading settings..."}</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-100 p-4 md:p-6 pb-20 overflow-x-hidden">
             <div className="space-y-6 max-w-full">
+                {/* Company Information Section */}
                 <DashboardBanner
                     title={t('settings.companyTitle')}
                     description={t('settings.companyDescription')}
                     rightContent={
-                        <button className="bg-[#22B3E8] text-white px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#1fa0d1] transition-colors flex items-center gap-2 shadow-sm">
-                            <Save size={16} /> {t('settings.saveChanges')}
+                        <button 
+                            onClick={handleSaveCompanyInfo}
+                            disabled={isSavingCompanyInfo}
+                            className="bg-[#22B3E8] text-white px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#1fa0d1] transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50"
+                        >
+                            {isSavingCompanyInfo ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                                <Save size={16} />
+                            )}
+                            {t('settings.saveChanges')}
                         </button>
                     }
                 />
 
-                {/* Company Information Card */}
                 <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100">
                     <div className="space-y-6">
                         {/* Company Name */}
@@ -97,6 +178,7 @@ const SettingsPage = () => {
                                 value={companyInfo.name}
                                 onChange={handleCompanyChange}
                                 classes="h-12 rounded-xl text-sm font-medium"
+                                placeholder={t('settings.companyNamePlaceholder') || "Enter company name"}
                             />
                         </div>
 
@@ -104,15 +186,34 @@ const SettingsPage = () => {
                         <div className="space-y-2">
                             <label className="text-gray-700 text-xs font-bold font-inter">{t('settings.companyLogo')}</label>
                             <div className="flex items-center gap-4">
-                                <div className="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center border border-gray-200">
-                                    <ImagePlaceholder />
+                                <div className="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center border border-gray-200 overflow-hidden">
+                                    {companyInfo.logo ? (
+                                        <img src={companyInfo.logo} alt="Company Logo" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <ImagePlaceholder />
+                                    )}
                                 </div>
                                 <div>
-                                    <button className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors bg-white">
-                                        <Upload size={16} />
-                                        {t('settings.uploadLogo')}
-                                    </button>
-                                    <p className="text-gray-400 text-xs font-medium mt-1.5">{t('settings.uploadDesc')}</p>
+                                    <input
+                                        type="file"
+                                        id="logo-upload"
+                                        accept="image/jpeg,image/jpg,image/png"
+                                        onChange={handleFileChange}
+                                        className="hidden"
+                                        disabled={isUploadingLogo}
+                                    />
+                                    <label
+                                        htmlFor="logo-upload"
+                                        className={`flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors bg-white cursor-pointer ${isUploadingLogo ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    >
+                                        {isUploadingLogo ? (
+                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                        ) : (
+                                            <Upload size={16} />
+                                        )}
+                                        {isUploadingLogo ? (t('settings.uploading') || "Uploading...") : (t('settings.uploadLogo') || "Upload Logo")}
+                                    </label>
+                                    <p className="text-gray-400 text-xs font-medium mt-1.5">{t('settings.uploadDesc') || "PNG, JPG up to 2MB"}</p>
                                 </div>
                             </div>
                         </div>
@@ -143,168 +244,6 @@ const SettingsPage = () => {
                         </div>
                     </div>
                 </div>
-
-                {/* Section Header */}
-                <div className="mt-2">
-                    <h2 className="text-[#111827] text-lg font-bold font-inter">{t('settings.workingHoursTitle')}</h2>
-                    <p className="text-gray-400 text-sm font-medium mt-1">{t('settings.workingHoursDesc')}</p>
-                </div>
-
-                {/* Working Hours Card */}
-                <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100">
-                    <div className="flex items-start gap-4 mb-8">
-                        <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center shrink-0">
-                            <Clock className="text-blue-600" size={20} />
-                        </div>
-                        <div>
-                            <h3 className="text-[#111827] text-base font-bold font-inter">{t('settings.rulesTitle')}</h3>
-                            <p className="text-gray-400 text-sm font-medium">{t('settings.rulesDesc')}</p>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                        {/* Daily Start/End Time */}
-                        <div className="space-y-4">
-                            <label className="text-gray-700 text-xs font-bold font-inter">{t('settings.dailyStartEnd')}</label>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="text-gray-500 text-[11px] font-semibold mb-1 block">{t('settings.startTime')}</label>
-                                    <ReusableInput
-                                        name="startTime"
-                                        type="time"
-                                        value={workingHours.startTime}
-                                        onChange={handleWorkingHoursChange}
-                                        classes="h-12 rounded-xl text-sm font-medium"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="text-gray-500 text-[11px] font-semibold mb-1 block">{t('settings.endTime')}</label>
-                                    <ReusableInput
-                                        name="endTime"
-                                        type="time"
-                                        value={workingHours.endTime}
-                                        onChange={handleWorkingHoursChange}
-                                        classes="h-12 rounded-xl text-sm font-medium"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Minimum Hours */}
-                        <div className="space-y-4">
-                            <label className="text-gray-700 text-xs font-bold font-inter">{t('settings.minHours')}</label>
-                            <div>
-                                <label className="text-gray-500 text-[11px] font-semibold mb-1 block">{t('settings.dailyMin')}</label>
-                                <ReusableInput
-                                    name="dailyMin"
-                                    type="number"
-                                    value={workingHours.dailyMin}
-                                    onChange={handleWorkingHoursChange}
-                                    classes="h-12 rounded-xl text-sm font-medium"
-                                />
-                            </div>
-                            <div>
-                                <label className="text-gray-500 text-[11px] font-semibold mb-1 block">{t('settings.weeklyMin')}</label>
-                                <ReusableInput
-                                    name="weeklyMin"
-                                    type="number"
-                                    value={workingHours.weeklyMin}
-                                    onChange={handleWorkingHoursChange}
-                                    classes="h-12 rounded-xl text-sm font-medium"
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="mt-8 pt-6 border-t border-gray-50">
-                        <button className="bg-[#22B3E8] text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-[#1fa0d1] transition-colors flex items-center gap-2 shadow-sm shadow-sky-100">
-                            <Save size={16} /> {t('settings.saveWorkingHours')}
-                        </button>
-                    </div>
-                </div>
-
-                {/* Overtime & Break Rules Card */}
-                <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100">
-                    <div className="flex items-start gap-4 mb-8">
-                        <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center shrink-0">
-                            <FileText className="text-blue-500" size={20} />
-                        </div>
-                        <div>
-                            <h3 className="text-[#111827] text-base font-bold font-inter">{t('settings.overtimeTitle')}</h3>
-                            <p className="text-gray-400 text-sm font-medium">{t('settings.overtimeDesc')}</p>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                        {/* Break Deduction Rules */}
-                        <div className="space-y-4">
-                            <label className="text-gray-700 text-xs font-bold font-inter">{t('settings.breakRules')}</label>
-                            <div>
-                                <label className="text-gray-500 text-[11px] font-semibold mb-1 block">{t('settings.lunchBreak')}</label>
-                                <ReusableInput
-                                    name="lunchBreak"
-                                    type="number"
-                                    value={overtimeRules.lunchBreak}
-                                    onChange={handleOvertimeChange}
-                                    classes="h-12 rounded-xl text-sm font-medium"
-                                />
-                            </div>
-                            <div>
-                                <label className="text-gray-500 text-[11px] font-semibold mb-1 block">{t('settings.shortBreak')}</label>
-                                <ReusableInput
-                                    name="shortBreak"
-                                    type="number"
-                                    value={overtimeRules.shortBreak}
-                                    onChange={handleOvertimeChange}
-                                    classes="h-12 rounded-xl text-sm font-medium"
-                                />
-                            </div>
-                            <div className="flex items-center gap-2 pt-1">
-                                <input
-                                    type="checkbox"
-                                    id="autoDeduct"
-                                    name="autoDeduct"
-                                    checked={overtimeRules.autoDeduct}
-                                    onChange={handleOvertimeChange}
-                                    className="w-4 h-4 rounded border-gray-300 text-sky-500 focus:ring-sky-500 cursor-pointer"
-                                />
-                                <label htmlFor="autoDeduct" className="text-gray-500 text-xs font-medium cursor-pointer">{t('settings.autoDeduct')}</label>
-                            </div>
-                        </div>
-
-                        {/* Overtime Calculation */}
-                        <div className="space-y-4">
-                            <label className="text-gray-700 text-xs font-bold font-inter">{t('settings.overtimeCalc')}</label>
-                            <div>
-                                <label className="text-gray-500 text-[11px] font-semibold mb-1 block">{t('settings.overtimeThreshold')}</label>
-                                <ReusableInput
-                                    name="overtimeThreshold"
-                                    type="number"
-                                    value={overtimeRules.overtimeThreshold}
-                                    onChange={handleOvertimeChange}
-                                    classes="h-12 rounded-xl text-sm font-medium"
-                                />
-                            </div>
-                            <div>
-                                <label className="text-gray-500 text-[11px] font-semibold mb-1 block">{t('settings.overtimeMultiplier')}</label>
-                                <Select
-                                    name="overtimeRate"
-                                    value={overtimeRules.overtimeRate}
-                                    onChange={handleOvertimeChange}
-                                    options={overtimeRateOptions}
-                                    className="w-full h-12 bg-white border border-gray-200 rounded-xl px-4 text-gray-900 text-sm font-medium focus:outline-none focus:ring-1 focus:ring-sky-500"
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="mt-8 pt-6 border-t border-gray-50">
-                        <button className="bg-[#22B3E8] text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-[#1fa0d1] transition-colors flex items-center gap-2 shadow-sm shadow-sky-100">
-                            <Save size={16} /> {t('settings.saveOvertime')}
-                        </button>
-                    </div>
-                </div>
-
             </div>
         </div>
     );

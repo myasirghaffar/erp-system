@@ -9,11 +9,18 @@ import EmployeeProfile from "./features/EmployeeProfile";
 const EmployeeDashboard = () => {
   const { t } = useTranslation();
   const [view, setView] = useState("list"); // 'list', 'add', or 'profile'
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
 
   if (view === "add") {
     return (
       <div className="min-h-screen bg-gray-100 p-4 md:p-6 overflow-x-hidden">
-        <AddEditEmployee onBack={() => setView("list")} />
+        <AddEditEmployee 
+          onBack={() => {
+            setView("list");
+            setSelectedEmployee(null);
+          }}
+          employee={selectedEmployee}
+        />
       </div>
     );
   }
@@ -21,7 +28,17 @@ const EmployeeDashboard = () => {
   if (view === "profile") {
     return (
       <div className="min-h-screen bg-gray-100 p-4 md:p-6 overflow-x-hidden">
-        <EmployeeProfile onBack={() => setView("list")} onEdit={() => setView("add")} />
+        <EmployeeProfile 
+          onBack={() => {
+            setView("list");
+            setSelectedEmployee(null);
+          }} 
+          onEdit={(employee) => {
+            setSelectedEmployee(employee);
+            setView("add");
+          }}
+          employee={selectedEmployee}
+        />
       </div>
     );
   }
@@ -39,7 +56,10 @@ const EmployeeDashboard = () => {
               description={t('employee.managementDesc')}
               rightContent={
                 <div
-                  onClick={() => setView("add")}
+                  onClick={() => {
+                    setSelectedEmployee(null);
+                    setView("add");
+                  }}
                   className="bg-primary-500 backdrop-blur-sm rounded-lg px-4 py-3 flex items-center gap-3 shadow-sm cursor-pointer hover:bg-primary-600 transition-colors"
                 >
                   <LuPlus className="w-4 h-4 text-white" />
@@ -50,7 +70,16 @@ const EmployeeDashboard = () => {
               }
             />
             <div className="rounded-[1.5rem]">
-              <EmployeeReport onViewProfile={() => setView("profile")} />
+              <EmployeeReport 
+                onViewProfile={(employee) => {
+                  setSelectedEmployee(employee);
+                  setView("profile");
+                }}
+                onEdit={(employee) => {
+                  setSelectedEmployee(employee);
+                  setView("add");
+                }}
+              />
             </div>
           </div>
         </div>

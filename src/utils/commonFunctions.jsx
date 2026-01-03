@@ -70,3 +70,46 @@ export const getRemainingDaysLabel = (dateInput) => {
     return `${diffInDays} Days Remaining`;
 };
 
+/**
+ * Internationalized time ago formatter
+ * @param {string|Date} dateInput - The date to format
+ * @param {Function} t - Translation function from react-i18next
+ * @returns {string|null} - Formatted time string or null if invalid
+ */
+export const getTimeAgoI18n = (dateInput, t) => {
+    if (!dateInput || !t) return null;
+
+    const date = new Date(dateInput);
+    if (isNaN(date.getTime())) return null; // invalid date
+
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (diffInSeconds < 0) return t('time.justNow'); // future date
+
+    if (diffInSeconds < 60) return t('time.justNow');
+
+    const minutes = Math.floor(diffInSeconds / 60);
+    if (minutes < 60) {
+        return t('time.minutesAgo', { count: minutes });
+    }
+
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) {
+        return t('time.hoursAgo', { count: hours });
+    }
+
+    const days = Math.floor(hours / 24);
+    if (days < 30) {
+        return t('time.daysAgo', { count: days });
+    }
+
+    const months = Math.floor(days / 30);
+    if (months < 12) {
+        return t('time.monthsAgo', { count: months });
+    }
+
+    const years = Math.floor(months / 12);
+    return t('time.yearsAgo', { count: years });
+};
+

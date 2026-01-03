@@ -15,7 +15,7 @@ const Select = ({
       onChange={onChange}
       disabled={disabled}
       className={cn(
-        "bg-gray-950 text-gray-750 text-xs rounded-lg border border-gray-800 px-4 py-2 min-w-[120px]",
+        "bg-gray-950 text-black text-xs rounded-lg border border-gray-800 px-4 py-2 min-w-[120px]",
         className
       )}
       {...props}

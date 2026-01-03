@@ -7,7 +7,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { logout } from "../../store/slices/authSlice";
 import { persistor } from "../../store";
-import { useGetDriverAlertReminderQuery } from "../../services/driver/driverApi";
 import {
   SearchIconHeader,
   SettingsIconHeader,
@@ -18,8 +17,15 @@ import {
   ToggleOnIcon,
   ToggleOffIcon,
 } from "../../assets/icons/icons";
-import Perfil from "../../assets/images/Perfil.jpg";
 import Dropdown from "../../components/Dropdown";
+import {
+  useGetAllNotificationsQuery,
+  useGetUnreadNotificationCountQuery,
+  useMarkNotificationAsReadMutation,
+  useMarkAllNotificationsAsReadMutation,
+} from "../../services/Api";
+import { getTimeAgoI18n } from "../../utils/commonFunctions";
+import { useSocketNotifications } from "../../hooks/useSocketNotifications";
 
 function Header({ toggleSidebar }) {
   const location = useLocation();
@@ -61,34 +67,126 @@ function Header({ toggleSidebar }) {
     localStorage.setItem('i18nextLng', langCode);
   };
 
-  const { data: alertsData } = useGetDriverAlertReminderQuery();
-  const unreadCount =
-    alertsData?.data?.alerts?.filter((alert) => !alert.read)?.length || 0;
+  // Fetch notifications from API (reduced polling since we have Socket.io)
+  const {
+    data: notificationsData,
+    isLoading: isLoadingNotifications,
+    isError: isErrorNotifications,
+    refetch: refetchNotifications,
+  } = useGetAllNotificationsQuery(
+    { page: 1, limit: 20 },
+    {
+      pollingInterval: 300000, // Poll every 5 minutes as fallback (Socket.io handles real-time)
+      refetchOnMountOrArgChange: true,
+    }
+  );
 
-  // Mock notifications data
-  const notifications = [
-    {
-      id: 1,
-      title: "New Employee Added",
-      message: "John Doe has been added to the system",
-      time: "5 min ago",
-      read: false,
-    },
-    {
-      id: 2,
-      title: "Attendance Report",
-      message: "Monthly attendance report is ready",
-      time: "1 hour ago",
-      read: false,
-    },
-    {
-      id: 3,
-      title: "System Update",
-      message: "System will be updated tonight",
-      time: "2 hours ago",
-      read: true,
-    },
-  ];
+  // Fetch unread count (reduced polling since we have Socket.io)
+  const { data: unreadCountData, refetch: refetchUnreadCount } = useGetUnreadNotificationCountQuery(undefined, {
+    pollingInterval: 300000, // Poll every 5 minutes as fallback
+  });
+
+  // Socket.io real-time notifications
+  const [notificationsList, setNotificationsList] = useState([]);
+  
+  // Handle new notification from Socket.io
+  const handleNotificationReceived = (notification, action = 'new') => {
+    if (action === 'new') {
+      // Add new notification to the top of the list
+      setNotificationsList((prev) => [notification, ...prev]);
+      // Refetch to get updated list from server
+      refetchNotifications();
+      refetchUnreadCount();
+    } else if (action === 'update') {
+      // Update existing notification
+      setNotificationsList((prev) =>
+        prev.map((n) => (n.id === notification.id ? { ...n, ...notification } : n))
+      );
+      refetchUnreadCount();
+    } else if (action === 'delete') {
+      // Remove deleted notification
+      setNotificationsList((prev) => prev.filter((n) => n.id !== notification.id));
+      refetchUnreadCount();
+    }
+  };
+
+  // Handle count update from Socket.io
+  const handleCountUpdated = () => {
+    refetchUnreadCount();
+    refetchNotifications();
+  };
+
+  // Initialize Socket.io notifications
+  const { isConnected: socketConnected } = useSocketNotifications(
+    handleNotificationReceived,
+    handleCountUpdated
+  );
+
+  // Sync notifications from API with local state
+  useEffect(() => {
+    if (notificationsData?.data?.notifications) {
+      setNotificationsList(notificationsData.data.notifications);
+    }
+  }, [notificationsData]);
+
+  // Mutations
+  const [markNotificationAsRead] = useMarkNotificationAsReadMutation();
+  const [markAllNotificationsAsRead] = useMarkAllNotificationsAsReadMutation();
+
+  // Use local notifications list (synced with API and Socket.io)
+  const notifications = notificationsList.length > 0 ? notificationsList : (notificationsData?.data?.notifications || []);
+  const unreadCount = unreadCountData?.data?.unread_count || 0;
+
+  // Handle mark notification as read
+  const handleMarkAsRead = async (notificationId) => {
+    try {
+      await markNotificationAsRead(notificationId).unwrap();
+    } catch (error) {
+      console.error('Failed to mark notification as read:', error);
+    }
+  };
+
+  // Handle mark all as read
+  const handleMarkAllAsRead = async () => {
+    try {
+      await markAllNotificationsAsRead().unwrap();
+    } catch (error) {
+      console.error('Failed to mark all notifications as read:', error);
+    }
+  };
+
+  // Auto-refetch notifications when language changes
+  useEffect(() => {
+    refetchNotifications();
+  }, [i18n.language, refetchNotifications]);
+
+  // Get first character of user's name for avatar
+  const getInitials = (name) => {
+    if (!name) return "A";
+    const trimmedName = name.trim();
+    if (trimmedName.length === 0) return "A";
+    return trimmedName.charAt(0).toUpperCase();
+  };
+
+  // Generate background color based on user's name
+  const getAvatarColor = (name) => {
+    if (!name) return "bg-blue-500";
+    const colors = [
+      "bg-blue-500",
+      "bg-green-500",
+      "bg-purple-500",
+      "bg-pink-500",
+      "bg-indigo-500",
+      "bg-yellow-500",
+      "bg-red-500",
+      "bg-teal-500",
+    ];
+    const index = name.charCodeAt(0) % colors.length;
+    return colors[index];
+  };
+
+  const userInitial = getInitials(user?.name);
+  const avatarColor = getAvatarColor(user?.name);
 
   const languages = [
     { code: "en", name: "English", flag: "🇬🇧" },
@@ -109,7 +207,7 @@ function Header({ toggleSidebar }) {
             <Menu className="w-6 h-6" />
           </button>
 
-          <div className={`${isSearchOpen ? "flex" : "hidden md:flex"} relative w-full md:w-80 h-10 shadow-[0px_4px_5.2px_0px_rgba(0,0,0,0.11)] rounded-[10px]`}>
+          {/* <div className={`${isSearchOpen ? "flex" : "hidden md:flex"} relative w-full md:w-80 h-10 shadow-[0px_4px_5.2px_0px_rgba(0,0,0,0.11)] rounded-[10px]`}>
             <div className="absolute inset-0 bg-white rounded-[10px] border border-black/10" />
             <div className="absolute left-[20px] top-[10px] flex items-center justify-center">
               <SearchIconHeader className="w-5 h-5" />
@@ -124,7 +222,7 @@ function Header({ toggleSidebar }) {
               onKeyDown={(e) => e.key === 'Enter' && handleSearchSubmit(e)}
               onBlur={() => setIsSearchOpen(false)}
             />
-          </div>
+          </div> */}
         </div>
 
         {/* Right Side - Actions and Profile */}
@@ -279,16 +377,33 @@ function Header({ toggleSidebar }) {
                 )}
               </div>
 
-              {notifications.length > 0 ? (
+              {isLoadingNotifications ? (
+                <div className="px-4 py-8 text-center">
+                  <p className="text-sm text-gray-500">{t('header.loadingNotifications')}</p>
+                </div>
+              ) : isErrorNotifications ? (
+                <div className="px-4 py-8 text-center">
+                  <p className="text-sm text-red-500">{t('header.errorLoadingNotifications')}</p>
+                </div>
+              ) : notifications.length > 0 ? (
                 <>
+                  {unreadCount > 0 && (
+                    <button
+                      onClick={handleMarkAllAsRead}
+                      className="w-full px-4 py-2 text-xs text-blue-600 hover:bg-blue-50 transition-colors text-left border-b border-gray-100"
+                    >
+                      {t('header.markAllAsRead')}
+                    </button>
+                  )}
                   {notifications.map((notification) => (
                     <div
                       key={notification.id}
-                      className={`px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-50 ${!notification.read ? "bg-blue-50/30" : ""
+                      onClick={() => !notification.is_read && handleMarkAsRead(notification.id)}
+                      className={`px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-50 cursor-pointer ${!notification.is_read ? "bg-blue-50/30" : ""
                         }`}
                     >
                       <div className="flex gap-3">
-                        <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${!notification.read ? "bg-blue-500" : "bg-gray-300"
+                        <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${!notification.is_read ? "bg-blue-500" : "bg-gray-300"
                           }`} />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-800 truncate">
@@ -298,7 +413,7 @@ function Header({ toggleSidebar }) {
                             {notification.message}
                           </p>
                           <p className="text-xs text-gray-400 mt-1">
-                            {notification.time}
+                            {getTimeAgoI18n(notification.created_at, t) || t('time.justNow')}
                           </p>
                         </div>
                       </div>
@@ -320,8 +435,8 @@ function Header({ toggleSidebar }) {
           <Dropdown
             trigger={
               <div className="flex items-center gap-2.5 ml-2 cursor-pointer">
-                <div className="w-10 h-10 rounded-full overflow-hidden hover:ring-2 hover:ring-blue-500 transition-all">
-                  <img src={Perfil} alt="User Profile" className="w-full h-full object-cover" />
+                <div className={`w-10 h-10 rounded-full ${avatarColor} hover:ring-2 hover:ring-blue-500 transition-all flex items-center justify-center text-white font-semibold text-sm`}>
+                  {userInitial}
                 </div>
               </div>
             }
@@ -331,8 +446,8 @@ function Header({ toggleSidebar }) {
               {/* User Info Section */}
               <div className="px-4 py-3 border-b border-gray-100">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full overflow-hidden">
-                    <img src={Perfil} alt="User Profile" className="w-full h-full object-cover" />
+                  <div className={`w-12 h-12 rounded-full ${avatarColor} flex items-center justify-center text-white font-semibold text-lg`}>
+                    {userInitial}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-gray-800 truncate">
@@ -346,7 +461,7 @@ function Header({ toggleSidebar }) {
               </div>
 
               {/* Menu Items */}
-              <div className="py-1">
+              {/* <div className="py-1">
                 <button className="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left">
                   <UserCircleIcon className="w-5 h-5 text-gray-600" />
                   <span className="text-sm text-gray-700">{t('header.myProfile')}</span>
@@ -355,7 +470,7 @@ function Header({ toggleSidebar }) {
                   <SettingsIconHeader className="w-5 h-5 text-gray-600" />
                   <span className="text-sm text-gray-700">{t('header.accountSettings')}</span>
                 </button>
-              </div>
+              </div> */}
 
               {/* Logout */}
               <div className="border-t border-gray-100 py-1">

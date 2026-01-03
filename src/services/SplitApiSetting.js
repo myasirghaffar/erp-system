@@ -1,7 +1,9 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { logout } from '../store/slices/authSlice';
+import { BASE_URL } from './ApiEndpoints';
 
 const baseQuery = fetchBaseQuery({
+  baseUrl: BASE_URL || 'http://localhost:3000',
   prepareHeaders: async (headers, { getState }) => {
     try {
       const token = getState().auth?.user?.token;
@@ -19,9 +21,8 @@ const baseQuery = fetchBaseQuery({
 });
 
 const baseQueryWithReauth = async (args, api, extraOptions) => {
-  ``
   let result = await baseQuery(args, api, extraOptions);
-  if (result.error && result.error.status == 401) {
+  if (result.error && result.error.status === 401) {
     api.dispatch(logout(null));
   }
   return result;
@@ -30,5 +31,17 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
 export const SplitApiSettings = createApi({
   baseQuery: baseQueryWithReauth,
   endpoints: () => ({}),
-  tagTypes: []
+  tagTypes: [
+    'UpdateUserList',
+    'Dashboard',
+    'Analytics',
+    'Employees',
+    'EmployeeAttendance',
+    'Attendance',
+    'AttendanceApproval',
+    'Workplaces',
+    'QRCodes',
+    'LeaveRequests',
+    'AppSettings',
+  ]
 });

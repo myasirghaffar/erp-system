@@ -12,8 +12,15 @@ export const adminApi = SplitApiSettings.injectEndpoints({
         params: params && Object.keys(params).length > 0 ? params : undefined,
       }),
     }),
+    getRolesStatistics: builder.query({
+      query: () => ({
+        url: API_END_POINTS.getRolesStatistics,
+        method: "GET",
+      }),
+      providesTags: [{ type: "Roles" }],
+    }),
   }),
   overrideExisting: true,
 });
 
-export const { useGetAdminDashboardStatsQuery } = adminApi;
+export const { useGetAdminDashboardStatsQuery, useGetRolesStatisticsQuery } = adminApi;

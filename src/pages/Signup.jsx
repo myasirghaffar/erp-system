@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { signup } from "../store/slices/authSlice";
+import { useSelector } from "react-redux";
+import { useSignupMutation } from "../services/Api";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Eye, EyeOff } from "lucide-react";
@@ -15,8 +15,8 @@ const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const { auth } = useSelector((state) => state);
+  const [signup, { isLoading: isSigningUp }] = useSignupMutation();
 
   const {
     register,
@@ -42,13 +42,14 @@ const SignUp = () => {
     };
 
     try {
-      const result = await dispatch(signup(data));
-      if (result.success) {
+      const result = await signup({ data });
+      if (result.data) {
         setIsSubmitted(true);
         toast.success("Account created successfully!");
         navigate("/login");
-      } else {
-        toast.error(result.message || "Signup failed. Please try again.");
+      } else if (result.error) {
+        const errorMessage = result.error.data?.message || result.error.data?.error || "Signup failed. Please try again.";
+        toast.error(errorMessage);
       }
     } catch (error) {
       toast.error("An error occurred during signup.");
@@ -171,10 +172,10 @@ const SignUp = () => {
             {/* Signup Button */}
             <button
               type="submit"
-              disabled={auth.loading}
+              disabled={isSigningUp || auth.loading}
               className="w-full h-11 mt-2 bg-gradient-to-b from-sky-400 to-cyan-600 hover:from-sky-500 hover:to-cyan-700 text-white text-lg font-semibold font-urbanist rounded-xl shadow-lg transition-all transform active:scale-95 disabled:opacity-70"
             >
-              {auth.loading ? "Signing Up..." : "Sign Up"}
+              {isSigningUp || auth.loading ? "Signing Up..." : "Sign Up"}
             </button>
 
             {/* Footer Links */}
