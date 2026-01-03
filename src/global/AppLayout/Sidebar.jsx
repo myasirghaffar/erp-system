@@ -245,7 +245,7 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar }) {
           </button>
 
           {/* Brand Section */}
-          <div className="py-5 px-6 flex justify-center">
+          <div className="py-5 px-6 flex justify-center flex-shrink-0">
             {/* Using the logo from the original code but ensuring it fits the new design if needed. 
                  The design didn't explicitly show a logo, but it's good practice to keep it. 
                  I'll keep it but maybe adjust spacing. */}
@@ -255,7 +255,7 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar }) {
           </div>
 
           {/* Navigation Section */}
-          <nav className="flex-1 px-4 space-y-2 mt-0">
+          <nav className="flex-1 px-4 space-y-2 mt-0 overflow-y-auto overflow-x-hidden min-h-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {/* Render items in order, checking for parent groups */}
             {finalMenuItems?.main?.map((item, index) => {
               // If this item has a parent and we haven't processed this parent yet
@@ -340,19 +340,6 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar }) {
           </nav>
 
           {/* Logout Button */}
-          <div className="p-4 border-t border-gray-700 mt-auto">
-            <button
-              onClick={handleLogout}
-              className="flex items-center w-full h-12 pl-4 pr-4 gap-3 group transition-all duration-200 relative rounded-lg cursor-pointer text-white hover:bg-white/5"
-            >
-              <div className="w-5 h-5 flex items-center justify-center text-white">
-                <LogoutIcon />
-              </div>
-              <span className="text-sm leading-6 font-normal font-inter">
-                Logout
-              </span>
-            </button>
-          </div>
         </div>
       </div>
     );
