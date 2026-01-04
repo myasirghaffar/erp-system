@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import ModernDatePicker from "../../../../components/ModernDatePicker";
+import FlowbiteDatePicker from "../../../../components/FlowbiteDatePicker";
 import Select from "../../../../components/Form/Select";
 import MonthYearPicker from "../../../../components/MonthYearPicker";
 import ReactSelect from "react-select";
@@ -339,22 +339,22 @@ const ReportExport = () => {
             >
                 <div className="flex flex-col lg:flex-row items-end gap-6">
                     <div className="w-full lg:w-60">
-                        <ModernDatePicker
+                        <FlowbiteDatePicker
                             label={t('report.startDate')}
                             value={startDate}
                             onChange={(e) => setStartDate(e.target.value)}
                             placeholder={t('report.startDate') || "Select start date"}
-                            maxDate={endDate ? new Date(endDate) : null}
+                            maxDate={endDate || undefined}
                             className="h-11"
                         />
                     </div>
                     <div className="w-full lg:w-60">
-                        <ModernDatePicker
+                        <FlowbiteDatePicker
                             label={t('report.endDate')}
                             value={endDate}
                             onChange={(e) => setEndDate(e.target.value)}
                             placeholder={t('report.endDate') || "Select end date"}
-                            minDate={startDate ? new Date(startDate) : null}
+                            minDate={startDate || undefined}
                             className="h-11"
                         />
                     </div>
