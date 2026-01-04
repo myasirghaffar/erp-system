@@ -20,6 +20,9 @@ import {
 } from "../../../../services/Api";
 import { toast } from "react-toastify";
 import { UserPlus } from "lucide-react";
+import * as XLSX from 'xlsx';
+import api from "../../../../utils/axios";
+import { API_END_POINTS } from "../../../../services/ApiEndpoints";
 
 const itemsPerPage = 5;
 
@@ -109,6 +112,7 @@ const EmployeeReport = ({ onViewProfile, onEdit }) => {
     const searchTimeoutRef = useRef(null);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [employeeToDelete, setEmployeeToDelete] = useState(null);
+    const [isExporting, setIsExporting] = useState(false);
 
     // Convert status from UI format (Active/Inactive) to backend format (active/inactive)
     const getBackendStatus = (status) => {
@@ -278,6 +282,125 @@ const EmployeeReport = ({ onViewProfile, onEdit }) => {
     const handleCancelRoleAssignment = useCallback(() => {
         setRoleAssignmentModal({ open: false, employee: null });
     }, []);
+
+    // Export all employees to Excel
+    const handleExportEmployees = useCallback(async () => {
+        if (isExporting) return; // Prevent multiple clicks
+        
+        setIsExporting(true);
+        try {
+            if (!XLSX || !XLSX.utils) {
+                toast.error('Excel library not loaded. Please refresh the page.');
+                setIsExporting(false);
+                return;
+            }
+
+            // Helper function to fetch all pages of employees
+            const fetchAllEmployees = async (baseParams) => {
+                const allEmployees = [];
+                let currentPage = 1;
+                const limit = 100; // Max allowed by backend
+                let hasMore = true;
+
+                while (hasMore) {
+                    const params = {
+                        ...baseParams,
+                        page: currentPage,
+                        limit: limit,
+                    };
+
+                    const response = await api.get(API_END_POINTS.getAllEmployees, { params });
+                    const pageEmployees = response.data?.data?.employees || [];
+                    const pagination = response.data?.data?.pagination || {};
+                    
+                    allEmployees.push(...pageEmployees);
+
+                    // Check if there are more pages
+                    const totalPages = pagination.pages || Math.ceil((pagination.total || 0) / limit);
+                    hasMore = currentPage < totalPages && pageEmployees.length > 0;
+                    currentPage++;
+                }
+
+                return allEmployees;
+            };
+
+            // Fetch ALL employees regardless of filters
+            // We need to fetch both assigned and unassigned users separately
+            const baseParams = {
+                limit: 100, // Max allowed limit
+            };
+
+            // Fetch assigned users (default behavior - excludes pending)
+            const assignedEmployees = await fetchAllEmployees(baseParams);
+            
+            // Also fetch unassigned/pending users
+            const unassignedEmployees = await fetchAllEmployees({
+                ...baseParams,
+                role: "null",
+            });
+
+            // Combine all employees
+            const employees = [...assignedEmployees, ...unassignedEmployees];
+            
+            if (employees.length === 0) {
+                toast.warning(t('employee.noDataToExport') || "No employees found to export");
+                setIsExporting(false);
+                return;
+            }
+
+            // Transform data for Excel
+            const excelData = employees.map((employee, index) => ({
+                'No.': index + 1,
+                'ID': employee.id,
+                'Full Name': employee.full_name || '-',
+                'Email': employee.email || '-',
+                'Phone Number': employee.phone_number || '-',
+                'Position': employee.position || '-',
+                'Role': employee.role || 'Not Assigned',
+                'Status': employee.status === 'active' ? 'Active' : 'Inactive',
+                'Pending Leave Requests': employee.pending_leave_requests || 0,
+                'Created At': employee.created_at ? new Date(employee.created_at).toLocaleString() : '-',
+                'Last Login': employee.last_login ? new Date(employee.last_login).toLocaleString() : '-',
+            }));
+
+            // Create workbook and worksheet
+            const workbook = XLSX.utils.book_new();
+            const worksheet = XLSX.utils.json_to_sheet(excelData);
+
+            // Set column widths
+            const columnWidths = [
+                { wch: 5 },  // No.
+                { wch: 10 }, // ID
+                { wch: 25 }, // Full Name
+                { wch: 30 }, // Email
+                { wch: 18 }, // Phone Number
+                { wch: 20 }, // Position
+                { wch: 15 }, // Role
+                { wch: 12 }, // Status
+                { wch: 20 }, // Pending Leave Requests
+                { wch: 20 }, // Created At
+                { wch: 20 }, // Last Login
+            ];
+            worksheet['!cols'] = columnWidths;
+
+            // Add worksheet to workbook
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Employees');
+
+            // Generate filename with current date
+            const dateStr = new Date().toISOString().split('T')[0];
+            const filename = `Employees_Export_${dateStr}.xlsx`;
+
+            // Write file and trigger download
+            XLSX.writeFile(workbook, filename);
+            
+            toast.success('Employees exported successfully!');
+        } catch (error) {
+            console.error('Export error:', error);
+            toast.error(error?.response?.data?.message || t('employee.exportError') || 'Failed to export employees');
+        } finally {
+            setIsExporting(false);
+        }
+    }, [isExporting, filters, t]);
 
     // Calculate pagination from API
     const currentTableData = transformedData;
@@ -491,7 +614,12 @@ const EmployeeReport = ({ onViewProfile, onEdit }) => {
                         <h2 className="text-[#111827] text-[18px] font-bold font-inter">{t('employee.employeeDirectory')}</h2>
                         <p className="text-gray-400 text-[13px] font-medium mt-0.5">{t('employee.employeeCount', { count: totalItems })}</p>
                     </div>
-                    <button className="p-2.5 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm">
+                    <button 
+                        onClick={handleExportEmployees}
+                        disabled={isExporting}
+                        className="p-2.5 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        title={t('employee.exportEmployees') || 'Export all employees to Excel'}
+                    >
                         <Download size={18} strokeWidth={2} />
                     </button>
                 </div>
