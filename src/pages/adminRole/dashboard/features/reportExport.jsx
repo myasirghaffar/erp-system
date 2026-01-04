@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
-import ModernDatePicker from "../../../../components/ModernDatePicker";
+import FlowbiteDatePicker from "../../../../components/FlowbiteDatePicker";
 import Select from "../../../../components/Form/Select";
+import MonthYearPicker from "../../../../components/MonthYearPicker";
 import ReactSelect from "react-select";
 import {
     FullMonthlyExportIcon,
@@ -93,39 +94,23 @@ const ReportExport = () => {
     const { data: employeesData } = useGetAllEmployeesQuery({ page: 1, limit: 100 });
     const { data: workplacesData } = useGetAllWorkplacesQuery({ page: 1, limit: 100 });
     
-    // Generate month options (years 2024 to 2035)
-    const monthOptions = useMemo(() => {
-        const options = [];
-        const startYear = 2024;
-        const endYear = 2035;
-        
-        for (let year = endYear; year >= startYear; year--) {
-            // Include all 12 months for each year
-            for (let month = 11; month >= 0; month--) {
-                const date = new Date(year, month, 1);
-                const monthStr = String(month + 1).padStart(2, '0');
-                const monthName = date.toLocaleString('default', { month: 'long' });
-                const value = `${year}-${monthStr}`;
-                const label = `${monthName} ${year}`;
-                options.push({ value, label });
-            }
-        }
-        
-        return options;
-    }, []);
-    
-    // Initialize default month
+    // Initialize default month (current month)
     React.useEffect(() => {
-        if (monthOptions.length > 0 && !selectedMonth) {
-            setSelectedMonth(monthOptions[0].value);
+        const today = new Date();
+        const currentYear = today.getFullYear();
+        const currentMonth = String(today.getMonth() + 1).padStart(2, '0');
+        const defaultMonth = `${currentYear}-${currentMonth}`;
+        
+        if (!selectedMonth) {
+            setSelectedMonth(defaultMonth);
         }
-        if (monthOptions.length > 0 && !employeeMonth) {
-            setEmployeeMonth(monthOptions[0].value);
+        if (!employeeMonth) {
+            setEmployeeMonth(defaultMonth);
         }
-        if (monthOptions.length > 0 && !workplaceMonth) {
-            setWorkplaceMonth(monthOptions[0].value);
+        if (!workplaceMonth) {
+            setWorkplaceMonth(defaultMonth);
         }
-    }, [monthOptions, selectedMonth, employeeMonth, workplaceMonth]);
+    }, [selectedMonth, employeeMonth, workplaceMonth]);
     
     // Initialize default dates
     React.useEffect(() => {
@@ -303,18 +288,14 @@ const ReportExport = () => {
             >
                 <div className="flex flex-col lg:flex-row items-end gap-6 mb-6">
                     <div className="w-full lg:w-72">
-                        <CustomLabel label={t('report.selectMonth')} />
-                        <div className="relative">
-                            <Select
-                                options={monthOptions}
-                                value={selectedMonth}
-                                onChange={(e) => setSelectedMonth(e.target.value)}
-                                className="w-full h-11 bg-white text-black text-sm font-normal font-inter border border-gray-300 appearance-none pr-10"
-                            />
-                            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                                <ChevronDownIconLarge />
-                            </div>
-                        </div>
+                        <MonthYearPicker
+                            label={t('report.selectMonth')}
+                            value={selectedMonth}
+                            onChange={(e) => setSelectedMonth(e.target.value)}
+                            placeholder={t('report.selectMonth') || "Select month and year"}
+                            minYear={2024}
+                            maxYear={2035}
+                        />
                     </div>
                     <ExportButton
                         text={t('report.exportMonthlyExcel')}
@@ -358,22 +339,22 @@ const ReportExport = () => {
             >
                 <div className="flex flex-col lg:flex-row items-end gap-6">
                     <div className="w-full lg:w-60">
-                        <ModernDatePicker
+                        <FlowbiteDatePicker
                             label={t('report.startDate')}
                             value={startDate}
                             onChange={(e) => setStartDate(e.target.value)}
                             placeholder={t('report.startDate') || "Select start date"}
-                            maxDate={endDate ? new Date(endDate) : null}
+                            maxDate={endDate || undefined}
                             className="h-11"
                         />
                     </div>
                     <div className="w-full lg:w-60">
-                        <ModernDatePicker
+                        <FlowbiteDatePicker
                             label={t('report.endDate')}
                             value={endDate}
                             onChange={(e) => setEndDate(e.target.value)}
                             placeholder={t('report.endDate') || "Select end date"}
-                            minDate={startDate ? new Date(startDate) : null}
+                            minDate={startDate || undefined}
                             className="h-11"
                         />
                     </div>
@@ -502,18 +483,14 @@ const ReportExport = () => {
                             />
                         </div>
                         <div>
-                            <CustomLabel label={t('report.month')} />
-                            <div className="relative">
-                                <Select
-                                    options={monthOptions}
-                                    value={employeeMonth}
-                                    onChange={(e) => setEmployeeMonth(e.target.value)}
-                                    className="w-full h-11 bg-white text-black text-sm font-normal font-inter border border-gray-300 appearance-none pr-10"
-                                />
-                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                                    <ChevronDownIconLarge />
-                                </div>
-                            </div>
+                            <MonthYearPicker
+                                label={t('report.month')}
+                                value={employeeMonth}
+                                onChange={(e) => setEmployeeMonth(e.target.value)}
+                                placeholder={t('report.month') || "Select month and year"}
+                                minYear={2024}
+                                maxYear={2035}
+                            />
                         </div>
                         <ExportButton 
                             text={t('report.exportEmployeeAttendance')} 
@@ -624,18 +601,14 @@ const ReportExport = () => {
                             />
                         </div>
                         <div>
-                            <CustomLabel label={t('report.month')} />
-                            <div className="relative">
-                                <Select
-                                    options={monthOptions}
-                                    value={workplaceMonth}
-                                    onChange={(e) => setWorkplaceMonth(e.target.value)}
-                                    className="w-full h-11 bg-white text-black text-sm font-normal font-inter border border-gray-300 appearance-none pr-10"
-                                />
-                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                                    <ChevronDownIconLarge />
-                                </div>
-                            </div>
+                            <MonthYearPicker
+                                label={t('report.month')}
+                                value={workplaceMonth}
+                                onChange={(e) => setWorkplaceMonth(e.target.value)}
+                                placeholder={t('report.month') || "Select month and year"}
+                                minYear={2024}
+                                maxYear={2035}
+                            />
                         </div>
                         <ExportButton 
                             text={t('report.exportWorkplaceAttendance')} 

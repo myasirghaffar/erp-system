@@ -2,13 +2,14 @@ import React, { useState, useCallback, useMemo } from "react";
 import ReusableDataTable from "../../../../components/ReusableDataTable";
 import ReusableFilter from "../../../../components/ReusableFilter";
 import ReusablePagination from "../../../../components/ReusablePagination";
-import ModernDatePicker from "../../../../components/ModernDatePicker";
+import FlowbiteDatePicker from "../../../../components/FlowbiteDatePicker";
 import { Building2, Search, Check, X, Clock } from "lucide-react";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { useGetAdminAttendanceHistoryQuery, useGetAllWorkplacesQuery, useGetMonthlyMetricsQuery, useUpdateAttendanceRecordStatusMutation } from "../../../../services/Api";
 import { toast } from "react-toastify";
 import moment from "moment";
+import { useSocketAttendance } from "../../../../hooks/useSocketAttendance";
 
 // Beautiful color palette for avatars
 const avatarColors = [
@@ -114,6 +115,59 @@ const AttendanceReport = () => {
         refetchOnMountOrArgChange: true, // Refetch when arguments change
         refetchOnMount: true, // Refetch on mount
     });
+
+    // Handle real-time attendance updates via Socket.io
+    const handleAttendanceUpdate = useCallback((attendance, eventType) => {
+        console.log('📊 Attendance update received:', { attendance, eventType });
+        
+        // Check if the new attendance matches current filters
+        const attendanceDate = attendance.date;
+        const attendanceWorkplaceId = attendance.workplace_id?.toString();
+        const isManual = attendance.is_manual;
+        
+        // Check date filter
+        const matchesDateFilter = !dateRange.start_date && !dateRange.end_date 
+            ? true // No date filter, show all
+            : (!dateRange.start_date || attendanceDate >= dateRange.start_date) 
+                && (!dateRange.end_date || attendanceDate <= dateRange.end_date);
+        
+        // Check workplace filter
+        const matchesWorkplaceFilter = !filters.workplace || filters.workplace === "" 
+            ? true // No workplace filter
+            : attendanceWorkplaceId === filters.workplace;
+        
+        // Check type filter
+        const matchesTypeFilter = !filters.type || filters.type === ""
+            ? true // No type filter
+            : (filters.type === "manual" && isManual) || (filters.type === "qr_scan" && !isManual);
+        
+        // Check search filter (if any)
+        const employeeName = attendance.employee_name || attendance.user?.full_name || "";
+        const matchesSearchFilter = !searchTerm || searchTerm.trim() === ""
+            ? true // No search filter
+            : employeeName.toLowerCase().includes(searchTerm.toLowerCase().trim());
+        
+        // Only refetch if the new attendance matches current filters
+        if (matchesDateFilter && matchesWorkplaceFilter && matchesTypeFilter && matchesSearchFilter) {
+            // Show a subtle notification
+            toast.info(
+                `${attendance.employee_name || 'Employee'} ${eventType === 'attendance_created' ? 'marked attendance' : eventType === 'attendance_updated' ? 'updated attendance' : 'attendance status changed'}`,
+                {
+                    position: 'top-right',
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                }
+            );
+            
+            // Refetch the data to get the latest attendance
+            refetch();
+        }
+    }, [dateRange, filters, searchTerm, refetch]);
+
+    // Use the socket attendance hook
+    useSocketAttendance(handleAttendanceUpdate);
 
     // Transform API data to match component format
     const transformedData = useMemo(() => {
@@ -393,7 +447,7 @@ const AttendanceReport = () => {
             },
             render: (row) => (
                 <div className="flex items-center gap-2 min-w-max">
-                    <Building2 className="w-4 h-4 text-gray-400 shrink-0" />
+                    <Building2 className="w-4 h-4 text-sky-500 shrink-0" />
                     <span className="text-gray-500 font-medium text-[0.8125rem] whitespace-nowrap">{row.workplace}</span>
                 </div>
             )
@@ -468,36 +522,74 @@ const AttendanceReport = () => {
             label: t('common.actions'),
             width: "220px",
             render: (row) => {
-                // Only show action buttons for manual attendance records with pending status
-                // Show buttons if status is explicitly "pending", or if status is not provided (assume pending for manual records)
-                // Don't show buttons if status is "approved" or "rejected"
-                const status = row.status?.toLowerCase();
-                const shouldShowActions = row.is_manual && (
-                    status === "pending" || 
-                    (status !== "approved" && status !== "rejected" && (row.status === undefined || row.status === null || !row.status))
-                );
-                
-                if (shouldShowActions) {
-                    return (
-                        <div className="flex items-center gap-2">
-                            <button 
-                                onClick={() => handleApproveClick(row)} 
-                                className="flex items-center gap-1 px-4 py-1.5 bg-[#22B3E8] hover:bg-[#1fa0d1] text-white rounded-lg text-xs font-bold transition-colors"
-                                disabled={isUpdating}
-                            >
-                                <Check size={14} /> {t('common.approve')}
-                            </button>
-                            <button 
-                                onClick={() => handleRejectClick(row)} 
-                                className="flex items-center gap-1 px-4 py-1.5 bg-[#EF4444] hover:bg-[#d42d2d] text-white rounded-lg text-xs font-bold transition-colors"
-                                disabled={isUpdating}
-                            >
-                                <X size={14} /> {t('common.reject')}
-                            </button>
-                        </div>
+                // For manual attendance, show action buttons if pending, otherwise show status
+                if (row.is_manual) {
+                    const status = row.status?.toLowerCase();
+                    const shouldShowActions = (
+                        status === "pending" || 
+                        (status !== "approved" && status !== "rejected" && (row.status === undefined || row.status === null || !row.status))
                     );
+                    
+                    if (shouldShowActions) {
+                        return (
+                            <div className="flex items-center gap-2">
+                                <button 
+                                    onClick={() => handleApproveClick(row)} 
+                                    className="flex items-center gap-1 px-4 py-1.5 bg-[#22B3E8] hover:bg-[#1fa0d1] text-white rounded-lg text-xs font-bold transition-colors"
+                                    disabled={isUpdating}
+                                >
+                                    <Check size={14} /> {t('common.approve')}
+                                </button>
+                                <button 
+                                    onClick={() => handleRejectClick(row)} 
+                                    className="flex items-center gap-1 px-4 py-1.5 bg-[#EF4444] hover:bg-[#d42d2d] text-white rounded-lg text-xs font-bold transition-colors"
+                                    disabled={isUpdating}
+                                >
+                                    <X size={14} /> {t('common.reject')}
+                                </button>
+                            </div>
+                        );
+                    } else {
+                        // Show status for manual attendance that is approved or rejected
+                        const statusDisplay = row.statusDisplay || (row.status ? row.status.charAt(0).toUpperCase() + row.status.slice(1) : "");
+                        let bgClass = "bg-orange-50 text-orange-500";
+                        let icon = <Clock size={12} />;
+                        
+                        if (statusDisplay === "Approved" || statusDisplay?.toLowerCase() === "approved") {
+                            bgClass = "bg-green-50 text-green-500";
+                            icon = <Check size={12} />;
+                        } else if (statusDisplay === "Rejected" || statusDisplay?.toLowerCase() === "rejected") {
+                            bgClass = "bg-red-50 text-red-500";
+                            icon = <X size={12} />;
+                        }
+                        
+                        return (
+                            <span className={`px-3 py-1 rounded-full ${bgClass} text-[11px] font-bold flex items-center gap-1 w-fit`}>
+                                {icon} {statusDisplay}
+                            </span>
+                        );
+                    }
                 }
-                return null;
+                // For non-manual attendance, show status instead of blank
+                const statusDisplay = row.statusDisplay || (row.status ? row.status.charAt(0).toUpperCase() + row.status.slice(1) : "");
+                if (!statusDisplay) return null;
+                
+                let bgClass = "bg-orange-50 text-orange-500";
+                let icon = <Clock size={12} />;
+                
+                if (statusDisplay === "Approved" || statusDisplay?.toLowerCase() === "approved") {
+                    bgClass = "bg-green-50 text-green-500";
+                    icon = <Check size={12} />;
+                } else if (statusDisplay === "Rejected" || statusDisplay?.toLowerCase() === "rejected") {
+                    bgClass = "bg-red-50 text-red-500";
+                    icon = <X size={12} />;
+                }
+                
+                return (
+                    <span className={`px-3 py-1 rounded-full ${bgClass} text-[11px] font-bold flex items-center gap-1 w-fit`}>
+                        {icon} {statusDisplay}
+                    </span>
+                );
             }
         }
     ], [t, isUpdating, handleApproveClick, handleRejectClick]);
@@ -524,30 +616,34 @@ const AttendanceReport = () => {
                         data={transformedData}
                         onFilterChange={handleFilterChange}
                         onSearchChange={handleSearchChange}
-                        className="w-full flex-col md:flex-row items-center gap-4"
-                        searchClassName="w-full md:flex-1"
-                        filterClassName="flex-wrap gap-3"
-                        dropdownClassName="min-w-[150px]"
+                        className="w-full flex flex-col gap-4"
+                        searchClassName="w-full"
+                        filterClassName="flex flex-col sm:flex-row flex-wrap gap-3 w-full"
+                        dropdownClassName="min-w-[150px] w-full sm:w-auto"
+                        layout="vertical"
+                        fullWidth={true}
                     />
                     
                     {/* Date Range Filters */}
-                    <div className="flex flex-col md:flex-row gap-4 items-end">
-                        <div className="flex-1 md:flex-none md:w-48">
-                            <ModernDatePicker
+                    <div className="flex flex-col sm:flex-row gap-4 w-full">
+                        <div className="w-full sm:flex-1 sm:max-w-[48%]">
+                            <FlowbiteDatePicker
                                 label="Start Date"
                                 value={filters.start_date}
                                 onChange={(e) => handleFilterChange("start_date", e.target.value)}
                                 placeholder="Select start date"
-                                maxDate={filters.end_date ? new Date(filters.end_date) : null}
+                                maxDate={filters.end_date || undefined}
+                                containerClasses="w-full"
                             />
                         </div>
-                        <div className="flex-1 md:flex-none md:w-48">
-                            <ModernDatePicker
+                        <div className="w-full sm:flex-1 sm:max-w-[48%]">
+                            <FlowbiteDatePicker
                                 label="End Date"
                                 value={filters.end_date}
                                 onChange={(e) => handleFilterChange("end_date", e.target.value)}
                                 placeholder="Select end date"
-                                minDate={filters.start_date ? new Date(filters.start_date) : null}
+                                minDate={filters.start_date || undefined}
+                                containerClasses="w-full"
                             />
                         </div>
                     </div>

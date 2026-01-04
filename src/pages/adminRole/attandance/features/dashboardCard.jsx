@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActiveEmployeesIcon,
@@ -11,14 +11,64 @@ import {
   useGetDashboardRealtimeQuery,
   useGetAnalyticsSummaryQuery,
 } from "../../../../services/Api";
+import { API_END_POINTS } from "../../../../services/ApiEndpoints";
+import api from "../../../../utils/axios";
+import { toast } from "react-toastify";
+import { useSocketAttendance } from "../../../../hooks/useSocketAttendance";
 
 // Dashboard Cards Container Component
 const DashboardCardsContainer = () => {
   const { t } = useTranslation();
+  const [isExporting, setIsExporting] = useState(false);
 
   // Fetch dashboard data - same as /admin/dashboard screen
-  const { data: realtimeData, isLoading: isLoadingRealtime } = useGetDashboardRealtimeQuery();
-  const { data: summaryData, isLoading: isLoadingSummary } = useGetAnalyticsSummaryQuery();
+  const { data: realtimeData, isLoading: isLoadingRealtime, refetch: refetchRealtime } = useGetDashboardRealtimeQuery();
+  const { data: summaryData, isLoading: isLoadingSummary, refetch: refetchSummary } = useGetAnalyticsSummaryQuery();
+
+  // Handle real-time attendance updates to refresh dashboard cards
+  const handleAttendanceUpdate = useCallback((attendance, eventType) => {
+    console.log('📊 Dashboard: Attendance update received, refreshing cards');
+    // Refetch both queries to update the dashboard cards
+    refetchRealtime();
+    refetchSummary();
+  }, [refetchRealtime, refetchSummary]);
+
+  // Use the socket attendance hook to listen for updates
+  useSocketAttendance(handleAttendanceUpdate);
+
+  // Export all employees attendance to Excel
+  const handleExportAllEmployees = async () => {
+    setIsExporting(true);
+    try {
+      // Get current month in YYYY-MM format
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const currentMonth = `${year}-${month}`;
+
+      const response = await api.get(API_END_POINTS.exportMonthlyAttendance, {
+        params: { month: currentMonth },
+        responseType: 'blob'
+      });
+
+      // Create download link
+      const url = window.URL.createObjectURL(response.data);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `all_employees_attendance_${currentMonth.replace('-', '_')}.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast.success(t('report.exportSuccess') || "Export successful!");
+    } catch (error) {
+      console.error('Export error:', error);
+      toast.error(error.response?.data?.message || t('report.exportError') || "Export failed");
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   // Calculate values from API data - same logic as /admin/dashboard screen
   const cards = useMemo(() => {
@@ -76,6 +126,8 @@ const DashboardCardsContainer = () => {
           icon={card.icon}
           isExportCard={card.isExportCard}
           isLoading={card.isLoading}
+          onExportClick={card.isExportCard ? handleExportAllEmployees : undefined}
+          isExporting={card.isExportCard ? isExporting : false}
         />
       ))}
     </div>

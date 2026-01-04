@@ -3,6 +3,8 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import AppLayout from "./global/AppLayout";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import UnauthorizedPage from "./pages/Unauthor";
 import AuthGuard from "./components/AuthGuard";
 import AuthRedirect from "./utils/AuthRedirect";
@@ -27,6 +29,8 @@ const AppRouter = () => {
       {/* Authentication Routes - No Layout (Full Page) */}
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
 
       {/* Unauthorized Page */}
       <Route path="/unauthorized" element={<UnauthorizedPage />} />

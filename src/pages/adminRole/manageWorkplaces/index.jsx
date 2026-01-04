@@ -7,10 +7,11 @@ import DashboardBanner from "../../../components/DashboardBanner";
 import ReusableDataTable from "../../../components/ReusableDataTable";
 import ReusablePagination from "../../../components/ReusablePagination";
 import ReusableFilter from "../../../components/ReusableFilter";
-import ModernDatePicker from "../../../components/ModernDatePicker";
+import FlowbiteDatePicker from "../../../components/FlowbiteDatePicker";
 import AddWorkplace from "./features/AddWorkplace";
 import WorkPlaceQrForm from "./features/workPlaceQrForm";
 import QrCodeDetail from "./features/QrCodeDetail";
+import WorkplaceQRCodeModal from "./features/WorkplaceQRCodeModal";
 import ConfirmModal from "../../../components/ConfirmModal";
 import {
     useGetAllWorkplacesQuery,
@@ -49,6 +50,10 @@ const WorkplaceManagement = () => {
     const [isExporting, setIsExporting] = useState(false);
     const [internalOpenDropdowns, setInternalOpenDropdowns] = useState({});
     const openDropdowns = internalOpenDropdowns;
+    const [qrCodeModalOpen, setQrCodeModalOpen] = useState(false);
+    const [selectedWorkplaceQrCode, setSelectedWorkplaceQrCode] = useState(null);
+    const [selectedWorkplaceForQr, setSelectedWorkplaceForQr] = useState(null);
+    const [isLoadingQrCode, setIsLoadingQrCode] = useState(false);
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -214,6 +219,36 @@ const WorkplaceManagement = () => {
             }
         }
     }, [deleteQRCode, refetchQRCodes, t]);
+
+    // Handle view QR code for workplace
+    const handleViewWorkplaceQRCode = useCallback(async (workplace) => {
+        setIsLoadingQrCode(true);
+        setSelectedWorkplaceForQr(workplace);
+        
+        try {
+            // Fetch QR code for this workplace
+            const response = await api.get(API_END_POINTS.getAllQRCodes, {
+                params: {
+                    workplace_id: workplace.id,
+                    limit: 1
+                }
+            });
+
+            const qrCodes = response.data?.data?.qrCodes || [];
+            
+            if (qrCodes.length > 0) {
+                setSelectedWorkplaceQrCode(qrCodes[0]);
+                setQrCodeModalOpen(true);
+            } else {
+                toast.warning(t('workplace.noQrCode') || "No QR code found for this workplace");
+            }
+        } catch (error) {
+            console.error('Error fetching QR code:', error);
+            toast.error(error?.response?.data?.message || t('qrCode.fetchError') || "Failed to fetch QR code");
+        } finally {
+            setIsLoadingQrCode(false);
+        }
+    }, [t]);
 
     // Export QR codes to Excel
     const handleExportQRCodes = useCallback(async () => {
@@ -458,15 +493,20 @@ const WorkplaceManagement = () => {
             key: "qrCode",
             label: t('qrCode.title'),
             width: "120px",
-            render: () => (
+            render: (row) => (
                 <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded bg-gray-100 flex items-center justify-center text-gray-400">
-                        <QrCode size={16} />
-                    </div>
-                    <div className="flex gap-1">
-                        <button className="text-gray-400 hover:text-blue-500"><Download size={14} /></button>
-                        <button className="text-gray-400 hover:text-blue-500"><Eye size={14} /></button>
-                    </div>
+                    <button
+                        onClick={() => handleViewWorkplaceQRCode(row.workplaceData || { id: row.id, name: row.name })}
+                        disabled={isLoadingQrCode}
+                        className="w-8 h-8 rounded bg-purple-100 flex items-center justify-center text-purple-500 hover:bg-purple-200 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed group"
+                        title={t('qrCode.viewQrCode') || "View QR Code"}
+                    >
+                        {isLoadingQrCode ? (
+                            <div className="w-4 h-4 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                            <QrCode size={16} />
+                        )}
+                    </button>
                 </div>
             )
         },
@@ -492,14 +532,14 @@ const WorkplaceManagement = () => {
                             setSelectedWorkplace(row.workplaceData || { id: row.id });
                             setView("add");
                         }}
-                        className="text-gray-400 hover:text-blue-500"
+                        className="text-amber-500 hover:text-amber-600"
                         title={t('common.edit') || "Edit"}
                     >
                         <Edit size={16} strokeWidth={2} />
                     </button>
                     <button 
                         onClick={() => handleDeleteWorkplace(row.id || row.workplaceData?.id)} 
-                        className="text-gray-400 hover:text-red-500"
+                        className="text-red-500 hover:text-red-600"
                         title={t('common.delete') || "Delete"}
                     >
                         <Trash2 size={16} strokeWidth={2} />
@@ -549,7 +589,7 @@ const WorkplaceManagement = () => {
             grow: 1,
             render: (row) => (
                 <div className="flex items-center gap-2">
-                    <Building2 className="w-4 h-4 text-gray-400" />
+                    <Building2 className="w-4 h-4 text-sky-500" />
                     <span className="text-[#374151] font-semibold text-[13px]">{row.workplace}</span>
                 </div>
             )
@@ -590,8 +630,8 @@ const WorkplaceManagement = () => {
             width: "120px",
             render: (row) => (
                 <div className="flex items-center gap-4">
-                    <button onClick={() => handleViewQr(row)} className="text-gray-400 hover:text-blue-500"><Eye size={16} strokeWidth={2} /></button>
-                    <button className="text-gray-400 hover:text-blue-500"><Download size={16} strokeWidth={2} /></button>
+                    <button onClick={() => handleViewQr(row)} className="text-indigo-500 hover:text-indigo-600"><Eye size={16} strokeWidth={2} /></button>
+                    <button className="text-blue-500 hover:text-blue-600"><Download size={16} strokeWidth={2} /></button>
                     <button className="text-gray-400 hover:text-gray-600">
                         {/* Kebab menu placeholder */}
                         <div className="flex flex-col gap-[2px]">
@@ -699,7 +739,7 @@ const WorkplaceManagement = () => {
 
                                 {/* Dropdown Menu */}
                                 {openDropdowns?.status && (
-                                    <div className="absolute top-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-[180px] left-0">
+                                    <div className="absolute top-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-full md:w-auto md:min-w-[180px] left-0">
                                         <button
                                             onClick={() => {
                                                 handleFilterChange("status", "");
@@ -741,10 +781,7 @@ const WorkplaceManagement = () => {
                         {/* Second Row: Location and Date Range */}
                         <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
                             {/* Location Input Field */}
-                            <div className="flex items-center gap-2 flex-1 w-full">
-                                <label className="text-sm font-medium text-gray-700 whitespace-nowrap">
-                                    {t('workplace.location') || "Location"}:
-                                </label>
+                            <div className="flex-1 w-full">
                                 <input
                                     type="text"
                                     value={locationFilter}
@@ -753,18 +790,15 @@ const WorkplaceManagement = () => {
                                         setCurrentPage(1);
                                     }}
                                     placeholder="Enter location address..."
-                                    className="flex-1 px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
+                                    className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
                                 />
                             </div>
 
                             {/* Date Range Filter */}
-                            <div className="flex items-center gap-2 flex-1 w-full">
-                                <div className="flex items-center gap-2 flex-1">
-                                    <label className="text-sm font-medium text-gray-700 whitespace-nowrap">
-                                        Start Date:
-                                    </label>
-                                    <div className="flex-1">
-                                        <ModernDatePicker
+                            <div className="flex flex-col gap-3 flex-1 w-full">
+                                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-2 w-full">
+                                    <div className="flex-1 w-full sm:w-auto">
+                                        <FlowbiteDatePicker
                                             key={`start-${dateRangeEnd}`}
                                             value={dateRangeStart}
                                             onChange={(e) => {
@@ -772,16 +806,12 @@ const WorkplaceManagement = () => {
                                                 handleDateRangeChange(newStart, dateRangeEnd);
                                             }}
                                             placeholder="Select start date"
-                                            maxDate={dateRangeEnd ? new Date(dateRangeEnd) : null}
-                                            showIcon={true}
+                                            maxDate={dateRangeEnd || undefined}
                                             containerClasses="!mb-0"
                                         />
                                     </div>
-                                    <label className="text-sm font-medium text-gray-700 whitespace-nowrap">
-                                        End Date:
-                                    </label>
-                                    <div className="flex-1">
-                                        <ModernDatePicker
+                                    <div className="flex-1 w-full sm:w-auto">
+                                        <FlowbiteDatePicker
                                             key={`end-${dateRangeStart}`}
                                             value={dateRangeEnd}
                                             onChange={(e) => {
@@ -789,15 +819,14 @@ const WorkplaceManagement = () => {
                                                 handleDateRangeChange(dateRangeStart, newEnd);
                                             }}
                                             placeholder="Select end date"
-                                            minDate={dateRangeStart ? new Date(dateRangeStart) : null}
-                                            showIcon={true}
+                                            minDate={dateRangeStart || undefined}
                                             containerClasses="!mb-0"
                                         />
                                     </div>
                                     {(dateRangeStart || dateRangeEnd) && (
                                         <button
                                             onClick={() => handleDateRangeChange("", "")}
-                                            className="px-3 py-2.5 text-gray-400 hover:text-gray-600 transition-colors"
+                                            className="px-3 py-2.5 text-gray-400 hover:text-gray-600 transition-colors self-start sm:self-center"
                                             title={t('common.clear') || "Clear"}
                                         >
                                             <X className="w-4 h-4" />
@@ -845,8 +874,8 @@ const WorkplaceManagement = () => {
 
                 {/* QR Code Section */}
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden pt-6">
-                    <div className="px-6 flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
-                        <div className="flex items-center gap-4">
+                    <div className="px-4 sm:px-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
                             <h2 className="text-lg font-bold text-[#111827]">{t('qrCode.allQrCodes')}</h2>
                             <div className="flex items-center p-1 bg-gray-100 rounded-lg">
                                 {["All", "Active", "Inactive"].map(tab => (
@@ -871,7 +900,7 @@ const WorkplaceManagement = () => {
                                 handleExportQRCodes();
                             }}
                             disabled={isExporting}
-                            className={`flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer ${isExporting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer w-full sm:w-auto justify-center ${isExporting ? 'opacity-50 cursor-not-allowed' : ''}`}
                             type="button"
                         >
                             <Download size={16} />
@@ -945,7 +974,7 @@ const WorkplaceManagement = () => {
 
                                         {/* Dropdown Menu */}
                                         {openDropdowns?.qrExpired && (
-                                            <div className="absolute top-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-[180px] left-0">
+                                            <div className="absolute top-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-full md:w-auto md:min-w-[180px] left-0">
                                                 <button
                                                     onClick={() => {
                                                         handleQrExpiredFilterChange("");
@@ -987,38 +1016,30 @@ const WorkplaceManagement = () => {
                                 {/* Second Row: Date Range */}
                                 <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
                                     {/* Date Range Filter */}
-                                    <div className="flex items-center gap-2 flex-1 w-full">
-                                        <div className="flex items-center gap-2 flex-1">
-                                            <label className="text-sm font-medium text-gray-700 whitespace-nowrap">
-                                                {t('common.dateRange') || "Date Range"}:
-                                            </label>
-                                            <div className="flex-1">
-                                                <ModernDatePicker
+                                    <div className="flex flex-col gap-3 flex-1 w-full">
+                                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-2 w-full">
+                                            <div className="flex-1 w-full sm:w-auto">
+                                                <FlowbiteDatePicker
                                                     value={qrDateRangeStart}
                                                     onChange={(e) => handleQrDateRangeChange(e.target.value, qrDateRangeEnd)}
                                                     placeholder={t('common.startDate') || "Start Date"}
-                                                    maxDate={qrDateRangeEnd ? new Date(qrDateRangeEnd) : null}
-                                                    showIcon={true}
+                                                    maxDate={qrDateRangeEnd || undefined}
                                                     containerClasses=""
                                                 />
                                             </div>
-                                            <label className="text-sm font-medium text-gray-700 whitespace-nowrap">
-                                                {t('common.to') || "to"}:
-                                            </label>
-                                            <div className="flex-1">
-                                                <ModernDatePicker
+                                            <div className="flex-1 w-full sm:w-auto">
+                                                <FlowbiteDatePicker
                                                     value={qrDateRangeEnd}
                                                     onChange={(e) => handleQrDateRangeChange(qrDateRangeStart, e.target.value)}
                                                     placeholder={t('common.endDate') || "End Date"}
-                                                    minDate={qrDateRangeStart ? new Date(qrDateRangeStart) : null}
-                                                    showIcon={true}
+                                                    minDate={qrDateRangeStart || undefined}
                                                     containerClasses=""
                                                 />
                                             </div>
                                             {(qrDateRangeStart || qrDateRangeEnd) && (
                                                 <button
                                                     onClick={() => handleQrDateRangeChange("", "")}
-                                                    className="px-3 py-2.5 text-gray-400 hover:text-gray-600 transition-colors"
+                                                    className="px-3 py-2.5 text-gray-400 hover:text-gray-600 transition-colors self-start sm:self-center"
                                                     title={t('common.clear') || "Clear"}
                                                 >
                                                     <X className="w-4 h-4" />
@@ -1076,6 +1097,18 @@ const WorkplaceManagement = () => {
                 cancelColor="bg-gray-100 hover:bg-gray-200"
                 confirmTextColor="text-white"
                 cancelTextColor="text-gray-700"
+            />
+
+            {/* QR Code Modal */}
+            <WorkplaceQRCodeModal
+                isOpen={qrCodeModalOpen}
+                onClose={() => {
+                    setQrCodeModalOpen(false);
+                    setSelectedWorkplaceQrCode(null);
+                    setSelectedWorkplaceForQr(null);
+                }}
+                qrCodeData={selectedWorkplaceQrCode}
+                workplaceName={selectedWorkplaceForQr?.name}
             />
         </div>
     );

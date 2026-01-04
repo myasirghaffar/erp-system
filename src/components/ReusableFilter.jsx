@@ -161,8 +161,8 @@ const ReusableFilter = ({
     <div className={containerClasses}>
       {/* Search Bar */}
       {searchConfig && (
-        <div className={`relative ${searchClassName}`}>
-          <div className="relative">
+        <div className={`relative w-full ${searchClassName}`}>
+          <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
@@ -190,12 +190,12 @@ const ReusableFilter = ({
 
       {/* Filter Dropdowns */}
       {filters.length > 0 && (
-        <div className={`flex flex-wrap items-center gap-2 ${filterClassName}`}>
+        <div className={`flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 sm:gap-3 w-full ${filterClassName}`}>
           {filters.map((filter, index) => (
-            <div key={filter.key} className={`relative filter-dropdown ${fullWidth ? "w-full" : ""}`}>
+            <div key={filter.key} className={`relative filter-dropdown w-full sm:w-auto sm:flex-1 sm:min-w-[150px] ${fullWidth ? "w-full" : ""}`}>
               <button
                 onClick={() => toggleDropdown(filter.key)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border transition-colors min-w-[120px] justify-between whitespace-nowrap text-[13px] font-inter ${fullWidth ? "w-full" : ""
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border transition-colors w-full sm:min-w-[120px] justify-between whitespace-nowrap text-[13px] font-inter ${fullWidth ? "w-full" : ""
                   } ${selectedFilters[filter.key]
                     ? "bg-primary-50 border-primary-200 text-primary-700"
                     : "bg-white hover:bg-gray-50 text-black border-gray-300"
@@ -215,7 +215,7 @@ const ReusableFilter = ({
               {/* Dropdown Menu */}
               {openDropdowns[filter.key] && (
                 <div
-                  className={`absolute top-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-[180px] max-h-60 overflow-y-auto ${index === filters.length - 1 ? "right-0" : "left-0"
+                  className={`absolute top-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-full sm:w-auto sm:min-w-[180px] max-h-60 overflow-y-auto ${index === filters.length - 1 ? "right-0" : "left-0"
                     } ${dropdownClassName}`}
                 >
                   {/* Dropdown Options */}

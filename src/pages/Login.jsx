@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { setUser } from "../store/slices/authSlice";
+import { setUser, clearUser } from "../store/slices/authSlice";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useLoginMutation } from "../services/Api";
@@ -23,9 +23,16 @@ const Login = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (auth.isAuthenticated && auth.user) {
-      navigate("/admin/dashboard", { replace: true });
+      const allowedRoles = ['admin', 'manager'];
+      if (auth.user.role && allowedRoles.includes(auth.user.role)) {
+        navigate("/admin/dashboard", { replace: true });
+      } else {
+        // User is authenticated but doesn't have required role
+        // Clear session and stay on login page
+        dispatch(clearUser());
+      }
     }
-  }, [auth.isAuthenticated, auth.user, navigate]);
+  }, [auth.isAuthenticated, auth.user, navigate, dispatch]);
 
   const {
     register,
@@ -47,8 +54,18 @@ const Login = () => {
         const user = result.data?.data?.user;
         if (user && token) {
           dispatch(setUser({ ...user, token }));
-          toast.success(`Welcome, ${user.name || user.email}!`);
-          navigate("/admin/dashboard");
+          
+          // Check if user has allowed role (admin or manager)
+          const allowedRoles = ['admin', 'manager'];
+          if (user.role && allowedRoles.includes(user.role)) {
+            toast.success(`Welcome, ${user.name || user.email}!`);
+            navigate("/admin/dashboard");
+          } else {
+            // Clear the user session since they don't have required role
+            dispatch(clearUser());
+            toast.error("Access denied. Only administrators and managers can access the dashboard.");
+            // Stay on login page (we're already here)
+          }
         } else {
           toast.error("Auto login failed. Invalid response from server.");
         }
@@ -70,8 +87,18 @@ const Login = () => {
         const user = result.data?.data?.user;
         if (user && token) {
           dispatch(setUser({ ...user, token }));
-          toast.success(`Welcome, ${user.name || user.email}!`);
-          navigate("/admin/dashboard");
+          
+          // Check if user has allowed role (admin or manager)
+          const allowedRoles = ['admin', 'manager'];
+          if (user.role && allowedRoles.includes(user.role)) {
+            toast.success(`Welcome, ${user.name || user.email}!`);
+            navigate("/admin/dashboard");
+          } else {
+            // Clear the user session since they don't have required role
+            dispatch(clearUser());
+            toast.error("Access denied. Only administrators and managers can access the dashboard.");
+            // Stay on login page (we're already here)
+          }
         } else {
           toast.error("Login failed. Invalid response from server.");
         }
@@ -130,7 +157,7 @@ const Login = () => {
             <div className="flex flex-col gap-1.5">
               <div className="flex justify-between items-center">
                 <label className="text-black text-base font-medium font-urbanist">Password</label>
-                <Link to="#" className="text-stone-500 text-xs font-medium font-urbanist hover:text-indigo-600 transition-colors">
+                <Link to="/forgot-password" className="text-stone-500 text-xs font-medium font-urbanist hover:text-indigo-600 transition-colors">
                   Forgot Password?
                 </Link>
               </div>
@@ -144,7 +171,7 @@ const Login = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-300 hover:text-stone-500 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-600 hover:text-stone-800 transition-colors"
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -169,7 +196,7 @@ const Login = () => {
             </div>
 
             {/* Social Logins */}
-            <div className="flex gap-3">
+            {/* <div className="flex gap-3">
               <button type="button" className="flex-1 h-10 flex items-center justify-center rounded-xl border border-stone-200 hover:bg-stone-50 transition-all">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" className="w-5 h-5" alt="Google" />
               </button>
@@ -179,7 +206,7 @@ const Login = () => {
               <button type="button" className="flex-1 h-10 flex items-center justify-center rounded-xl border border-stone-200 hover:bg-stone-50 transition-all">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg" className="w-5 h-5" alt="Facebook" />
               </button>
-            </div>
+            </div> */}
 
             {/* Footer Links */}
             <div className="text-center mt-2">

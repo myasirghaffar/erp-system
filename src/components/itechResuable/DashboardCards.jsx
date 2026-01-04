@@ -8,6 +8,8 @@ const DashboardCards = ({
   description,
   isExportCard = false,
   className = "",
+  onExportClick,
+  isExporting = false,
 }) => {
   const { t } = useTranslation();
 
@@ -22,10 +24,14 @@ const DashboardCards = ({
         <div className="text-white text-sm font-medium font-poppins leading-5 mb-6">
           {title}
         </div>
-        <button className="mt-auto w-full h-12 bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] border-gray-200 flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors">
+        <button 
+          onClick={onExportClick}
+          disabled={isExporting}
+          className="mt-auto w-full h-12 bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] border-gray-200 flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
           <ExportButtonIcon className="w-4 h-6" />
           <span className="text-blue-700 text-base font-semibold font-poppins">
-            {t('common.exportExcel')}
+            {isExporting ? (t('report.exporting') || "Exporting...") : t('common.exportExcel')}
           </span>
         </button>
       </div>
