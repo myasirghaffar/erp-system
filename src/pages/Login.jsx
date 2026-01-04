@@ -130,7 +130,7 @@ const Login = () => {
             <div className="flex flex-col gap-1.5">
               <div className="flex justify-between items-center">
                 <label className="text-black text-base font-medium font-urbanist">Password</label>
-                <Link to="#" className="text-stone-500 text-xs font-medium font-urbanist hover:text-indigo-600 transition-colors">
+                <Link to="/forgot-password" className="text-stone-500 text-xs font-medium font-urbanist hover:text-indigo-600 transition-colors">
                   Forgot Password?
                 </Link>
               </div>
@@ -169,7 +169,7 @@ const Login = () => {
             </div>
 
             {/* Social Logins */}
-            <div className="flex gap-3">
+            {/* <div className="flex gap-3">
               <button type="button" className="flex-1 h-10 flex items-center justify-center rounded-xl border border-stone-200 hover:bg-stone-50 transition-all">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" className="w-5 h-5" alt="Google" />
               </button>
@@ -179,7 +179,7 @@ const Login = () => {
               <button type="button" className="flex-1 h-10 flex items-center justify-center rounded-xl border border-stone-200 hover:bg-stone-50 transition-all">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg" className="w-5 h-5" alt="Facebook" />
               </button>
-            </div>
+            </div> */}
 
             {/* Footer Links */}
             <div className="text-center mt-2">

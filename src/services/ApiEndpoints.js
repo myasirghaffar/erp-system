@@ -7,8 +7,9 @@ const VERSION_API = "v1";
 export const API_END_POINTS = {
   /////////////////////////////<=== AUTH ===>//////////////////////////////
   login: BASE_URL + "/api/auth/login",
-  signup: BASE_URL + "/api/auth/register",
+  signup: BASE_URL + "/api/auth/signup",
   forgetPassword: BASE_URL + "/api/auth/forgot-password",
+  verifyResetToken: BASE_URL + "/api/auth/verify-reset-token",
   resetPassword: BASE_URL + "/api/auth/reset-password",
   updateUserProfile: BASE_URL + "/api/auth/profile",
   getUserProfile: BASE_URL + "/api/auth/profile",

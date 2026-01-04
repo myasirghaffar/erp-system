@@ -27,6 +27,13 @@ export const api = SplitApiSettings.injectEndpoints({
         body: data,
       }),
     }),
+    verifyResetToken: builder.query({
+      query: (token) => ({
+        url: API_END_POINTS.verifyResetToken,
+        method: "GET",
+        params: { token },
+      }),
+    }),
     resetPassword: builder.mutation({
       query: ({ data }) => ({
         url: API_END_POINTS.resetPassword,
@@ -708,6 +715,7 @@ export const {
 
   /////////////////////////////<===AUTH QUERIES===>////////////////////////////////
   useGetUserProfileQuery,
+  useVerifyResetTokenQuery,
 
   /////////////////////////////<===DASHBOARD QUERIES===>//////////////////////////
   useGetDashboardRealtimeQuery,
