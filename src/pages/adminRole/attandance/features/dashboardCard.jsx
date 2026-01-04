@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActiveEmployeesIcon,
@@ -14,6 +14,7 @@ import {
 import { API_END_POINTS } from "../../../../services/ApiEndpoints";
 import api from "../../../../utils/axios";
 import { toast } from "react-toastify";
+import { useSocketAttendance } from "../../../../hooks/useSocketAttendance";
 
 // Dashboard Cards Container Component
 const DashboardCardsContainer = () => {
@@ -21,8 +22,19 @@ const DashboardCardsContainer = () => {
   const [isExporting, setIsExporting] = useState(false);
 
   // Fetch dashboard data - same as /admin/dashboard screen
-  const { data: realtimeData, isLoading: isLoadingRealtime } = useGetDashboardRealtimeQuery();
-  const { data: summaryData, isLoading: isLoadingSummary } = useGetAnalyticsSummaryQuery();
+  const { data: realtimeData, isLoading: isLoadingRealtime, refetch: refetchRealtime } = useGetDashboardRealtimeQuery();
+  const { data: summaryData, isLoading: isLoadingSummary, refetch: refetchSummary } = useGetAnalyticsSummaryQuery();
+
+  // Handle real-time attendance updates to refresh dashboard cards
+  const handleAttendanceUpdate = useCallback((attendance, eventType) => {
+    console.log('📊 Dashboard: Attendance update received, refreshing cards');
+    // Refetch both queries to update the dashboard cards
+    refetchRealtime();
+    refetchSummary();
+  }, [refetchRealtime, refetchSummary]);
+
+  // Use the socket attendance hook to listen for updates
+  useSocketAttendance(handleAttendanceUpdate);
 
   // Export all employees attendance to Excel
   const handleExportAllEmployees = async () => {

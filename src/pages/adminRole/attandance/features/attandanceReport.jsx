@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { useGetAdminAttendanceHistoryQuery, useGetAllWorkplacesQuery, useGetMonthlyMetricsQuery, useUpdateAttendanceRecordStatusMutation } from "../../../../services/Api";
 import { toast } from "react-toastify";
 import moment from "moment";
+import { useSocketAttendance } from "../../../../hooks/useSocketAttendance";
 
 // Beautiful color palette for avatars
 const avatarColors = [
@@ -114,6 +115,59 @@ const AttendanceReport = () => {
         refetchOnMountOrArgChange: true, // Refetch when arguments change
         refetchOnMount: true, // Refetch on mount
     });
+
+    // Handle real-time attendance updates via Socket.io
+    const handleAttendanceUpdate = useCallback((attendance, eventType) => {
+        console.log('📊 Attendance update received:', { attendance, eventType });
+        
+        // Check if the new attendance matches current filters
+        const attendanceDate = attendance.date;
+        const attendanceWorkplaceId = attendance.workplace_id?.toString();
+        const isManual = attendance.is_manual;
+        
+        // Check date filter
+        const matchesDateFilter = !dateRange.start_date && !dateRange.end_date 
+            ? true // No date filter, show all
+            : (!dateRange.start_date || attendanceDate >= dateRange.start_date) 
+                && (!dateRange.end_date || attendanceDate <= dateRange.end_date);
+        
+        // Check workplace filter
+        const matchesWorkplaceFilter = !filters.workplace || filters.workplace === "" 
+            ? true // No workplace filter
+            : attendanceWorkplaceId === filters.workplace;
+        
+        // Check type filter
+        const matchesTypeFilter = !filters.type || filters.type === ""
+            ? true // No type filter
+            : (filters.type === "manual" && isManual) || (filters.type === "qr_scan" && !isManual);
+        
+        // Check search filter (if any)
+        const employeeName = attendance.employee_name || attendance.user?.full_name || "";
+        const matchesSearchFilter = !searchTerm || searchTerm.trim() === ""
+            ? true // No search filter
+            : employeeName.toLowerCase().includes(searchTerm.toLowerCase().trim());
+        
+        // Only refetch if the new attendance matches current filters
+        if (matchesDateFilter && matchesWorkplaceFilter && matchesTypeFilter && matchesSearchFilter) {
+            // Show a subtle notification
+            toast.info(
+                `${attendance.employee_name || 'Employee'} ${eventType === 'attendance_created' ? 'marked attendance' : eventType === 'attendance_updated' ? 'updated attendance' : 'attendance status changed'}`,
+                {
+                    position: 'top-right',
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                }
+            );
+            
+            // Refetch the data to get the latest attendance
+            refetch();
+        }
+    }, [dateRange, filters, searchTerm, refetch]);
+
+    // Use the socket attendance hook
+    useSocketAttendance(handleAttendanceUpdate);
 
     // Transform API data to match component format
     const transformedData = useMemo(() => {
