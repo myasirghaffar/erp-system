@@ -522,36 +522,74 @@ const AttendanceReport = () => {
             label: t('common.actions'),
             width: "220px",
             render: (row) => {
-                // Only show action buttons for manual attendance records with pending status
-                // Show buttons if status is explicitly "pending", or if status is not provided (assume pending for manual records)
-                // Don't show buttons if status is "approved" or "rejected"
-                const status = row.status?.toLowerCase();
-                const shouldShowActions = row.is_manual && (
-                    status === "pending" || 
-                    (status !== "approved" && status !== "rejected" && (row.status === undefined || row.status === null || !row.status))
-                );
-                
-                if (shouldShowActions) {
-                    return (
-                        <div className="flex items-center gap-2">
-                            <button 
-                                onClick={() => handleApproveClick(row)} 
-                                className="flex items-center gap-1 px-4 py-1.5 bg-[#22B3E8] hover:bg-[#1fa0d1] text-white rounded-lg text-xs font-bold transition-colors"
-                                disabled={isUpdating}
-                            >
-                                <Check size={14} /> {t('common.approve')}
-                            </button>
-                            <button 
-                                onClick={() => handleRejectClick(row)} 
-                                className="flex items-center gap-1 px-4 py-1.5 bg-[#EF4444] hover:bg-[#d42d2d] text-white rounded-lg text-xs font-bold transition-colors"
-                                disabled={isUpdating}
-                            >
-                                <X size={14} /> {t('common.reject')}
-                            </button>
-                        </div>
+                // For manual attendance, show action buttons if pending, otherwise show status
+                if (row.is_manual) {
+                    const status = row.status?.toLowerCase();
+                    const shouldShowActions = (
+                        status === "pending" || 
+                        (status !== "approved" && status !== "rejected" && (row.status === undefined || row.status === null || !row.status))
                     );
+                    
+                    if (shouldShowActions) {
+                        return (
+                            <div className="flex items-center gap-2">
+                                <button 
+                                    onClick={() => handleApproveClick(row)} 
+                                    className="flex items-center gap-1 px-4 py-1.5 bg-[#22B3E8] hover:bg-[#1fa0d1] text-white rounded-lg text-xs font-bold transition-colors"
+                                    disabled={isUpdating}
+                                >
+                                    <Check size={14} /> {t('common.approve')}
+                                </button>
+                                <button 
+                                    onClick={() => handleRejectClick(row)} 
+                                    className="flex items-center gap-1 px-4 py-1.5 bg-[#EF4444] hover:bg-[#d42d2d] text-white rounded-lg text-xs font-bold transition-colors"
+                                    disabled={isUpdating}
+                                >
+                                    <X size={14} /> {t('common.reject')}
+                                </button>
+                            </div>
+                        );
+                    } else {
+                        // Show status for manual attendance that is approved or rejected
+                        const statusDisplay = row.statusDisplay || (row.status ? row.status.charAt(0).toUpperCase() + row.status.slice(1) : "");
+                        let bgClass = "bg-orange-50 text-orange-500";
+                        let icon = <Clock size={12} />;
+                        
+                        if (statusDisplay === "Approved" || statusDisplay?.toLowerCase() === "approved") {
+                            bgClass = "bg-green-50 text-green-500";
+                            icon = <Check size={12} />;
+                        } else if (statusDisplay === "Rejected" || statusDisplay?.toLowerCase() === "rejected") {
+                            bgClass = "bg-red-50 text-red-500";
+                            icon = <X size={12} />;
+                        }
+                        
+                        return (
+                            <span className={`px-3 py-1 rounded-full ${bgClass} text-[11px] font-bold flex items-center gap-1 w-fit`}>
+                                {icon} {statusDisplay}
+                            </span>
+                        );
+                    }
                 }
-                return null;
+                // For non-manual attendance, show status instead of blank
+                const statusDisplay = row.statusDisplay || (row.status ? row.status.charAt(0).toUpperCase() + row.status.slice(1) : "");
+                if (!statusDisplay) return null;
+                
+                let bgClass = "bg-orange-50 text-orange-500";
+                let icon = <Clock size={12} />;
+                
+                if (statusDisplay === "Approved" || statusDisplay?.toLowerCase() === "approved") {
+                    bgClass = "bg-green-50 text-green-500";
+                    icon = <Check size={12} />;
+                } else if (statusDisplay === "Rejected" || statusDisplay?.toLowerCase() === "rejected") {
+                    bgClass = "bg-red-50 text-red-500";
+                    icon = <X size={12} />;
+                }
+                
+                return (
+                    <span className={`px-3 py-1 rounded-full ${bgClass} text-[11px] font-bold flex items-center gap-1 w-fit`}>
+                        {icon} {statusDisplay}
+                    </span>
+                );
             }
         }
     ], [t, isUpdating, handleApproveClick, handleRejectClick]);
