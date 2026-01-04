@@ -353,7 +353,7 @@ const ManageQrCode = () => {
             grow: 1,
             render: (row) => (
                 <div className="flex items-center gap-2">
-                    <Building2 className="w-4 h-4 text-gray-400" />
+                    <Building2 className="w-4 h-4 text-sky-500" />
                     <span className="text-[#374151] font-semibold text-[13px]">{row.workplace}</span>
                 </div>
             )
@@ -394,10 +394,10 @@ const ManageQrCode = () => {
             width: "120px",
             render: (row) => (
                 <div className="flex items-center gap-4">
-                    <button onClick={() => handleViewQr(row)} className="text-gray-400 hover:text-blue-500">
+                    <button onClick={() => handleViewQr(row)} className="text-indigo-500 hover:text-indigo-600">
                         <Eye size={16} strokeWidth={2} />
                     </button>
-                    <button className="text-gray-400 hover:text-blue-500">
+                    <button className="text-blue-500 hover:text-blue-600">
                         <Download size={16} strokeWidth={2} />
                     </button>
                 </div>

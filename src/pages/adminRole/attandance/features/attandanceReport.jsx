@@ -393,7 +393,7 @@ const AttendanceReport = () => {
             },
             render: (row) => (
                 <div className="flex items-center gap-2 min-w-max">
-                    <Building2 className="w-4 h-4 text-gray-400 shrink-0" />
+                    <Building2 className="w-4 h-4 text-sky-500 shrink-0" />
                     <span className="text-gray-500 font-medium text-[0.8125rem] whitespace-nowrap">{row.workplace}</span>
                 </div>
             )

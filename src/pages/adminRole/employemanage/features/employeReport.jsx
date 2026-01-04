@@ -23,6 +23,36 @@ import { UserPlus } from "lucide-react";
 
 const itemsPerPage = 5;
 
+// Beautiful color palette for avatars
+const avatarColors = [
+    { bg: "bg-blue-500", text: "text-white" },
+    { bg: "bg-purple-500", text: "text-white" },
+    { bg: "bg-pink-500", text: "text-white" },
+    { bg: "bg-indigo-500", text: "text-white" },
+    { bg: "bg-teal-500", text: "text-white" },
+    { bg: "bg-cyan-500", text: "text-white" },
+    { bg: "bg-emerald-500", text: "text-white" },
+    { bg: "bg-rose-500", text: "text-white" },
+    { bg: "bg-amber-500", text: "text-white" },
+    { bg: "bg-orange-500", text: "text-white" },
+    { bg: "bg-violet-500", text: "text-white" },
+    { bg: "bg-fuchsia-500", text: "text-white" },
+    { bg: "bg-lime-500", text: "text-white" },
+    { bg: "bg-sky-500", text: "text-white" },
+    { bg: "bg-red-500", text: "text-white" },
+];
+
+// Generate consistent color based on name
+const getAvatarColor = (name) => {
+    if (!name) return avatarColors[0];
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+        hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const index = Math.abs(hash) % avatarColors.length;
+    return avatarColors[index];
+};
+
 // Demo Data expanded for pagination (fallback)
 const demoData = [
     {
@@ -120,15 +150,19 @@ const EmployeeReport = ({ onViewProfile, onEdit }) => {
                 ? `${nameParts[0][0]}${nameParts[1][0]}`.toUpperCase()
                 : nameParts[0]?.[0]?.toUpperCase() || "U";
             
+            const employeeName = employee.full_name || "Unknown";
+            const avatarColor = getAvatarColor(employeeName);
+            
             return {
                 id: employee.id,
-                name: employee.full_name || "Unknown",
+                name: employeeName,
                 title: employee.position || employee.role || "Not Assigned",
                 email: employee.email || "",
                 phone: employee.phone_number || employee.phone || "",
                 status: employee.status === "active" ? "Active" : "Inactive",
                 role: employee.role || null, // Store role for role assignment check
                 avatar: initials,
+                avatarColor: avatarColor,
                 employeeData: employee, // Store full employee data for actions
             };
         });
@@ -289,20 +323,20 @@ const EmployeeReport = ({ onViewProfile, onEdit }) => {
             label: t('table.name'),
             minWidth: "18.75rem", // 300px
             grow: 1,
-            render: (row) => (
-                <div className="flex items-center gap-3 py-3">
-                    <div className="w-10 h-10 rounded-full border-2 border-white shadow-sm overflow-hidden shrink-0 flex items-center justify-center bg-gray-100">
-                        {/* Avatar Image Placeholder */}
-                        <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center text-gray-500 font-bold text-xs uppercase tracking-tighter">
+            render: (row) => {
+                const avatarColor = row.avatarColor || getAvatarColor(row.name);
+                return (
+                    <div className="flex items-center gap-3 py-3">
+                        <div className={`w-10 h-10 rounded-full ${avatarColor.bg} ${avatarColor.text} flex items-center justify-center text-sm font-bold shrink-0 shadow-sm`}>
                             {row.avatar}
                         </div>
+                        <div className="flex flex-col">
+                            <span className="text-[#111827] font-bold text-[0.875rem] leading-tight">{row.name}</span>
+                            <span className="text-gray-400 text-[0.75rem] font-medium mt-0.5">{row.title}</span>
+                        </div>
                     </div>
-                    <div className="flex flex-col">
-                        <span className="text-[#111827] font-bold text-[0.875rem] leading-tight">{row.name}</span>
-                        <span className="text-gray-400 text-[0.75rem] font-medium mt-0.5">{row.title}</span>
-                    </div>
-                </div>
-            )
+                );
+            }
         },
         {
             key: "email",
@@ -346,7 +380,7 @@ const EmployeeReport = ({ onViewProfile, onEdit }) => {
                     {!row.role && (
                         <button 
                             onClick={() => handleAssignRole(row.employeeData)} 
-                            className="text-gray-400 hover:text-green-500 transition-colors"
+                            className="text-green-500 hover:text-green-600 transition-colors"
                             disabled={isChangingRole}
                             title={t('employee.assignRoleTooltip') || 'Assign Role'}
                         >
@@ -355,7 +389,7 @@ const EmployeeReport = ({ onViewProfile, onEdit }) => {
                     )}
                     <button 
                         onClick={() => handleStatusUpdate(row.id, row.status === "Active" ? "Inactive" : "Active")}
-                        className="text-gray-400 hover:text-sky-500 transition-colors"
+                        className="text-blue-500 hover:text-blue-600 transition-colors"
                         disabled={isUpdatingStatus}
                         title={t('employee.toggleStatusTooltip')}
                     >
@@ -363,21 +397,21 @@ const EmployeeReport = ({ onViewProfile, onEdit }) => {
                     </button>
                     <button 
                         onClick={() => onViewProfile && onViewProfile(row.employeeData)} 
-                        className="text-gray-400 hover:text-sky-500 transition-colors"
+                        className="text-indigo-500 hover:text-indigo-600 transition-colors"
                         title={t('employee.viewProfileTooltip')}
                     >
                         <Eye size={18} strokeWidth={2} />
                     </button>
                     <button 
                         onClick={() => onEdit && onEdit(row.employeeData)} 
-                        className="text-gray-400 hover:text-sky-500 transition-colors"
+                        className="text-amber-500 hover:text-amber-600 transition-colors"
                         title={t('employee.editEmployeeTooltip')}
                     >
                         <Edit3 size={18} strokeWidth={2} />
                     </button>
                     <button 
                         onClick={() => handleDeleteClick(row.id)} 
-                        className="text-gray-400 hover:text-red-500 transition-colors"
+                        className="text-red-500 hover:text-red-600 transition-colors"
                         disabled={isDeleting}
                         title={t('employee.deleteEmployeeTooltip')}
                     >

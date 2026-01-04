@@ -460,12 +460,12 @@ const WorkplaceManagement = () => {
             width: "120px",
             render: () => (
                 <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded bg-gray-100 flex items-center justify-center text-gray-400">
+                    <div className="w-8 h-8 rounded bg-purple-100 flex items-center justify-center text-purple-500">
                         <QrCode size={16} />
                     </div>
                     <div className="flex gap-1">
-                        <button className="text-gray-400 hover:text-blue-500"><Download size={14} /></button>
-                        <button className="text-gray-400 hover:text-blue-500"><Eye size={14} /></button>
+                        <button className="text-blue-500 hover:text-blue-600"><Download size={14} /></button>
+                        <button className="text-indigo-500 hover:text-indigo-600"><Eye size={14} /></button>
                     </div>
                 </div>
             )
@@ -492,14 +492,14 @@ const WorkplaceManagement = () => {
                             setSelectedWorkplace(row.workplaceData || { id: row.id });
                             setView("add");
                         }}
-                        className="text-gray-400 hover:text-blue-500"
+                        className="text-amber-500 hover:text-amber-600"
                         title={t('common.edit') || "Edit"}
                     >
                         <Edit size={16} strokeWidth={2} />
                     </button>
                     <button 
                         onClick={() => handleDeleteWorkplace(row.id || row.workplaceData?.id)} 
-                        className="text-gray-400 hover:text-red-500"
+                        className="text-red-500 hover:text-red-600"
                         title={t('common.delete') || "Delete"}
                     >
                         <Trash2 size={16} strokeWidth={2} />
@@ -549,7 +549,7 @@ const WorkplaceManagement = () => {
             grow: 1,
             render: (row) => (
                 <div className="flex items-center gap-2">
-                    <Building2 className="w-4 h-4 text-gray-400" />
+                    <Building2 className="w-4 h-4 text-sky-500" />
                     <span className="text-[#374151] font-semibold text-[13px]">{row.workplace}</span>
                 </div>
             )
@@ -590,8 +590,8 @@ const WorkplaceManagement = () => {
             width: "120px",
             render: (row) => (
                 <div className="flex items-center gap-4">
-                    <button onClick={() => handleViewQr(row)} className="text-gray-400 hover:text-blue-500"><Eye size={16} strokeWidth={2} /></button>
-                    <button className="text-gray-400 hover:text-blue-500"><Download size={16} strokeWidth={2} /></button>
+                    <button onClick={() => handleViewQr(row)} className="text-indigo-500 hover:text-indigo-600"><Eye size={16} strokeWidth={2} /></button>
+                    <button className="text-blue-500 hover:text-blue-600"><Download size={16} strokeWidth={2} /></button>
                     <button className="text-gray-400 hover:text-gray-600">
                         {/* Kebab menu placeholder */}
                         <div className="flex flex-col gap-[2px]">
