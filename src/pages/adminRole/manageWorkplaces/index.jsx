@@ -11,6 +11,7 @@ import ModernDatePicker from "../../../components/ModernDatePicker";
 import AddWorkplace from "./features/AddWorkplace";
 import WorkPlaceQrForm from "./features/workPlaceQrForm";
 import QrCodeDetail from "./features/QrCodeDetail";
+import WorkplaceQRCodeModal from "./features/WorkplaceQRCodeModal";
 import ConfirmModal from "../../../components/ConfirmModal";
 import {
     useGetAllWorkplacesQuery,
@@ -49,6 +50,10 @@ const WorkplaceManagement = () => {
     const [isExporting, setIsExporting] = useState(false);
     const [internalOpenDropdowns, setInternalOpenDropdowns] = useState({});
     const openDropdowns = internalOpenDropdowns;
+    const [qrCodeModalOpen, setQrCodeModalOpen] = useState(false);
+    const [selectedWorkplaceQrCode, setSelectedWorkplaceQrCode] = useState(null);
+    const [selectedWorkplaceForQr, setSelectedWorkplaceForQr] = useState(null);
+    const [isLoadingQrCode, setIsLoadingQrCode] = useState(false);
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -214,6 +219,36 @@ const WorkplaceManagement = () => {
             }
         }
     }, [deleteQRCode, refetchQRCodes, t]);
+
+    // Handle view QR code for workplace
+    const handleViewWorkplaceQRCode = useCallback(async (workplace) => {
+        setIsLoadingQrCode(true);
+        setSelectedWorkplaceForQr(workplace);
+        
+        try {
+            // Fetch QR code for this workplace
+            const response = await api.get(API_END_POINTS.getAllQRCodes, {
+                params: {
+                    workplace_id: workplace.id,
+                    limit: 1
+                }
+            });
+
+            const qrCodes = response.data?.data?.qrCodes || [];
+            
+            if (qrCodes.length > 0) {
+                setSelectedWorkplaceQrCode(qrCodes[0]);
+                setQrCodeModalOpen(true);
+            } else {
+                toast.warning(t('workplace.noQrCode') || "No QR code found for this workplace");
+            }
+        } catch (error) {
+            console.error('Error fetching QR code:', error);
+            toast.error(error?.response?.data?.message || t('qrCode.fetchError') || "Failed to fetch QR code");
+        } finally {
+            setIsLoadingQrCode(false);
+        }
+    }, [t]);
 
     // Export QR codes to Excel
     const handleExportQRCodes = useCallback(async () => {
@@ -458,15 +493,20 @@ const WorkplaceManagement = () => {
             key: "qrCode",
             label: t('qrCode.title'),
             width: "120px",
-            render: () => (
+            render: (row) => (
                 <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded bg-purple-100 flex items-center justify-center text-purple-500">
-                        <QrCode size={16} />
-                    </div>
-                    <div className="flex gap-1">
-                        <button className="text-blue-500 hover:text-blue-600"><Download size={14} /></button>
-                        <button className="text-indigo-500 hover:text-indigo-600"><Eye size={14} /></button>
-                    </div>
+                    <button
+                        onClick={() => handleViewWorkplaceQRCode(row.workplaceData || { id: row.id, name: row.name })}
+                        disabled={isLoadingQrCode}
+                        className="w-8 h-8 rounded bg-purple-100 flex items-center justify-center text-purple-500 hover:bg-purple-200 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed group"
+                        title={t('qrCode.viewQrCode') || "View QR Code"}
+                    >
+                        {isLoadingQrCode ? (
+                            <div className="w-4 h-4 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                            <QrCode size={16} />
+                        )}
+                    </button>
                 </div>
             )
         },
@@ -1076,6 +1116,18 @@ const WorkplaceManagement = () => {
                 cancelColor="bg-gray-100 hover:bg-gray-200"
                 confirmTextColor="text-white"
                 cancelTextColor="text-gray-700"
+            />
+
+            {/* QR Code Modal */}
+            <WorkplaceQRCodeModal
+                isOpen={qrCodeModalOpen}
+                onClose={() => {
+                    setQrCodeModalOpen(false);
+                    setSelectedWorkplaceQrCode(null);
+                    setSelectedWorkplaceForQr(null);
+                }}
+                qrCodeData={selectedWorkplaceQrCode}
+                workplaceName={selectedWorkplaceForQr?.name}
             />
         </div>
     );
