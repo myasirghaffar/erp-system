@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Building2, QrCode, Download, Printer, Info, Check, Image as ImageIcon, FileText } from "lucide-react";
 import { QRCodeCanvas } from 'qrcode.react';
 import ReusableInput from "../../../../components/ReusableInput";
-import ModernDatePicker from "../../../../components/ModernDatePicker";
+import FlowbiteDatePicker from "../../../../components/FlowbiteDatePicker";
 import Select from "../../../../components/Form/Select";
 import DashboardBanner from "../../../../components/DashboardBanner";
 import {
@@ -514,7 +514,7 @@ const WorkPlaceQrForm = ({ onBack, qrCodeId = null, workplaceId = null }) => {
 
                         {/* Expires At (Optional) */}
                         <div className="space-y-2">
-                            <ModernDatePicker
+                            <FlowbiteDatePicker
                                 label={t('qrCode.expiresAt') || "Expires At (Optional)"}
                                 value={formData.expires_at}
                                 onChange={handleChange}

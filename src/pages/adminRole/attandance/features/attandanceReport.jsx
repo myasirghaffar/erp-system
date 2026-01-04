@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo } from "react";
 import ReusableDataTable from "../../../../components/ReusableDataTable";
 import ReusableFilter from "../../../../components/ReusableFilter";
 import ReusablePagination from "../../../../components/ReusablePagination";
-import ModernDatePicker from "../../../../components/ModernDatePicker";
+import FlowbiteDatePicker from "../../../../components/FlowbiteDatePicker";
 import { Building2, Search, Check, X, Clock } from "lucide-react";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
@@ -533,21 +533,21 @@ const AttendanceReport = () => {
                     {/* Date Range Filters */}
                     <div className="flex flex-col md:flex-row gap-4 items-end">
                         <div className="flex-1 md:flex-none md:w-48">
-                            <ModernDatePicker
+                            <FlowbiteDatePicker
                                 label="Start Date"
                                 value={filters.start_date}
                                 onChange={(e) => handleFilterChange("start_date", e.target.value)}
                                 placeholder="Select start date"
-                                maxDate={filters.end_date ? new Date(filters.end_date) : null}
+                                maxDate={filters.end_date || undefined}
                             />
                         </div>
                         <div className="flex-1 md:flex-none md:w-48">
-                            <ModernDatePicker
+                            <FlowbiteDatePicker
                                 label="End Date"
                                 value={filters.end_date}
                                 onChange={(e) => handleFilterChange("end_date", e.target.value)}
                                 placeholder="Select end date"
-                                minDate={filters.start_date ? new Date(filters.start_date) : null}
+                                minDate={filters.start_date || undefined}
                             />
                         </div>
                     </div>

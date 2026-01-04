@@ -6,7 +6,7 @@ import DashboardBanner from "../../../components/DashboardBanner";
 import ReusableDataTable from "../../../components/ReusableDataTable";
 import ReusablePagination from "../../../components/ReusablePagination";
 import ReusableFilter from "../../../components/ReusableFilter";
-import ModernDatePicker from "../../../components/ModernDatePicker";
+import FlowbiteDatePicker from "../../../components/FlowbiteDatePicker";
 import WorkPlaceQrForm from "../manageWorkplaces/features/workPlaceQrForm";
 import QrCodeDetail from "../manageWorkplaces/features/QrCodeDetail";
 import {
@@ -567,7 +567,7 @@ const ManageQrCode = () => {
                                                 {t('common.dateRange') || "Date Range"}:
                                             </label>
                                             <div className="flex-1">
-                                                <ModernDatePicker
+                                                <FlowbiteDatePicker
                                                     key={`qr-start-${dateRangeEnd}`}
                                                     value={dateRangeStart}
                                                     onChange={(e) => {
@@ -575,8 +575,7 @@ const ManageQrCode = () => {
                                                         handleDateRangeChange(newStart, dateRangeEnd);
                                                     }}
                                                     placeholder={t('common.startDate') || "Start Date"}
-                                                    maxDate={dateRangeEnd ? new Date(dateRangeEnd) : null}
-                                                    showIcon={true}
+                                                    maxDate={dateRangeEnd || undefined}
                                                     containerClasses="!mb-0"
                                                 />
                                             </div>
@@ -584,7 +583,7 @@ const ManageQrCode = () => {
                                                 {t('common.to') || "to"}:
                                             </label>
                                             <div className="flex-1">
-                                                <ModernDatePicker
+                                                <FlowbiteDatePicker
                                                     key={`qr-end-${dateRangeStart}`}
                                                     value={dateRangeEnd}
                                                     onChange={(e) => {
@@ -592,8 +591,7 @@ const ManageQrCode = () => {
                                                         handleDateRangeChange(dateRangeStart, newEnd);
                                                     }}
                                                     placeholder={t('common.endDate') || "End Date"}
-                                                    minDate={dateRangeStart ? new Date(dateRangeStart) : null}
-                                                    showIcon={true}
+                                                    minDate={dateRangeStart || undefined}
                                                     containerClasses="!mb-0"
                                                 />
                                             </div>

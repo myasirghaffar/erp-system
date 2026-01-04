@@ -7,7 +7,7 @@ import DashboardBanner from "../../../components/DashboardBanner";
 import ReusableDataTable from "../../../components/ReusableDataTable";
 import ReusablePagination from "../../../components/ReusablePagination";
 import ReusableFilter from "../../../components/ReusableFilter";
-import ModernDatePicker from "../../../components/ModernDatePicker";
+import FlowbiteDatePicker from "../../../components/FlowbiteDatePicker";
 import AddWorkplace from "./features/AddWorkplace";
 import WorkPlaceQrForm from "./features/workPlaceQrForm";
 import QrCodeDetail from "./features/QrCodeDetail";
@@ -804,7 +804,7 @@ const WorkplaceManagement = () => {
                                         Start Date:
                                     </label>
                                     <div className="flex-1">
-                                        <ModernDatePicker
+                                        <FlowbiteDatePicker
                                             key={`start-${dateRangeEnd}`}
                                             value={dateRangeStart}
                                             onChange={(e) => {
@@ -812,8 +812,7 @@ const WorkplaceManagement = () => {
                                                 handleDateRangeChange(newStart, dateRangeEnd);
                                             }}
                                             placeholder="Select start date"
-                                            maxDate={dateRangeEnd ? new Date(dateRangeEnd) : null}
-                                            showIcon={true}
+                                            maxDate={dateRangeEnd || undefined}
                                             containerClasses="!mb-0"
                                         />
                                     </div>
@@ -821,7 +820,7 @@ const WorkplaceManagement = () => {
                                         End Date:
                                     </label>
                                     <div className="flex-1">
-                                        <ModernDatePicker
+                                        <FlowbiteDatePicker
                                             key={`end-${dateRangeStart}`}
                                             value={dateRangeEnd}
                                             onChange={(e) => {
@@ -829,8 +828,7 @@ const WorkplaceManagement = () => {
                                                 handleDateRangeChange(dateRangeStart, newEnd);
                                             }}
                                             placeholder="Select end date"
-                                            minDate={dateRangeStart ? new Date(dateRangeStart) : null}
-                                            showIcon={true}
+                                            minDate={dateRangeStart || undefined}
                                             containerClasses="!mb-0"
                                         />
                                     </div>
@@ -1033,12 +1031,11 @@ const WorkplaceManagement = () => {
                                                 {t('common.dateRange') || "Date Range"}:
                                             </label>
                                             <div className="flex-1">
-                                                <ModernDatePicker
+                                                <FlowbiteDatePicker
                                                     value={qrDateRangeStart}
                                                     onChange={(e) => handleQrDateRangeChange(e.target.value, qrDateRangeEnd)}
                                                     placeholder={t('common.startDate') || "Start Date"}
-                                                    maxDate={qrDateRangeEnd ? new Date(qrDateRangeEnd) : null}
-                                                    showIcon={true}
+                                                    maxDate={qrDateRangeEnd || undefined}
                                                     containerClasses=""
                                                 />
                                             </div>
@@ -1046,12 +1043,11 @@ const WorkplaceManagement = () => {
                                                 {t('common.to') || "to"}:
                                             </label>
                                             <div className="flex-1">
-                                                <ModernDatePicker
+                                                <FlowbiteDatePicker
                                                     value={qrDateRangeEnd}
                                                     onChange={(e) => handleQrDateRangeChange(qrDateRangeStart, e.target.value)}
                                                     placeholder={t('common.endDate') || "End Date"}
-                                                    minDate={qrDateRangeStart ? new Date(qrDateRangeStart) : null}
-                                                    showIcon={true}
+                                                    minDate={qrDateRangeStart || undefined}
                                                     containerClasses=""
                                                 />
                                             </div>
