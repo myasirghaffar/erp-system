@@ -664,9 +664,9 @@
         "invalidDateRange": "Start date must be before end date"
     },
     "roles": {
-        "title": "Role & Permissions Assignment",
-        "description": "Manage user roles and control access permissions",
-        "roleTypes": "Role Types",
+        "title": "Users by Role",
+        "description": "View total users assigned to each role in the system",
+        "roleTypes": "User Distribution by Role",
         "permissionsMatrix": "Permissions Matrix",
         "globalAccessToggle": "Global Access Toggle",
         "permissions": "Permissions",

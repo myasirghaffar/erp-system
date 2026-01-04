@@ -355,16 +355,36 @@ const ApproveRequests = () => {
             key: "actions",
             label: t('common.actions'),
             width: "220px",
-            render: (row) => (
-                <div className="flex items-center gap-2">
-                    <button onClick={() => handleApproveClick(row)} className="flex items-center gap-1 px-4 py-1.5 bg-[#22B3E8] hover:bg-[#1fa0d1] text-white rounded-lg text-xs font-bold transition-colors">
-                        <Check size={14} /> {t('common.approve')}
-                    </button>
-                    <button onClick={() => handleRejectClick(row)} className="flex items-center gap-1 px-4 py-1.5 bg-[#EF4444] hover:bg-[#d42d2d] text-white rounded-lg text-xs font-bold transition-colors">
-                        <X size={14} /> {t('common.reject')}
-                    </button>
-                </div>
-            )
+            render: (row) => {
+                // If status is not "Pending", show the status value
+                if (row.status && row.status.toLowerCase() !== "pending") {
+                    let bgClass = "bg-green-50 text-green-500";
+                    let icon = <Check size={12} />;
+                    
+                    if (row.status === "Rejected") {
+                        bgClass = "bg-red-50 text-red-500";
+                        icon = <X size={12} />;
+                    }
+                    
+                    return (
+                        <span className={`px-3 py-1 rounded-full ${bgClass} text-[11px] font-bold flex items-center gap-1 w-fit`}>
+                            {icon} {row.status}
+                        </span>
+                    );
+                }
+                
+                // If status is "Pending", show approve/reject buttons
+                return (
+                    <div className="flex items-center gap-2">
+                        <button onClick={() => handleApproveClick(row)} className="flex items-center gap-1 px-4 py-1.5 bg-[#22B3E8] hover:bg-[#1fa0d1] text-white rounded-lg text-xs font-bold transition-colors">
+                            <Check size={14} /> {t('common.approve')}
+                        </button>
+                        <button onClick={() => handleRejectClick(row)} className="flex items-center gap-1 px-4 py-1.5 bg-[#EF4444] hover:bg-[#d42d2d] text-white rounded-lg text-xs font-bold transition-colors">
+                            <X size={14} /> {t('common.reject')}
+                        </button>
+                    </div>
+                );
+            }
         }
     ];
 

@@ -603,9 +603,9 @@
         "selectEmployee": "Vybrat zaměstnance"
     },
     "roles": {
-        "title": "Přiřazení rolí a oprávnění",
-        "description": "Spravujte uživatelské role a řiďte přístupová oprávnění",
-        "roleTypes": "Typy rolí",
+        "title": "Uživatelé podle rolí",
+        "description": "Zobrazit celkový počet uživatelů přiřazených každé roli v systému",
+        "roleTypes": "Rozdělení uživatelů podle rolí",
         "permissionsMatrix": "Matice oprávnění",
         "globalAccessToggle": "Globální přepínač přístupu",
         "permissions": "Oprávnění",
