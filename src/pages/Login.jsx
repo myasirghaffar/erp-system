@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { setUser } from "../store/slices/authSlice";
+import { setUser, clearUser } from "../store/slices/authSlice";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useLoginMutation } from "../services/Api";
@@ -23,9 +23,16 @@ const Login = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (auth.isAuthenticated && auth.user) {
-      navigate("/admin/dashboard", { replace: true });
+      const allowedRoles = ['admin', 'manager'];
+      if (auth.user.role && allowedRoles.includes(auth.user.role)) {
+        navigate("/admin/dashboard", { replace: true });
+      } else {
+        // User is authenticated but doesn't have required role
+        // Clear session and stay on login page
+        dispatch(clearUser());
+      }
     }
-  }, [auth.isAuthenticated, auth.user, navigate]);
+  }, [auth.isAuthenticated, auth.user, navigate, dispatch]);
 
   const {
     register,
@@ -47,8 +54,18 @@ const Login = () => {
         const user = result.data?.data?.user;
         if (user && token) {
           dispatch(setUser({ ...user, token }));
-          toast.success(`Welcome, ${user.name || user.email}!`);
-          navigate("/admin/dashboard");
+          
+          // Check if user has allowed role (admin or manager)
+          const allowedRoles = ['admin', 'manager'];
+          if (user.role && allowedRoles.includes(user.role)) {
+            toast.success(`Welcome, ${user.name || user.email}!`);
+            navigate("/admin/dashboard");
+          } else {
+            // Clear the user session since they don't have required role
+            dispatch(clearUser());
+            toast.error("Access denied. Only administrators and managers can access the dashboard.");
+            // Stay on login page (we're already here)
+          }
         } else {
           toast.error("Auto login failed. Invalid response from server.");
         }
@@ -70,8 +87,18 @@ const Login = () => {
         const user = result.data?.data?.user;
         if (user && token) {
           dispatch(setUser({ ...user, token }));
-          toast.success(`Welcome, ${user.name || user.email}!`);
-          navigate("/admin/dashboard");
+          
+          // Check if user has allowed role (admin or manager)
+          const allowedRoles = ['admin', 'manager'];
+          if (user.role && allowedRoles.includes(user.role)) {
+            toast.success(`Welcome, ${user.name || user.email}!`);
+            navigate("/admin/dashboard");
+          } else {
+            // Clear the user session since they don't have required role
+            dispatch(clearUser());
+            toast.error("Access denied. Only administrators and managers can access the dashboard.");
+            // Stay on login page (we're already here)
+          }
         } else {
           toast.error("Login failed. Invalid response from server.");
         }
