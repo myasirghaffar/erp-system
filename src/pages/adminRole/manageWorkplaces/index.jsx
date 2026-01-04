@@ -781,10 +781,7 @@ const WorkplaceManagement = () => {
                         {/* Second Row: Location and Date Range */}
                         <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
                             {/* Location Input Field */}
-                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 flex-1 w-full">
-                                <label className="text-sm font-medium text-gray-700 whitespace-nowrap sm:min-w-[80px]">
-                                    {t('workplace.location') || "Location"}:
-                                </label>
+                            <div className="flex-1 w-full">
                                 <input
                                     type="text"
                                     value={locationFilter}
@@ -793,57 +790,38 @@ const WorkplaceManagement = () => {
                                         setCurrentPage(1);
                                     }}
                                     placeholder="Enter location address..."
-                                    className="flex-1 w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
+                                    className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
                                 />
                             </div>
 
                             {/* Date Range Filter */}
                             <div className="flex flex-col gap-3 flex-1 w-full">
-                                <label className="text-sm font-medium text-gray-700 whitespace-nowrap md:hidden">
-                                    {t('common.dateRange') || "Date Range"}:
-                                </label>
                                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-2 w-full">
-                                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 flex-1 w-full sm:flex-1">
-                                        <label className="text-sm font-medium text-gray-700 whitespace-nowrap sm:min-w-[90px] hidden sm:block">
-                                            Start Date:
-                                        </label>
-                                        <label className="text-sm font-medium text-gray-700 whitespace-nowrap sm:hidden">
-                                            Start:
-                                        </label>
-                                        <div className="flex-1 w-full sm:w-auto">
-                                            <FlowbiteDatePicker
-                                                key={`start-${dateRangeEnd}`}
-                                                value={dateRangeStart}
-                                                onChange={(e) => {
-                                                    const newStart = e.target.value;
-                                                    handleDateRangeChange(newStart, dateRangeEnd);
-                                                }}
-                                                placeholder="Select start date"
-                                                maxDate={dateRangeEnd || undefined}
-                                                containerClasses="!mb-0"
-                                            />
-                                        </div>
+                                    <div className="flex-1 w-full sm:w-auto">
+                                        <FlowbiteDatePicker
+                                            key={`start-${dateRangeEnd}`}
+                                            value={dateRangeStart}
+                                            onChange={(e) => {
+                                                const newStart = e.target.value;
+                                                handleDateRangeChange(newStart, dateRangeEnd);
+                                            }}
+                                            placeholder="Select start date"
+                                            maxDate={dateRangeEnd || undefined}
+                                            containerClasses="!mb-0"
+                                        />
                                     </div>
-                                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 flex-1 w-full sm:flex-1">
-                                        <label className="text-sm font-medium text-gray-700 whitespace-nowrap sm:min-w-[85px] hidden sm:block">
-                                            End Date:
-                                        </label>
-                                        <label className="text-sm font-medium text-gray-700 whitespace-nowrap sm:hidden">
-                                            End:
-                                        </label>
-                                        <div className="flex-1 w-full sm:w-auto">
-                                            <FlowbiteDatePicker
-                                                key={`end-${dateRangeStart}`}
-                                                value={dateRangeEnd}
-                                                onChange={(e) => {
-                                                    const newEnd = e.target.value;
-                                                    handleDateRangeChange(dateRangeStart, newEnd);
-                                                }}
-                                                placeholder="Select end date"
-                                                minDate={dateRangeStart || undefined}
-                                                containerClasses="!mb-0"
-                                            />
-                                        </div>
+                                    <div className="flex-1 w-full sm:w-auto">
+                                        <FlowbiteDatePicker
+                                            key={`end-${dateRangeStart}`}
+                                            value={dateRangeEnd}
+                                            onChange={(e) => {
+                                                const newEnd = e.target.value;
+                                                handleDateRangeChange(dateRangeStart, newEnd);
+                                            }}
+                                            placeholder="Select end date"
+                                            minDate={dateRangeStart || undefined}
+                                            containerClasses="!mb-0"
+                                        />
                                     </div>
                                     {(dateRangeStart || dateRangeEnd) && (
                                         <button
@@ -1039,43 +1017,24 @@ const WorkplaceManagement = () => {
                                 <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
                                     {/* Date Range Filter */}
                                     <div className="flex flex-col gap-3 flex-1 w-full">
-                                        <label className="text-sm font-medium text-gray-700 whitespace-nowrap md:hidden">
-                                            {t('common.dateRange') || "Date Range"}:
-                                        </label>
                                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-2 w-full">
-                                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 flex-1 w-full sm:flex-1">
-                                                <label className="text-sm font-medium text-gray-700 whitespace-nowrap sm:min-w-[90px] hidden sm:block">
-                                                    {t('common.startDate') || "Start Date"}:
-                                                </label>
-                                                <label className="text-sm font-medium text-gray-700 whitespace-nowrap sm:hidden">
-                                                    {t('common.startDate') || "Start"}:
-                                                </label>
-                                                <div className="flex-1 w-full sm:w-auto">
-                                                    <FlowbiteDatePicker
-                                                        value={qrDateRangeStart}
-                                                        onChange={(e) => handleQrDateRangeChange(e.target.value, qrDateRangeEnd)}
-                                                        placeholder={t('common.startDate') || "Start Date"}
-                                                        maxDate={qrDateRangeEnd || undefined}
-                                                        containerClasses=""
-                                                    />
-                                                </div>
+                                            <div className="flex-1 w-full sm:w-auto">
+                                                <FlowbiteDatePicker
+                                                    value={qrDateRangeStart}
+                                                    onChange={(e) => handleQrDateRangeChange(e.target.value, qrDateRangeEnd)}
+                                                    placeholder={t('common.startDate') || "Start Date"}
+                                                    maxDate={qrDateRangeEnd || undefined}
+                                                    containerClasses=""
+                                                />
                                             </div>
-                                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 flex-1 w-full sm:flex-1">
-                                                <label className="text-sm font-medium text-gray-700 whitespace-nowrap sm:min-w-[85px] hidden sm:block">
-                                                    {t('common.endDate') || "End Date"}:
-                                                </label>
-                                                <label className="text-sm font-medium text-gray-700 whitespace-nowrap sm:hidden">
-                                                    {t('common.endDate') || "End"}:
-                                                </label>
-                                                <div className="flex-1 w-full sm:w-auto">
-                                                    <FlowbiteDatePicker
-                                                        value={qrDateRangeEnd}
-                                                        onChange={(e) => handleQrDateRangeChange(qrDateRangeStart, e.target.value)}
-                                                        placeholder={t('common.endDate') || "End Date"}
-                                                        minDate={qrDateRangeStart || undefined}
-                                                        containerClasses=""
-                                                    />
-                                                </div>
+                                            <div className="flex-1 w-full sm:w-auto">
+                                                <FlowbiteDatePicker
+                                                    value={qrDateRangeEnd}
+                                                    onChange={(e) => handleQrDateRangeChange(qrDateRangeStart, e.target.value)}
+                                                    placeholder={t('common.endDate') || "End Date"}
+                                                    minDate={qrDateRangeStart || undefined}
+                                                    containerClasses=""
+                                                />
                                             </div>
                                             {(qrDateRangeStart || qrDateRangeEnd) && (
                                                 <button
