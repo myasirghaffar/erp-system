@@ -168,6 +168,6 @@ export default {
   plugins: [
     async () => (await import("tailwindcss-animate")).default,
     async () => (await import("@tailwindcss/forms")).default,
-    async () => (await import("flowbite/plugin")).default,
+    async () => (await import("flowbite/plugin.js")).default,
   ],
 };
