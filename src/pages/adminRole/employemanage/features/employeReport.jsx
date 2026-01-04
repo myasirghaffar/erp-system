@@ -16,8 +16,10 @@ import {
     useGetAllEmployeesQuery,
     useDeleteEmployeeMutation,
     useUpdateEmployeeStatusMutation,
+    useChangeEmployeeRoleMutation,
 } from "../../../../services/Api";
 import { toast } from "react-toastify";
+import { UserPlus } from "lucide-react";
 
 const itemsPerPage = 5;
 
@@ -84,18 +86,29 @@ const EmployeeReport = ({ onViewProfile, onEdit }) => {
         return status === "Active" ? "active" : status === "Inactive" ? "inactive" : status;
     };
 
+    // Convert role filter to backend format
+    const getBackendRole = (role) => {
+        if (!role) return undefined;
+        if (role === "not_assigned") return "null"; // Backend expects "null" string for users without roles
+        return role;
+    };
+
     // Fetch employees from API
     const { data: employeesData, isLoading, error, refetch } = useGetAllEmployeesQuery({
         page: currentPage,
         limit: itemsPerPage,
         status: getBackendStatus(filters.status) || undefined,
-        role: filters.role || undefined,
+        role: getBackendRole(filters.role) || undefined,
         search: filters.search || undefined,
     });
 
     // Mutations
     const [deleteEmployee, { isLoading: isDeleting }] = useDeleteEmployeeMutation();
     const [updateEmployeeStatus, { isLoading: isUpdatingStatus }] = useUpdateEmployeeStatusMutation();
+    const [changeEmployeeRole, { isLoading: isChangingRole }] = useChangeEmployeeRoleMutation();
+    
+    // State for role assignment
+    const [roleAssignmentModal, setRoleAssignmentModal] = useState({ open: false, employee: null });
 
     // Transform API data to match component format
     const transformedData = useMemo(() => {
@@ -110,10 +123,11 @@ const EmployeeReport = ({ onViewProfile, onEdit }) => {
             return {
                 id: employee.id,
                 name: employee.full_name || "Unknown",
-                title: employee.position || employee.role || "Employee",
+                title: employee.position || employee.role || "Not Assigned",
                 email: employee.email || "",
                 phone: employee.phone_number || employee.phone || "",
                 status: employee.status === "active" ? "Active" : "Inactive",
+                role: employee.role || null, // Store role for role assignment check
                 avatar: initials,
                 employeeData: employee, // Store full employee data for actions
             };
@@ -202,7 +216,34 @@ const EmployeeReport = ({ onViewProfile, onEdit }) => {
         } catch (error) {
             toast.error(error?.data?.message || t('employee.statusUpdateError'));
         }
-    }, [updateEmployeeStatus, refetch]);
+    }, [updateEmployeeStatus, refetch, t]);
+
+    // Handle role assignment
+    const handleAssignRole = useCallback((employee) => {
+        setRoleAssignmentModal({ open: true, employee });
+    }, []);
+
+    // Handle role assignment confirmation
+    const handleConfirmRoleAssignment = useCallback(async (role) => {
+        if (!roleAssignmentModal.employee) return;
+        
+        try {
+            await changeEmployeeRole({
+                id: roleAssignmentModal.employee.id,
+                data: { role }
+            }).unwrap();
+            toast.success(t('employee.roleAssignedSuccess') || 'Role assigned successfully');
+            setRoleAssignmentModal({ open: false, employee: null });
+            refetch();
+        } catch (error) {
+            toast.error(error?.data?.message || t('employee.roleAssignmentError') || 'Failed to assign role');
+        }
+    }, [changeEmployeeRole, roleAssignmentModal, refetch, t]);
+
+    // Handle cancel role assignment
+    const handleCancelRoleAssignment = useCallback(() => {
+        setRoleAssignmentModal({ open: false, employee: null });
+    }, []);
 
     // Calculate pagination from API
     const currentTableData = transformedData;
@@ -215,6 +256,7 @@ const EmployeeReport = ({ onViewProfile, onEdit }) => {
             label: t('employee.allRoles'),
             options: [
                 { label: t('employee.allRoles'), value: "" },
+                { label: t('employee.notAssigned') || "Not Assigned", value: "not_assigned" },
                 { label: t('employee.roleEmployee'), value: "employee" },
                 { label: t('employee.roleManager'), value: "manager" },
                 { label: t('employee.roleAdmin'), value: "admin" }
@@ -300,6 +342,17 @@ const EmployeeReport = ({ onViewProfile, onEdit }) => {
             width: "12.5rem", // 200px
             render: (row) => (
                 <div className="flex items-center gap-5">
+                    {/* Role Assignment Button - Show only if role is not assigned */}
+                    {!row.role && (
+                        <button 
+                            onClick={() => handleAssignRole(row.employeeData)} 
+                            className="text-gray-400 hover:text-green-500 transition-colors"
+                            disabled={isChangingRole}
+                            title={t('employee.assignRoleTooltip') || 'Assign Role'}
+                        >
+                            <UserPlus size={18} strokeWidth={2} />
+                        </button>
+                    )}
                     <button 
                         onClick={() => handleStatusUpdate(row.id, row.status === "Active" ? "Inactive" : "Active")}
                         className="text-gray-400 hover:text-sky-500 transition-colors"
@@ -445,6 +498,57 @@ const EmployeeReport = ({ onViewProfile, onEdit }) => {
                 cancelText={t('employee.cancel')}
                 confirmColor="bg-red-600 hover:bg-red-700"
             />
+
+            {/* Role Assignment Modal */}
+            {roleAssignmentModal.open && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-xl">
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">
+                            {t('employee.assignRoleTitle') || 'Assign Role'}
+                        </h3>
+                        <p className="text-gray-600 text-sm mb-6">
+                            {t('employee.assignRoleMessage', { name: roleAssignmentModal.employee?.full_name || 'this user' }) || `Assign a role to ${roleAssignmentModal.employee?.full_name || 'this user'}`}
+                        </p>
+                        
+                        <div className="space-y-3 mb-6">
+                            <button
+                                onClick={() => handleConfirmRoleAssignment('employee')}
+                                disabled={isChangingRole}
+                                className="w-full text-left px-4 py-3 border-2 border-gray-200 rounded-xl hover:border-sky-500 hover:bg-sky-50 transition-all disabled:opacity-50"
+                            >
+                                <div className="font-semibold text-gray-900">{t('employee.roleEmployee')}</div>
+                                <div className="text-sm text-gray-500">{t('employee.roleEmployeeDesc') || 'Basic employee access'}</div>
+                            </button>
+                            <button
+                                onClick={() => handleConfirmRoleAssignment('manager')}
+                                disabled={isChangingRole}
+                                className="w-full text-left px-4 py-3 border-2 border-gray-200 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 transition-all disabled:opacity-50"
+                            >
+                                <div className="font-semibold text-gray-900">{t('employee.roleManager')}</div>
+                                <div className="text-sm text-gray-500">{t('employee.roleManagerDesc') || 'Team management access'}</div>
+                            </button>
+                            <button
+                                onClick={() => handleConfirmRoleAssignment('admin')}
+                                disabled={isChangingRole}
+                                className="w-full text-left px-4 py-3 border-2 border-gray-200 rounded-xl hover:border-red-500 hover:bg-red-50 transition-all disabled:opacity-50"
+                            >
+                                <div className="font-semibold text-gray-900">{t('employee.roleAdmin')}</div>
+                                <div className="text-sm text-gray-500">{t('employee.roleAdminDesc') || 'Full system access'}</div>
+                            </button>
+                        </div>
+
+                        <div className="flex gap-3">
+                            <button
+                                onClick={handleCancelRoleAssignment}
+                                disabled={isChangingRole}
+                                className="flex-1 px-4 py-2 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
+                            >
+                                {t('employee.cancel')}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
