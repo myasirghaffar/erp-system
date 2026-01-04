@@ -1,4 +1,4 @@
-export const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+export const BASE_URL = import.meta.env.VITE_API_URL || 'https://erpb.techverseo.com';
 // export const BASE_URL = 'https://b0fd-139-135-36-92.ngrok-free.app'
 export const BASE_URL_IMAGE = import.meta.env.VITE_FILES_URL;
 
