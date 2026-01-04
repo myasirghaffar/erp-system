@@ -422,8 +422,8 @@ const ManageQrCode = () => {
                 />
 
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden pt-6">
-                    <div className="px-6 flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
-                        <div className="flex items-center gap-4">
+                    <div className="px-4 sm:px-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
                             <h2 className="text-lg font-bold text-[#111827]">{t('qrCode.allQrCodes') || "All QR Codes"}</h2>
                             <div className="flex items-center p-1 bg-gray-100 rounded-lg">
                                 {["All", "Active", "Inactive"].map(tab => (
@@ -445,7 +445,7 @@ const ManageQrCode = () => {
                                 handleExportQRCodes();
                             }}
                             disabled={isExporting}
-                            className={`flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer ${isExporting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer w-full sm:w-auto justify-center ${isExporting ? 'opacity-50 cursor-not-allowed' : ''}`}
                             type="button"
                         >
                             <Download size={16} />
@@ -454,7 +454,7 @@ const ManageQrCode = () => {
                     </div>
 
                     {/* Filter Bar for QR Codes */}
-                    <div className="px-6 pb-4">
+                    <div className="px-4 sm:px-6 pb-4">
                         <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
                             <div className="flex flex-col gap-4">
                                 {/* First Row: Search, Status (tab), and Expired Filter */}
@@ -519,7 +519,7 @@ const ManageQrCode = () => {
 
                                         {/* Dropdown Menu */}
                                         {openDropdowns?.expired && (
-                                            <div className="absolute top-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-[180px] left-0">
+                                            <div className="absolute top-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-full md:w-auto md:min-w-[180px] left-0">
                                                 <button
                                                     onClick={() => {
                                                         handleExpiredFilterChange("");
@@ -561,12 +561,9 @@ const ManageQrCode = () => {
                                 {/* Second Row: Date Range */}
                                 <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
                                     {/* Date Range Filter */}
-                                    <div className="flex items-center gap-2 flex-1 w-full">
-                                        <div className="flex items-center gap-2 flex-1">
-                                            <label className="text-sm font-medium text-gray-700 whitespace-nowrap">
-                                                {t('common.dateRange') || "Date Range"}:
-                                            </label>
-                                            <div className="flex-1">
+                                    <div className="flex flex-col gap-3 flex-1 w-full">
+                                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-2 w-full">
+                                            <div className="flex-1 w-full sm:w-auto">
                                                 <FlowbiteDatePicker
                                                     key={`qr-start-${dateRangeEnd}`}
                                                     value={dateRangeStart}
@@ -579,10 +576,7 @@ const ManageQrCode = () => {
                                                     containerClasses="!mb-0"
                                                 />
                                             </div>
-                                            <label className="text-sm font-medium text-gray-700 whitespace-nowrap">
-                                                {t('common.to') || "to"}:
-                                            </label>
-                                            <div className="flex-1">
+                                            <div className="flex-1 w-full sm:w-auto">
                                                 <FlowbiteDatePicker
                                                     key={`qr-end-${dateRangeStart}`}
                                                     value={dateRangeEnd}
@@ -598,7 +592,7 @@ const ManageQrCode = () => {
                                             {(dateRangeStart || dateRangeEnd) && (
                                                 <button
                                                     onClick={() => handleDateRangeChange("", "")}
-                                                    className="px-3 py-2.5 text-gray-400 hover:text-gray-600 transition-colors"
+                                                    className="px-3 py-2.5 text-gray-400 hover:text-gray-600 transition-colors self-start sm:self-center"
                                                     title={t('common.clear') || "Clear"}
                                                 >
                                                     <X className="w-4 h-4" />
