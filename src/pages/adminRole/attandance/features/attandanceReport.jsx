@@ -524,30 +524,34 @@ const AttendanceReport = () => {
                         data={transformedData}
                         onFilterChange={handleFilterChange}
                         onSearchChange={handleSearchChange}
-                        className="w-full flex-col md:flex-row items-center gap-4"
-                        searchClassName="w-full md:flex-1"
-                        filterClassName="flex-wrap gap-3"
-                        dropdownClassName="min-w-[150px]"
+                        className="w-full flex flex-col gap-4"
+                        searchClassName="w-full"
+                        filterClassName="flex flex-col sm:flex-row flex-wrap gap-3 w-full"
+                        dropdownClassName="min-w-[150px] w-full sm:w-auto"
+                        layout="vertical"
+                        fullWidth={true}
                     />
                     
                     {/* Date Range Filters */}
-                    <div className="flex flex-col md:flex-row gap-4 items-end">
-                        <div className="flex-1 md:flex-none md:w-48">
+                    <div className="flex flex-col sm:flex-row gap-4 w-full">
+                        <div className="w-full sm:flex-1 sm:max-w-[48%]">
                             <FlowbiteDatePicker
                                 label="Start Date"
                                 value={filters.start_date}
                                 onChange={(e) => handleFilterChange("start_date", e.target.value)}
                                 placeholder="Select start date"
                                 maxDate={filters.end_date || undefined}
+                                containerClasses="w-full"
                             />
                         </div>
-                        <div className="flex-1 md:flex-none md:w-48">
+                        <div className="w-full sm:flex-1 sm:max-w-[48%]">
                             <FlowbiteDatePicker
                                 label="End Date"
                                 value={filters.end_date}
                                 onChange={(e) => handleFilterChange("end_date", e.target.value)}
                                 placeholder="Select end date"
                                 minDate={filters.start_date || undefined}
+                                containerClasses="w-full"
                             />
                         </div>
                     </div>
