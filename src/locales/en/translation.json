@@ -656,7 +656,12 @@
         "locationVerification": "Location Verification",
         "manualEntryNotes": "Manual Entry & Notes",
         "month": "Month",
-        "selectEmployee": "Select Employee"
+        "selectEmployee": "Select Employee",
+        "exportSuccess": "Attendance data exported successfully!",
+        "exportError": "Failed to export attendance data. Please try again later.",
+        "exporting": "Exporting...",
+        "selectDateRange": "Please select start and end dates",
+        "invalidDateRange": "Start date must be before end date"
     },
     "roles": {
         "title": "Role & Permissions Assignment",
